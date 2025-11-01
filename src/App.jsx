@@ -3,8 +3,8 @@ import React from "react"
 // Auth
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SignInPage } from "./pages/AuthPages/SigninPage";
-import { SignUpPage } from "./pages/AuthPages/SignupPage";
-import { ResetPasswordPage } from "./pages/AuthPages/ResetPasswordPage";
+import { SignUpPage } from "./pages/authPages/SignUpPage";
+import { ResetPasswordPage } from "./pages/authPages/ResetPasswordPage";
 
 // Globales
 
@@ -24,6 +24,7 @@ function App() {
 
         {/* Pagina de auth */}
         <Route path="/" element={<SignInPage />} />
+        <Route path="signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
