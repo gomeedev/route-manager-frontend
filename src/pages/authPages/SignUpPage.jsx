@@ -1,4 +1,6 @@
 import react, { useState } from "react"
+import CustomMeta from "../../components/customMeta/CustomMeta";
+
 
 
 export const SignUpPage = () => {
@@ -6,5 +8,12 @@ export const SignUpPage = () => {
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
 
-    return <h1>Registrarme</h1>
+    return (
+        <>
+            <CustomMeta />
+            <AuthLayout>
+                <SignUpForm />
+            </AuthLayout>
+        </>
+    );
 }
