@@ -31,6 +31,7 @@ export const SignInForm = () => {
         }
 
         if (data) {
+            localStorage.setItem('token', data.session.access_token);
             navigate("/admin");
             return null
         }

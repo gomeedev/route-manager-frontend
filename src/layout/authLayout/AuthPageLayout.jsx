@@ -2,6 +2,7 @@ import React from "react";
 import GridShape from "../../components/common/GridShape";
 import { Link } from "react-router-dom";
 import ThemeTogglerTwo from "../../components/common/ThemeTogglerTwo"
+import { logoUrl } from "../../supabase/storage";
 
 export default function AuthLayout({ children }) {
   return (
@@ -17,7 +18,8 @@ export default function AuthLayout({ children }) {
                 to="/"
                 className="flex flex-col items-center justify-center p-4 mb-3"
               >
-                <img width={357} src="/images/logo/logo.png" alt="Logo" />
+                {/* <img width={357} src="/images/logo/logo.png" alt="Logo" /> */}
+                <img width={357} src={logoUrl} alt="Logo" />
                 <p className="text-white text-center mt-5">
                   Lleva tus entregas al siguiente nivel
                 </p>
