@@ -1,0 +1,41 @@
+import React from "react";
+import GridShape from "../../components/common/GridShape";
+import { Link } from "react-router-dom";
+import ThemeTogglerTwo from "../../components/common/ThemeTogglerTwo"
+import { logoUrl } from "../../supabase/storage";
+
+export default function AuthLayout({ children }) {
+  return (
+    <div className="relative p-6 bg-white z-1 dark:bg-gray-25 sm:p-0">
+      <div className="relative flex flex-col justify-center w-full h-screen lg:flex-row dark:bg-gray-900 sm:p-0">
+        {children}
+        <div className="items-center hidden w-full h-full lg:w-1/2 bg-brand-950 dark:bg-white/5 lg:grid">
+          <div className="relative flex items-center justify-center z-1">
+            {/* ===== Inicio de forma de cuadrícula común ===== */}
+            <GridShape />
+            <div className="flex flex-col items-center max-w-xs">
+              <Link
+                to="/"
+                className="flex flex-col items-center justify-center p-4 mb-3"
+              >
+                {/* <img width={357} src="/images/logo/logo.png" alt="Logo" /> */}
+                <img width={357} src={logoUrl} alt="Logo" />
+                <p className="text-white text-center mt-5">
+                  Lleva tus entregas al siguiente nivel
+                </p>
+              </Link>
+              <p className="text-center text-gray-400 dark:text-white/60">
+                Nuestras soluciones personalizadas están diseñadas para
+                optimizar rutas, facilitar el trabajo de los conductores y
+                mejorar el control logístico de su empresa.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="fixed z-50 hidden bottom-6 right-6 sm:block">
+          <ThemeTogglerTwo />
+        </div>
+      </div>
+    </div>
+  );
+}

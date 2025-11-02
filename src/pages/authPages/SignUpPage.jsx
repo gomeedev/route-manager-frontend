@@ -1,10 +1,15 @@
-import react, { useState } from "react"
+import CustomMeta from "../../components/customMeta/CustomMeta";
+import AuthLayout from "../../layout/authLayout/AuthPageLayout";
+import { SignUpForm } from "../../components/auth/SignUpForm";
 
 
 export const SignUpPage = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
-
-    return <h1>Registrarme</h1>
+    return (
+        <>
+            <CustomMeta />
+            <AuthLayout>
+                <SignUpForm />
+            </AuthLayout>
+        </>
+    );
 }
