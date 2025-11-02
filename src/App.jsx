@@ -13,6 +13,8 @@ import { AdminPage } from "./pages/adminPages/AdminPage";
 
 // Driver
 import { DriverPage } from "./pages/driverPages/DriverPage";
+import ProtectedRoute from "./hooks/protectedRoute";
+import { PackagesManagement } from "./pages/adminPages/PackagesManagement";
 
 
 
@@ -28,9 +30,12 @@ function App() {
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-
         {/* Paginas del admin */}
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={<ProtectedRoute> <AdminPage />
+        </ProtectedRoute>}
+        />
+
+        <Route path="/packages-management" element={<PackagesManagement />} />
 
         {/* Paginas del driver */}
         <Route path="/driver" element={<DriverPage />} />
