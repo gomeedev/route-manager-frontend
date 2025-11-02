@@ -1,12 +1,14 @@
 import React from "react"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
 
 // Auth
-import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SignInPage } from "./pages/authPages/SignInPage";
 import { SignUpPage } from "./pages/authPages/SignUpPage";
 import { ResetPasswordPage } from "./pages/authPages/ResetPasswordPage";
 
 // Globales
+
 
 // Admin
 import { AdminPage } from "./pages/adminPages/AdminPage";
@@ -14,6 +16,7 @@ import { AdminPage } from "./pages/adminPages/AdminPage";
 // Driver
 import { DriverPage } from "./pages/driverPages/DriverPage";
 import ProtectedRoute from "./hooks/ProtectedRoute";
+import NotFound from "./pages/otherPages/NotFound";
 
 
 
@@ -36,6 +39,9 @@ function App() {
 
         {/* Paginas del driver */}
         <Route path="/driver" element={<DriverPage />} />
+
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
 
       </Routes>
     </BrowserRouter>
