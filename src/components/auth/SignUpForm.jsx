@@ -6,6 +6,7 @@ import { ChevronLeft } from "lucide-react";
 
 export const SignUpForm = () => {
 
+    // Estados Para el formulario 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
@@ -19,7 +20,6 @@ export const SignUpForm = () => {
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
-            message: message
         })
 
         if (error) {
