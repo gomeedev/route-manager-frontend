@@ -1,16 +1,28 @@
-import react, { useState } from "react"
+import React, { useState } from "react"
 import { supabase } from "../../supabase/supabaseClient";
 import { Link, useNavigate } from "react-router-dom";
+import Input from "../form/input/InputField";
+import { Eye, EyeOff } from "lucide-react";
+import Checkbox from "../form/input/CheckBox";
+
 
 export const SignInForm = () => {
-
-    // Instancia de useNavigate
-    const navigate = useNavigate();
 
     // Estados Para el formulario 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+
+    // Instancia de useNavigate
+    const navigate = useNavigate();
+
+    // Estado para ver la contraseña
+    const [showPassword, setShowPassword] = useState(false)
+
+    // Estado para mantener (o no) la actividad
+    const [isChecked, setIsChecked] = useState(false);
+
+
 
     const handleSubmit = async (event) => {
         // Hace que no recargue la pagina despues de oprimir el botón
@@ -31,7 +43,15 @@ export const SignInForm = () => {
         }
 
         if (data) {
-            localStorage.setItem('token', data.session.access_token);
+
+            // local es persistente aunque cierre el navegador
+            if (isChecked) {
+                localStorage.setItem("token", data.session.access_token);
+
+            // session caduca el token cuando cierro el navegador
+            } else {
+                sessionStorage.setItem('token', data.session.access_token);
+            }
             navigate("/admin");
             return null
         }
@@ -55,10 +75,10 @@ export const SignInForm = () => {
                         <form onSubmit={handleSubmit}>
                             <div className="space-y-6">
                                 <div>
-                                    <label className="block">
-                                        Correo<span className="text-error-500">*</span>
+                                    <label className="block text-[15px] mb-2 text-gray-700 dark:text-gray-400">
+                                        Correo <span className="text-error-500">*</span>
                                     </label>
-                                    <input
+                                    <Input
                                         onChange={(e) => setEmail(e.target.value)}
                                         value={email}
                                         type="email"
@@ -67,17 +87,29 @@ export const SignInForm = () => {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block">
+                                    <label className="block text-[15px] mb-2 text-gray-700 dark:text-gray-400">
                                         Contraseña <span className="text-error-500">*</span>
                                     </label>
-                                    <input
-                                        className="text:black"
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        value={password}
-                                        type="password"
-                                        placeholder="Ingresa tu contraseña"
-                                        required
-                                    />
+                                    <div className="relative">
+                                        <Input
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            value={password}
+                                            name="password"
+                                            type={showPassword ? "text" : "password"}
+                                            placeholder="Ingresa tu contraseña"
+                                            required
+                                        />
+                                        <span
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="text-gray-500 dark:text-gray-400 size-4" />
+                                            ) : (
+                                                <Eye className="text-gray-500 dark:text-gray-400 size-4" />
+                                            )}
+                                        </span>
+                                    </div>
                                 </div>
 
                                 {/** Mensaje de error */}
@@ -88,7 +120,7 @@ export const SignInForm = () => {
 
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        {/* <Checkbox checked={isChecked} onChange={setIsChecked} /> */}
+                                        <Checkbox checked={isChecked} onChange={setIsChecked} />
                                         <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
                                             Mantenerme conectado
                                         </span>

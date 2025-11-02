@@ -1,9 +1,16 @@
 import { supabase } from "./supabaseClient";
 
 
-const { data } = supabase.storage
+const { data:logoData } = supabase.storage
   .from('interfaz')
   .getPublicUrl('logo.png');
 
+const { data:logoResponsive } = supabase.storage
+  .from('interfaz')
+  .getPublicUrl('logo_responsive.png');
 
-export const logoUrl = data.publicUrl
+
+  
+export const logoUrl = logoData.publicUrl
+export const iconUrl = logoResponsive.publicUrl
+
