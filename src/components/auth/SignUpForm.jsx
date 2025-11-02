@@ -1,12 +1,41 @@
 import react, { useState } from "react"
+import { supabase } from "../../supabase/supabaseClient";
 import { Link } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 
 
 export const SignUpForm = () => {
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+
+    const handleSubmit = async (event) => {
+
+        // Hace que no recargue la pagina despues de oprimir el botón
+        event.preventDefault()
+        setMessage("");
+
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            message: message
+        })
+
+        if (error) {
+            setMessage(error.message);
+            return
+        }
+
+        if (data) {
+            setMessage("Conductor creado correctamente")
+        }
+
+        // Vaciamos el formulario despues de oprimir el botón
+        setEmail("")
+        setPassword("")
+    };
+
 
     return (
         <div className="flex flex-col flex-1 w-full overflow-y-auto lg:w-1/2 no-scrollbar">
@@ -30,21 +59,34 @@ export const SignUpForm = () => {
                         </p>
                     </div>
 
+                    {/** Mensaje de error */}
+                    {message && <span className="mb-4 p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:text-red-400 dark:border-red-800">{message}</span>}
+
                     <div>
-                        <form action="">
+                        <form onSubmit={handleSubmit}>
                             <div className="space-y-5">
                                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                                     <div className="sm:col-span-1">
                                         <label>
                                             Correo<span className="text-error-500">*</span>
                                         </label>
-                                        <input type="email" />
+                                        <input
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            value={email}
+                                            type="email"
+                                            required
+                                        />
                                     </div>
                                     <div className="sm:col-span-1">
                                         <label>
                                             Contraseña <span className="text-error-500">*</span>
                                         </label>
-                                        <input type="password" />
+                                        <input
+                                            onChange={(e) => setPassword(e.target.value)}
+                                            value={password}
+                                            type="password"
+                                            required
+                                        />
                                     </div>
                                     <div>
                                         <button type="submit" className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed">
