@@ -13,7 +13,7 @@ import { AdminPage } from "./pages/adminPages/AdminPage";
 
 // Driver
 import { DriverPage } from "./pages/driverPages/DriverPage";
-import ProtectedRoute from "./hooks/protectedRoute";
+import ProtectedRoute from "./hooks/ProtectedRoute";
 
 
 
