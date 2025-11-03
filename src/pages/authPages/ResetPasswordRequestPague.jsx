@@ -1,15 +1,16 @@
 import React from "react"
 import CustomMeta from "../../components/customMeta/CustomMeta"
 import AuthLayout from "../../layout/authLayout/AuthPageLayout"
-import { ResetPasswordForm } from "../../components/auth/ResetPasswordForm"
+import { ResetPasswordRequestForm } from "../../components/auth/ResetPasswordRequestForm"
 
 
-export const ResetPasswordPage = () => {
+
+export const ResetPasswordRequestPage = () => {
     return (
         <>
             <CustomMeta />
             <AuthLayout>
-                < ResetPasswordForm />
+                < ResetPasswordRequestForm />
             </AuthLayout>
         </>
     )

@@ -1,8 +1,15 @@
 import react, { useState } from "react"
-import { supabase } from "../../supabase/supabaseClient";
 import { Link, useNavigate } from "react-router-dom";
+
+// Servicios
+import { supabase } from "../../supabase/supabaseClient";
+import axios from "axios";
+
 import { ChevronLeft } from "lucide-react";
 import Input from "../form/input/InputField";
+import Select from "../form/input/Select";
+
+
 
 
 export const SignUpForm = () => {
@@ -10,7 +17,11 @@ export const SignUpForm = () => {
     // Estados Para el formulario 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
+    const [nombre, setNombre] = useState("")
+    const [apellido, setApellido] = useState("")
+    const [telefono_movil, setTelefono_movil] = useState("")
+    const [tipo_documento, setTipoDocumento] = useState("")
+    const [documento, setDocumento] = useState("")
     // Estado para los mensajes y tipos de mensajes
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState("");
@@ -19,11 +30,17 @@ export const SignUpForm = () => {
     const navigate = useNavigate();
 
 
+    const opcionestipoDocumento = [
+        { value: "CC", label: "Cédula de ciudadanía" },
+        { value: "CE", label: "Cédula de extranjería" },
+        { value: "TI", label: "Tarjeta de identidad" },
+    ]
+
+
     const handleSubmit = async (event) => {
 
         // Hace que no recargue la pagina despues de oprimir el botón
         event.preventDefault()
-
         // Mensaje vacio inicialmente
         setMessage("");
         setMessageType("");
@@ -39,16 +56,43 @@ export const SignUpForm = () => {
             return
         }
 
-        if (data) {
-            setMessage("Conductor creado correctamente");
-            setMessageType("success")
+        if (data && data.session) {
+            const token = data.session.access_token
 
-            setTimeout(() => {
-                navigate("/signin")
-            }, 5000);
+            try {
+                await axios.post("http://localhost:8000/api/v1/signup/", {
+                    nombre,
+                    apellido,
+                    telefono_movil,
+                    documento,
+                    tipo_documento,
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+
+                setMessage("Conductor creado correctamente");
+                setMessageType("success")
+
+                setTimeout(() => {
+                    navigate("/signin")
+                }, 5000);
+
+            } catch (err) {
+                setMessage(err.response?.data?.error || "Error al crear usuario mi bro");
+                setMessageType("error")
+            }
+
         }
 
         // Vaciamos el formulario despues de oprimir el botón
+        setNombre("")
+        setApellido("")
+        setTipoDocumento("")
+        setDocumento("")
+        setTelefono_movil("")
         setEmail("")
         setPassword("")
     };
@@ -93,6 +137,74 @@ export const SignUpForm = () => {
                         <form onSubmit={handleSubmit}>
                             <div className="space-y-5">
                                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+                                    {/* Valores enviados a django */}
+                                    <div className="sm:col-span-1">
+                                        <label className="block text-[15px] mb-2 text-gray-700 dark:text-gray-400">
+                                            Nombre <span className="text-error-500">*</span>
+                                        </label>
+                                        <Input
+                                            onChange={(e) => setNombre(e.target.value)}
+                                            value={nombre}
+                                            type="text"
+                                            placeholder="Ingresa tu nombre"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="sm:col-span-1">
+                                        <label className="block text-[15px] mb-2 text-gray-700 dark:text-gray-400">
+                                            Apellido <span className="text-error-500">*</span>
+                                        </label>
+                                        <Input
+                                            onChange={(e) => setApellido(e.target.value)}
+                                            value={apellido}
+                                            type="text"
+                                            placeholder="Ingresa tu nombre"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="sm:col-span-2">
+                                        <label className="block text-[15px] mb-2 text-gray-700 dark:text-gray-400">
+                                            Tipo documento <span className="text-error-500">*</span>
+                                        </label>
+                                        <Select
+                                            placeholder="Seleciona tu tipo de documento"
+                                            defaultValue={tipo_documento}
+                                            onChange={(value) => setTipoDocumento(value)}
+                                            options={opcionestipoDocumento.slice(0)}
+                                            className={"block text-[15px] mb-2 text-gray-700 dark:text-gray-400"}
+                                        >
+                                        </Select>
+                                    </div>
+
+                                    <div className="sm:col-span-1">
+                                        <label className="block text-[15px] mb-2 text-gray-700 dark:text-gray-400">
+                                            Documento <span className="text-error-500">*</span>
+                                        </label>
+                                        <Input
+                                            onChange={(e) => setDocumento(e.target.value)}
+                                            value={documento}
+                                            type="text"
+                                            placeholder="Ingresa tu nombre"
+                                            required
+                                        />
+                                    </div>
+
+                                    <div className="sm:col-span-1">
+                                        <label className="block text-[15px] mb-2 text-gray-700 dark:text-gray-400">
+                                            Telefono <span className="text-error-500">*</span>
+                                        </label>
+                                        <Input
+                                            onChange={(e) => setTelefono_movil(e.target.value)}
+                                            value={telefono_movil}
+                                            type="text"
+                                            placeholder="Ingresa tu nombre"
+                                            required
+                                        />
+                                    </div>
+
                                     <div className="sm:col-span-2">
                                         <label className="block text-[15px] mb-2 text-gray-700 dark:text-gray-400">
                                             Correo<span className="text-error-500">*</span>
