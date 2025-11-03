@@ -3,7 +3,7 @@ import { supabase } from "../supabase/supabaseClient";
 import { Navigate } from "react-router-dom";
 
 
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, role }) {
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -24,14 +24,22 @@ function ProtectedRoute({ children }) {
         getSession();
     }, []);
 
+
     if (loading) {
         return <div>Cargando...</div>
-    } else {
-        if (authenticated) {
-            return <>{children}</>;
-        }
-        return < Navigate to="/signin" />
     }
+
+    if (!authenticated) {
+        return <Navigate to="/signin" />
+    }
+
+
+    const userRole = localStorage.getItem("rol");
+    if (role && userRole !== role) {
+        return <Navigate to="/signin" />
+    }
+
+    return children;
 }
 
 export default ProtectedRoute

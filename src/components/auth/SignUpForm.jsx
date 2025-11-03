@@ -10,6 +10,8 @@ import Input from "../form/input/InputField";
 import Select from "../form/input/Select";
 
 
+
+
 export const SignUpForm = () => {
 
     // Estados Para el formulario 
@@ -18,7 +20,7 @@ export const SignUpForm = () => {
     const [nombre, setNombre] = useState("")
     const [apellido, setApellido] = useState("")
     const [telefono_movil, setTelefono_movil] = useState("")
-    const [tipoDocumento, setTipoDocumento] = useState("")
+    const [tipo_documento, setTipoDocumento] = useState("")
     const [documento, setDocumento] = useState("")
     // Estado para los mensajes y tipos de mensajes
     const [message, setMessage] = useState("");
@@ -63,7 +65,7 @@ export const SignUpForm = () => {
                     apellido,
                     telefono_movil,
                     documento,
-                    tipoDocumento,
+                    tipo_documento,
                 }, {
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -169,8 +171,8 @@ export const SignUpForm = () => {
                                         </label>
                                         <Select
                                             placeholder="Seleciona tu tipo de documento"
-                                            defaultValue={tipoDocumento}
-                                            onChange={(e) => setTipoDocumento(e.target.value)}
+                                            defaultValue={tipo_documento}
+                                            onChange={(value) => setTipoDocumento(value)}
                                             options={opcionestipoDocumento.slice(0)}
                                             className={"block text-[15px] mb-2 text-gray-700 dark:text-gray-400"}
                                         >

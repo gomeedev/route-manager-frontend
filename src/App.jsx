@@ -6,17 +6,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SignInPage } from "./pages/authPages/SignInPage";
 import { SignUpPage } from "./pages/authPages/SignUpPage";
 import { ResetPasswordPage } from "./pages/authPages/ResetPasswordPage";
+import ProtectedRoute from "./hooks/ProtectedRoute";
 
 // Globales
-
+import NotFound from "./pages/otherPages/NotFound";
 
 // Admin
 import { AdminPage } from "./pages/adminPages/AdminPage";
 
 // Driver
 import { DriverPage } from "./pages/driverPages/DriverPage";
-import ProtectedRoute from "./hooks/ProtectedRoute";
-import NotFound from "./pages/otherPages/NotFound";
+
 
 
 
@@ -33,15 +33,18 @@ function App() {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         {/* Paginas del admin */}
-        <Route path="/admin" element={<ProtectedRoute> <AdminPage />
+        <Route path="/admin" element={<ProtectedRoute role="admin"> <AdminPage />
         </ProtectedRoute>}
         />
 
         {/* Paginas del driver */}
-        <Route path="/driver" element={<DriverPage />} />
+        <Route path="/driver" element={<ProtectedRoute role="driver">
+          <DriverPage />
+        </ProtectedRoute>}
+        />
 
         {/* 404 */}
-        <Route path="*" element={<NotFound />} />
+        < Route path="*" element={<NotFound />} />
 
       </Routes>
     </BrowserRouter>

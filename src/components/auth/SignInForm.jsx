@@ -1,9 +1,15 @@
 import React, { useState } from "react"
-import { supabase } from "../../supabase/supabaseClient";
 import { Link, useNavigate } from "react-router-dom";
-import Input from "../form/input/InputField";
+
+// Servicios
+import { supabase } from "../../supabase/supabaseClient";
+import axios from "axios";
+
 import { Eye, EyeOff } from "lucide-react";
+import Input from "../form/input/InputField";
 import Checkbox from "../form/input/CheckBox";
+
+
 
 
 export const SignInForm = () => {
@@ -36,24 +42,48 @@ export const SignInForm = () => {
 
         if (error) {
             setMessage(error.message);
-            // Vaciamos el formulario despues de oprimir el botón
-            setEmail("")
+
+            // vaciar la contraseña porque el correo da pereza volverlo a escribir
             setPassword("")
             return;
         }
 
         if (data) {
 
+            const token = data.session.access_token;
+
             // local es persistente aunque cierre el navegador
             if (isChecked) {
-                localStorage.setItem("token", data.session.access_token);
+                localStorage.setItem("token", token);
 
             // session caduca el token cuando cierro el navegador
             } else {
-                sessionStorage.setItem('token', data.session.access_token);
+                sessionStorage.setItem('token', token);
             }
-            navigate("/admin");
-            return null
+
+
+            try {
+                const response = await axios.get("http://localhost:8000/api/v1/usuario/me/", {
+                    headers: {"Authorization": `Bearer ${token}`}
+                })
+
+                const rol = response.data.rol_nombre;
+
+                // guardar rol
+                localStorage.setItem("rol", rol);
+
+
+                if (rol == "admin") {
+                    navigate("/admin");
+                } else if (rol == "driver") {
+                    navigate("/driver")
+                } else {
+                    setMessage("No tienes acceso crack")
+                }
+
+            } catch(err) {
+                setMessage("Algo esta mal en lo que ingresas mi bro");
+            }
         }
 
     };
@@ -104,9 +134,9 @@ export const SignInForm = () => {
                                             className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
                                         >
                                             {showPassword ? (
-                                                <EyeOff className="text-gray-500 dark:text-gray-400 size-4" />
-                                            ) : (
                                                 <Eye className="text-gray-500 dark:text-gray-400 size-4" />
+                                            ) : (
+                                                <EyeOff className="text-gray-500 dark:text-gray-400 size-4" />
                                             )}
                                         </span>
                                     </div>
