@@ -17,6 +17,7 @@ import AdminLayout from "./layout/adminLayout/AdminLayout";
 import { AdminPage } from "./pages/adminPages/AdminPage";
 
 // Driver
+import DriverLayout from "./layout/driverLayout/DriverLayout";
 import { DriverPage } from "./pages/driverPages/DriverPage";
 
 
@@ -43,6 +44,12 @@ function App() {
         </Route>
 
         {/* Paginas del driver */}
+        <Route element={<ProtectedRoute role="driver" />}>
+          <Route path="/driver" element={<DriverLayout />} >
+            <Route index element={<DriverPage />} />
+          </Route>
+        </Route>
+
         <Route path="/driver" element={<ProtectedRoute role="driver">
           <DriverPage />
         </ProtectedRoute>

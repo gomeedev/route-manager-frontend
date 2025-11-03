@@ -3,8 +3,8 @@ import { Outlet } from "react-router";
 import ThemeTogglerTwo from "../../components/common/ThemeTogglerTwo";
 import { SidebarProvider, useSidebar } from "../../context/SidebarContext";
 
-import AdminHeader from "./AdminHeader";
-import AdminSidebar from "./AdminSidebar";
+import DriverHeader from "./DriverHeader";
+import DriverSidebar from "./DriverSidebar";
 import Backdrop from "../Backdrop";
 
 
@@ -14,14 +14,14 @@ const LayoutContent = () => {
     return (
         <div className="min-h-screen xl:flex">
             <div>
-                <AdminSidebar />
+                <DriverSidebar />
                 <Backdrop />
             </div>
             <div
                 className={`flex-1 transition-all duration-300 ease-in-out ${isExpanded || isHovered ? "lg:ml-[290px]" : "lg:ml-[90px]"
                     } ${isMobileOpen ? "ml-0" : ""}`}
             >
-                <AdminHeader />
+                <DriverHeader />
                 <div className="p-4 mx-auto max-w-screen-2xl md:p-6">
                     <Outlet />
                 </div>
@@ -33,7 +33,7 @@ const LayoutContent = () => {
     );
 };
 
-const AdminLayout = () => {
+const DriverLayout = () => {
     return (
         <SidebarProvider>
             <LayoutContent />
@@ -41,4 +41,4 @@ const AdminLayout = () => {
     );
 };
 
-export default AdminLayout;
+export default DriverLayout;
