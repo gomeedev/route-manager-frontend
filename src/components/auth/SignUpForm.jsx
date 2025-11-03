@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 // Servicios
 import { supabase } from "../../supabase/supabaseClient";
+import { API_URL } from "../../global/config/api";
 import axios from "axios";
 
 import { ChevronLeft } from "lucide-react";
@@ -60,7 +61,7 @@ export const SignUpForm = () => {
             const token = data.session.access_token
 
             try {
-                await axios.post("http://localhost:8000/api/v1/signup/", {
+                await axios.post(`${API_URL}/api/v1/signup/`, {
                     nombre,
                     apellido,
                     telefono_movil,

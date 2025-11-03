@@ -3,11 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 
 // Servicios
 import { supabase } from "../../supabase/supabaseClient";
+import { API_URL } from "../../global/config/api";
 import axios from "axios";
 
 import { Eye, EyeOff } from "lucide-react";
 import Input from "../form/input/InputField";
-import Checkbox from "../form/input/CheckBox";
+import Checkbox from "../form/input/CheckBox"
 
 
 
@@ -63,7 +64,7 @@ export const SignInForm = () => {
 
 
             try {
-                const response = await axios.get("http://localhost:8000/api/v1/usuario/me/", {
+                const response = await axios.get(`${API_URL}/api/v1/usuario/me/`, {
                     headers: {"Authorization": `Bearer ${token}`}
                 })
 
