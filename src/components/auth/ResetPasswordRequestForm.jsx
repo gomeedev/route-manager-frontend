@@ -1,6 +1,6 @@
 // Servicios
 import { useState } from "react"
-import { supabase } from "../../supabase/supabaseClient"
+import { supabase } from "../../global/supabase/supabaseClient"
 
 import { Link } from "react-router-dom"
 // Componentes

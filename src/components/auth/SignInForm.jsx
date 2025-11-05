@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
 
 // Servicios
-import { supabase } from "../../supabase/supabaseClient";
+import { supabase } from "../../global/supabase/supabaseClient";
 import { API_URL } from "../../global/config/api";
 import axios from "axios";
 
@@ -44,7 +44,7 @@ export const SignInForm = () => {
         if (error) {
             setMessage(error.message);
 
-            // vaciar la contraseña porque el correo da pereza volverlo a escribir
+            setEmail("")
             setPassword("")
             return;
         }
@@ -68,9 +68,12 @@ export const SignInForm = () => {
                     headers: {"Authorization": `Bearer ${token}`}
                 })
 
-                const rol = response.data.rol_nombre;
+                // Obtengo a mi usuario
+                const user = response.data;
+                localStorage.setItem("user", JSON.stringify(user));
 
-                // guardar rol
+
+                const rol = user.rol_nombre;
                 localStorage.setItem("rol", rol);
 
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 
+import UserDropdown from "../../components/header/UserDropdown";
 import { useSidebar } from "../../context/SidebarContext";
 
 
@@ -52,7 +53,10 @@ const DriverHeader = () => {
             </button>
           </div>
 
-          <div className="ml-auto flex items-center gap-3"></div>
+          <div className="ml-auto flex items-center gap-3">
+            < UserDropdown />
+
+          </div>
         </div>
       </div>
     </header>

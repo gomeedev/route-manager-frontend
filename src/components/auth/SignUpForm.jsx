@@ -2,7 +2,7 @@ import react, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
 
 // Servicios
-import { supabase } from "../../supabase/supabaseClient";
+import { supabase } from "../../global/supabase/supabaseClient";
 import { API_URL } from "../../global/config/api";
 import axios from "axios";
 
