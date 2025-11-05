@@ -1,6 +1,6 @@
 import React from "react"
 import CustomMeta from "../../components/customMeta/CustomMeta"
-import AuthLayout from "../../layout/authLayout/AuthPageLayout"
+import AuthLayout from "../../layout/authLayout/AuthLayout"
 import { ResetPasswordRequestForm } from "../../components/auth/ResetPasswordRequestForm"
 
 

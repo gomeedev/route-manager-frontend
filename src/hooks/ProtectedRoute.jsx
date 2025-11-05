@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react"
+import { Navigate, Outlet } from "react-router-dom";
 import { supabase } from "../supabase/supabaseClient";
-import { Navigate } from "react-router-dom";
 
 
-function ProtectedRoute({ children, role }) {
+function ProtectedRoute({ role }) {
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
@@ -39,7 +39,7 @@ function ProtectedRoute({ children, role }) {
         return <Navigate to="/signin" />
     }
 
-    return children;
+    return <Outlet />;
 }
 
 export default ProtectedRoute

@@ -1,5 +1,5 @@
 import CustomMeta from "../../components/customMeta/CustomMeta"
-import AuthLayout from "../../layout/authLayout/AuthPageLayout"
+import AuthLayout from "../../layout/authLayout/AuthLayout"
 import { SignInForm } from "../../components/auth/SignInForm"
 
 
