@@ -60,9 +60,9 @@ const DriverSidebar = () => {
               }`
             }
           >
-            <span className="menu-item-icon-size">{nav.icon}</span>
+            <span className="menu-item-icon-size text-sm">{nav.icon}</span>
             {(isExpanded || isHovered || isMobileOpen) && (
-              <span className="menu-item-text max-w-[200px] truncate">
+              <span className="menu-item-text max-w-[200px] truncate text-sm">
                 {nav.name}
               </span>
             )}
@@ -86,18 +86,14 @@ const DriverSidebar = () => {
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="flex justify-center items-center bg-white dark:bg-gray-900">
+      <div className="flex justify-center items-center bg-white dark:bg-gray-900 mt-14 lg:mt-5">
         <img
-          src={
-            isExpanded || isHovered || isMobileOpen
-              ? IconStudyImpetus
-              : IconResponsive
-          }
+          src={isExpanded || isHovered || isMobileOpen ? IconStudyImpetus : IconResponsive}
           alt="Logo"
-          className={`mt-5 mb-4 transition-all ${isExpanded || isHovered || isMobileOpen ? "h-16" : "h-10"
-            }`}
+          className={`mt-5 mb-4 transition-all ${isExpanded || isHovered || isMobileOpen ? "h-16" : "h-10"}`}
         />
       </div>
+      
 
       <div className="px-5 pt-5 flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
