@@ -2,9 +2,8 @@ import React, { useState } from "react"
 import { Link, useNavigate } from "react-router-dom";
 
 // Servicios
-import { supabase } from "../../global/supabase/supabaseClient";
-import { API_URL } from "../../global/config/api";
-import axios from "axios";
+import { SigninUserSupabase, SigninUserDjango } from "../../global/api/UsersService";
+
 
 import { Eye, EyeOff } from "lucide-react";
 import Input from "../form/input/InputField";
@@ -36,22 +35,22 @@ export const SignInForm = () => {
         event.preventDefault()
         setMessage("");
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email: email,
-            password: password,
-        })
+        let data;
+        let token;
 
-        if (error) {
-            setMessage(error.message);
+        try {
+            data = await SigninUserSupabase(email, password)
+            token = data.session.access_token;
 
+        } catch(error) {
+            setMessage(error.message)
             setEmail("")
             setPassword("")
-            return;
+            return
         }
 
-        if (data) {
 
-            const token = data.session.access_token;
+        if (data) {
 
             // local es persistente aunque cierre el navegador
             if (isChecked) {
@@ -64,12 +63,10 @@ export const SignInForm = () => {
 
 
             try {
-                const response = await axios.get(`${API_URL}/api/v1/usuario/me/`, {
-                    headers: {"Authorization": `Bearer ${token}`}
-                })
-
+                
                 // Obtengo a mi usuario
-                const user = response.data;
+                const user = await SigninUserDjango(token);
+                // LocalStorage lo uso para usar esa info en otras partes de la aplicación
                 localStorage.setItem("user", JSON.stringify(user));
 
 
