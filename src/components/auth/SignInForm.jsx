@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 // Servicios
 import { SigninUserSupabase, SigninUserDjango } from "../../global/api/UsersService";
 
-
 import { Eye, EyeOff } from "lucide-react";
 import Input from "../form/input/InputField";
 import Checkbox from "../form/input/CheckBox"
@@ -82,7 +81,7 @@ export const SignInForm = () => {
                     setMessage("No tienes acceso crack")
                 }
 
-            } catch(err) {
+            } catch(error) {
                 setMessage("Algo esta mal en lo que ingresas mi bro");
             }
         }
