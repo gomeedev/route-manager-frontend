@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 
 import GridShape from "../../components/common/GridShape";
-import CustomMeta from "../../components/customMeta/CustomMeta";
+import CustomMeta from "../../components/common/CustomMeta";
 import ThemeTogglerTwo from "../../components/common/ThemeTogglerTwo";
 
 export default function NotFound() {
