@@ -19,22 +19,22 @@ const navItems = [
   {
     icon: <Home className="menu-item-icon-size fill-current" />,
     name: "Dashboard",
-    path: "/admin",
+    path: "/driver",
   },
   {
     icon: <Inventory2 className="menu-item-icon-size fill-current" />,
     name: "Rutas",
-    path: "/admin/packages-management",
+    path: "rutas",
+  },
+    {
+    icon: <LocalShipping className="menu-item-icon-size" />,
+    name: "Reportes",
+    path: "novedades",
   },
   {
     icon: <LocationOnIcon className="menu-item-icon-size" />,
     name: "Historial",
-    path: "/admin/routes-management",
-  },
-  {
-    icon: <LocalShipping className="menu-item-icon-size" />,
-    name: "Reportes",
-    path: "/admin/vehicles-management",
+    path: "historial-rutas",
   },
 ];
 
