@@ -24,22 +24,22 @@ const navItems = [
   {
     icon: <Inventory2 className="menu-item-icon-size fill-current" />,
     name: "Rutas",
-    path: "rutas",
+    path: "/driver/rutas",
   },
   {
     icon: <LocalShipping className="menu-item-icon-size" />,
-    name: "Reportes",
-    path: "novedades",
+    name: "Crear Novedades",
+    path: "/driver/novedades",
   },
   {
     icon: <LocationOnIcon className="menu-item-icon-size" />,
     name: "Historial de rutas",
-    path: "historial-rutas",
+    path: "/driver/routes-history",
   },
   {
     icon: <LocationOnIcon className="menu-item-icon-size" />,
     name: "Historial de novedades",
-    path: "historial-novedades",
+    path: "/driver/novedades-history",
   },
 
 ];
@@ -55,7 +55,7 @@ const DriverSidebar = () => {
         <li key={nav.name}>
           <NavLink
             to={nav.path}
-            end={nav.path === "/admin"}
+            end={nav.path === "/driver"}
             className={({ isActive }) =>
               `menu-item group flex items-center gap-2 p-2 rounded-lg ${isActive
                 ? "bg-gray-100 dark:bg-gray-800 dark:text-gray-300 font-bold"

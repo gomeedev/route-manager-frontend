@@ -30,6 +30,7 @@ import { DriverProfile } from "./pages/profile/DriverProfile";
 import { RutasPage } from "./pages/driverPages/RutasPage";
 import { NovedadesPage } from "./pages/driverPages/NovedadesPage";
 import { HistorialRutasPage } from "./pages/driverPages/HistorialRutasPage";
+import { NovedadesHistoryPage } from "./pages/driverPages/NovedadesHistoryPage";
 
 
 
@@ -68,7 +69,8 @@ function App() {
             <Route path="profile" element={<DriverProfile />} />
             <Route path="rutas" element={<RutasPage />} />
             <Route path="novedades" element={<NovedadesPage />} />
-            <Route path="historial-rutas" element={<HistorialRutasPage />} />
+            <Route path="routes-history" element={<HistorialRutasPage />} />
+            <Route path="novedades-history" element={<NovedadesHistoryPage />} />
           </Route>
         </Route>
 

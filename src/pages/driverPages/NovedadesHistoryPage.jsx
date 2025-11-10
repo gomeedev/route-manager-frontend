@@ -1,6 +1,6 @@
 export const NovedadesHistoryPage = () => {
 
     return <div>
-        Historial de novedades
+        Historial de mis novedades
     </div>
 }
