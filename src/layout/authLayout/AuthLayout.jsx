@@ -2,7 +2,7 @@ import React from "react";
 import GridShape from "../../components/common/GridShape";
 import { Link } from "react-router-dom";
 import ThemeTogglerTwo from "../../components/common/ThemeTogglerTwo"
-import { logoUrl } from "../../supabase/storage";
+import { logoUrl } from "../../global/supabase/storageService";
 
 export default function AuthLayout({ children }) {
   return (

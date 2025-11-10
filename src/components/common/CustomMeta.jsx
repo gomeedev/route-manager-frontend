@@ -1,5 +1,5 @@
 
-import PageMeta from '../common/PageMeta'
+import PageMeta from './PageMeta'
 
 const CustomMeta = () => {
   return (

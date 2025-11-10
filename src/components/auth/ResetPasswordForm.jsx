@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { supabase } from "../../supabase/supabaseClient"
+import { supabase } from "../../global/supabase/supabaseClient"
 import { useNavigate } from "react-router-dom"
 
 import { Eye, EyeOff } from "lucide-react"
