@@ -26,16 +26,22 @@ const navItems = [
     name: "Rutas",
     path: "rutas",
   },
-    {
+  {
     icon: <LocalShipping className="menu-item-icon-size" />,
     name: "Reportes",
     path: "novedades",
   },
   {
     icon: <LocationOnIcon className="menu-item-icon-size" />,
-    name: "Historial",
+    name: "Historial de rutas",
     path: "historial-rutas",
   },
+  {
+    icon: <LocationOnIcon className="menu-item-icon-size" />,
+    name: "Historial de novedades",
+    path: "historial-novedades",
+  },
+
 ];
 
 const DriverSidebar = () => {
@@ -93,15 +99,15 @@ const DriverSidebar = () => {
           className={`mt-5 mb-4 transition-all ${isExpanded || isHovered || isMobileOpen ? "h-16" : "h-10"}`}
         />
       </div>
-      
+
 
       <div className="px-5 pt-5 flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             <h2
               className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
-                  ? "lg:justify-center"
-                  : "justify-start"
+                ? "lg:justify-center"
+                : "justify-start"
                 }`}
             >
               {isExpanded || isHovered || isMobileOpen ? (

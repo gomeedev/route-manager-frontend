@@ -16,7 +16,12 @@ import NotFound from "./pages/otherPages/NotFound";
 import AdminLayout from "./layout/adminLayout/AdminLayout";
 import { AdminPage } from "./pages/adminPages/AdminPage";
 import { AdminProfile } from "./pages/profile/AdminProfile";
-
+import { PackagesManagementPage } from "./pages/adminPages/PackagesManagementPage";
+import { RoutesManagementPage } from "./pages/adminPages/RoutesManagementPage";
+import { VehiclesManagementPage } from "./pages/adminPages/VehiclesManagementPage";
+import { DriversManagementPage } from "./pages/adminPages/DriversManagementPage";
+import { DeliveryHistory } from "./pages/adminPages/DeliveryHistory";
+import { NovedadesAdminPage } from "./pages/adminPages/NovedadesAdminPage";
 
 // Driver
 import DriverLayout from "./layout/driverLayout/DriverLayout";
@@ -46,6 +51,13 @@ function App() {
           <Route path="/admin" element={<AdminLayout />} >
             <Route index element={<AdminPage />} />
             <Route path="profile" element={< AdminProfile />} />
+            <Route path="packages-management" element={< PackagesManagementPage />} />
+            <Route path="routes-management" element={< RoutesManagementPage />} />
+            <Route path="vehicles-management" element={< VehiclesManagementPage />} />
+            <Route path="drivers-management" element={< DriversManagementPage />} />
+            <Route path="delivery-history" element={< DeliveryHistory />} />
+            <Route path="novedades" element={< NovedadesAdminPage />} />
+            
           </Route>
         </Route>
 
