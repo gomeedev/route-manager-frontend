@@ -15,10 +15,13 @@ import NotFound from "./pages/otherPages/NotFound";
 // Admin
 import AdminLayout from "./layout/adminLayout/AdminLayout";
 import { AdminPage } from "./pages/adminPages/AdminPage";
+import { AdminProfile } from "./pages/profile/AdminProfile";
+
 
 // Driver
 import DriverLayout from "./layout/driverLayout/DriverLayout";
 import { DriverPage } from "./pages/driverPages/DriverPage";
+import { DriverProfile } from "./pages/profile/DriverProfile";
 
 
 
@@ -40,6 +43,7 @@ function App() {
         <Route element={<ProtectedRoute role="admin" />}>
           <Route path="/admin" element={<AdminLayout />} >
             <Route index element={<AdminPage />} />
+            <Route path="profile" element={< AdminProfile />} />
           </Route>
         </Route>
 
@@ -47,14 +51,9 @@ function App() {
         <Route element={<ProtectedRoute role="driver" />}>
           <Route path="/driver" element={<DriverLayout />} >
             <Route index element={<DriverPage />} />
+            <Route path="profile" element={<DriverProfile />} />
           </Route>
         </Route>
-
-        <Route path="/driver" element={<ProtectedRoute role="driver">
-          <DriverPage />
-        </ProtectedRoute>
-        }
-        />
 
         {/* 404 */}
         < Route path="*" element={<NotFound />} />
