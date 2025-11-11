@@ -8,8 +8,7 @@ import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 import Input from "../../form/input/InputField";
 
 
-
-export const EditarPerfilAdmin = () => {
+export const EditarPerfilDriver = () => {
 
     const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")))
     const [photo, setPhoto] = useState(user.foto_perfil || "")

@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { EditarPerfilAdmin } from "./EditarPerfilAdmin"
 import { User, Mail, Phone, FileText, Building2, Calendar, Edit2 } from "lucide-react"
 
+import { EditarPerfilAdmin } from "./EditarPerfilAdmin"
 import { fotoDefaultUrl } from "../../../global/supabase/storageService"
 import { Modal } from "../../ui/modal/Modal"
 
