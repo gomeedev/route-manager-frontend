@@ -30,14 +30,10 @@ export const SigninUserDjango = async (token) => {
 export const EditProfileUser = async (UserId, UserData) => {
     try {
         const response = await axios.patch(`${API_URL}/api/v1/usuario/${UserId}/`, UserData,
-            {
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            }
         )
         return response.data
     } catch (error) {
+        console.log(error.response?.data || error)
         throw error
     }
 }
