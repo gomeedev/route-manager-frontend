@@ -1,3 +1,9 @@
+import { MostrarPerfilAdmin } from "../../components/admin/profile/MostrarPerfilAdmin"
+
 export const AdminProfile = () => {
-    return <h1>Admin profile </h1>
+    return (
+        <>
+            <MostrarPerfilAdmin />
+        </>
+    )
 }
