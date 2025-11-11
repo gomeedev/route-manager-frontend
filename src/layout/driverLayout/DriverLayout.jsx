@@ -22,7 +22,7 @@ const LayoutContent = () => {
                     } ${isMobileOpen ? "ml-0" : ""}`}
             >
                 <DriverHeader />
-                <div className="p-4 mx-auto max-w-screen-2xl md:p-6 ml-3">
+                <div className="p-4 mx-auto max-w-screen-2xl md:p-6 ml-3 mr-3">
                     <Outlet />
                 </div>
                 <div className="fixed z-50 hidden bottom-6 right-6 sm:block">
