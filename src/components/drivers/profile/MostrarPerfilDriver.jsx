@@ -35,6 +35,25 @@ export const MostrarPerfilDriver = () => {
             break
     }
 
+    switch (user.rol_nombre) {
+        case "driver":
+            user.rol_nombre = "Conductor"
+            break
+        case "admin":
+            user.rol_nombre = "Administrador"
+            break
+    }
+
+    switch (user.estado) {
+        case "activo":
+            user.estado = "Activo"
+            break
+        case "inactivo":
+            user.estado = "Inactivo"
+            break
+    }
+    
+
     return (
         <>
             <ComponentCard title={

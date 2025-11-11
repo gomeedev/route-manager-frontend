@@ -62,6 +62,26 @@ export const EditarPerfilAdmin = () => {
             break
     }
 
+
+    switch (user.rol_nombre) {
+        case "driver":
+            user.rol_nombre = "Conductor"
+            break
+        case "admin":
+            user.rol_nombre = "Administrador"
+            break
+    }
+
+    switch (user.estado) {
+        case "activo":
+            user.estado = "Activo"
+            break
+        case "inactivo":
+            user.estado = "Inactivo"
+            break
+    }
+    
+
     return (
         <>
             <div className="mb-6">
@@ -182,6 +202,30 @@ export const EditarPerfilAdmin = () => {
                                     <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Número de Documento</p>
                                     <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
                                         {user.documento}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                                <div className="mt-0.5">
+                                    <FileText className="size-4 text-gray-500 dark:text-gray-400" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Rol</p>
+                                    <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
+                                        {user.rol_nombre}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-start gap-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                                <div className="mt-0.5">
+                                    <FileText className="size-4 text-gray-500 dark:text-gray-400" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Estado</p>
+                                    <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
+                                        {user.estado}
                                     </p>
                                 </div>
                             </div>
