@@ -1,3 +1,9 @@
+import { MostrarPerfilDriver } from "../../components/drivers/profile/MostrarPerfilDriver"
+
 export const DriverProfile = () => {
-    return <h1>Driver profile </h1>
+    return (
+        <>
+        <MostrarPerfilDriver />
+        </>
+    )
 }
