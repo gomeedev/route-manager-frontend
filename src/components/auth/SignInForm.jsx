@@ -41,7 +41,7 @@ export const SignInForm = () => {
             data = await SigninUserSupabase(email, password)
             token = data.session.access_token;
 
-        } catch(error) {
+        } catch (error) {
             setMessage(error.message)
             setEmail("")
             setPassword("")
@@ -52,19 +52,13 @@ export const SignInForm = () => {
         if (data) {
 
             // local es persistente aunque cierre el navegador
-            if (isChecked) {
-                localStorage.setItem("token", token);
-
-            // session caduca el token cuando cierro el navegador
-            } else {
-                sessionStorage.setItem('token', token);
-            }
+            localStorage.setItem("token", token);
 
 
             try {
-                
+
                 // Obtengo a mi usuario
-                const user = await SigninUserDjango(token);
+                const user = await SigninUserDjango();
                 // LocalStorage lo uso para usar esa info en otras partes de la aplicación
                 localStorage.setItem("user", JSON.stringify(user));
 
@@ -81,7 +75,7 @@ export const SignInForm = () => {
                     setMessage("No tienes acceso crack")
                 }
 
-            } catch(error) {
+            } catch (error) {
                 setMessage("Algo esta mal en lo que ingresas mi bro");
             }
         }
