@@ -53,10 +53,11 @@ export const SignInForm = () => {
 
             // local es persistente aunque cierre el navegador
             localStorage.setItem("token", token);
+            console.log(localStorage.getItem("token"))
 
 
             try {
-
+                
                 // Obtengo a mi usuario
                 const user = await SigninUserDjango();
                 // LocalStorage lo uso para usar esa info en otras partes de la aplicación
