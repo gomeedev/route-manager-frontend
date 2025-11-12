@@ -1,5 +1,7 @@
 import { supabase } from "../supabase/supabaseClient";
 import { API_URL } from "../config/api";
+import { getToken } from "../config/auth";
+
 import axios from "axios";
 
 
@@ -16,9 +18,11 @@ export const SigninUserSupabase = async (email, password) => {
 }
 
 
-export const SigninUserDjango = async (token) => {
+export const SigninUserDjango = async () => {
 
-    const response = await axios.get(`${API_URL}/api/v1/usuario/me`, {
+    const token = getToken();
+
+    const response = await axios.get(`${API_URL}/api/v1/usuario/me/`, {
         headers: { "Authorization": `Bearer ${token}` }
     })
 
