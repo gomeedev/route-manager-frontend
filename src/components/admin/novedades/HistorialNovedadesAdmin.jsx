@@ -1,26 +1,36 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { BellDot } from 'lucide-react';
+import { BellDot, Trash2, Edit, Eye } from 'lucide-react';
 
-import { GetNovedades } from "../../../global/api/NovedadesService";
-import { DeleteNovedad } from "../../../global/api/NovedadesService";
+import { GetNovedades, DeleteNovedad } from "../../../global/api/NovedadesService";
 
-import ComponentCard from "../../common/ComponentCard";
+import Table from "../../ui/table/Table";
 import { Modal } from "../../ui/modal/Modal";
+import Badge from "../../ui/badge/Badge";
+
+import AnimatedTitle from "../../ui/animation/AnimatedTitle";
+import AnimatedText from "../../ui/animation/AnimatedText";
+
+import Loading from "../../common/Loading";
 
 
 export const HistorialNovedadesAdmin = () => {
 
     const [novedades, setNovedades] = useState([])
+    const [selectedId, setSelectedId] = useState(false)
     const [loading, setLoading] = useState(false)
-    const [open, setOpen] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
 
     const obtenerNovedades = async () => {
+
+        setLoading(true)
+
         try {
 
             const data = await GetNovedades()
             setNovedades(data)
+            setLoading(false)
 
         } catch (error) {
 
@@ -36,8 +46,6 @@ export const HistorialNovedadesAdmin = () => {
 
     const handleDelete = async (id_novedad) => {
 
-        if (!window.confirm('¿Estás seguro de eliminar esta novedad?')) return
-
         setLoading(true)
 
         try {
@@ -46,57 +54,145 @@ export const HistorialNovedadesAdmin = () => {
             toast.success("Novedad eliminada")
 
             setNovedades(novedades.filter(novedad => novedad.id_novedad !== id_novedad))
+            setIsModalOpen(false)
 
         } catch (error) {
+
             toast.error("No se pudo eliminar la novedad")
+
         } finally {
             setLoading(false)
         }
     }
 
 
+    const columns = [
+        {
+            key: "id_novedad",
+            label: "id",
+        },
+        {
+            key: "tipo",
+            label: "Tipo",
+            render: (item) => {
+                const colorMap = {
+                    "problemas_entrega": "error",
+                    "problemas_documentacion": "warning",
+                    "demoras_operativas": "primary"
+                };
+                return <Badge color={colorMap[item.tipo] || "primary"}>{item.tipo}</Badge>
+            },
+        },
+        {
+            key: "imagen",
+            label: "Comprobante",
+            render: (item) => (
+                <img src={item.imagen || "No adjuntó"} alt="N/A" className="w-10 h-10 rounded-full object-cover" />
+            ),
+        },
+        {
+            key: "conductor_nombre",
+            label: "Conductor",
+        },
+        {
+            key: "descripcion",
+            label: "Descripción",
+        },
+        {
+            key: "fecha_novedad",
+            label: "Fecha",
+            render: (item) => {
+                const fecha = new Date(item.fecha_novedad);
+                return (
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {
+                            new Intl.DateTimeFormat("es-CO", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                                hour: "numeric",
+                                minute: "numeric"
+                            }).format(fecha)
+                        }
+                    </span>
+                )
+            }
+        },
+    ]
+
+
+    const actions = [
+        {
+            key: 'delete',
+            label: "Eliminar",
+            icon: <Trash2 className="w-4 h-4" />,
+            onClick: (item) => {
+                setSelectedId(item.id_novedad);
+                setIsModalOpen(true);
+            },
+            className: "text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10",
+        },
+    ]
+
+
     return (
+
+
         <>
-            <ComponentCard title={
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                    <BellDot className="size-4" />
-                    <p>Historial de novedades</p>
+
+            {loading ? (
+                <div className="w-full h-screen flex items-center justify-center">
+                    <Loading />
                 </div>
-            }>
+            ) :
+                <>
+                    <div className="mt-4 mb-8">
+                        <AnimatedTitle text="Historial de notificaciones" />
+                        <AnimatedText text="Resiva todo el historial de novedades reportadas por tus conductores" />
+                    </div>
 
-                {loading && <p>Cargando...</p>}
+                    <Table
+                        title={
+                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                <p>Total de novedades: <i><span className="text-gray-800 dark:text-white">{novedades.length}</span></i></p>
+                            </div>
+                        }
+                        data={novedades}
+                        columns={columns}
+                        actions={actions}
+                    />
+                </>
+            }
 
-                {novedades.length > 0 ? (
-                    novedades.map((novedad) => {
-                        const fechaBackend = novedad.fecha_novedad;
-                        const fecha = new Date(fechaBackend)
+            <Modal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                showCloseButton={true}
+                size="sm"
+            >
+                <div className="flex flex-col items-center justify-center text-center space-y-6 p-6">
+                    <p className="text-[16px] font-medium text-gray-800 dark:text-gray-200">
+                        ¿Estás seguro que deseas eliminar esta novedad?
+                    </p>
 
-                        const formatoFecha = new Intl.DateTimeFormat("es-CO", {
-                            weekday: "long",
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                            hour: "2-digit",
-                        }).format(fecha)
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => setIsModalOpen(false)}
+                            className="flex items-center justify-center gap-2 w-[150px] px-4 py-3 text-sm font-medium transition rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600/15 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Cancelar
+                        </button>
 
-                        return (
-                            <p key={novedad.id_novedad}>
-                                <strong>ID:</strong> {novedad.id_novedad} <br />
-                                <strong>Conductor:</strong> {novedad.conductor_nombre} <br />
-                                <strong>Tipo:</strong> {novedad.tipo} <br />
-                                <strong>Descripcion:</strong> {novedad.descripcion} <br />
-                                <img src={novedad.imagen} alt="No adjuntó comprobante" /> <br />
-                                <strong>Fecha:</strong> {formatoFecha} <br />
-                                <strong>{novedad.leida ? "Leida" : "No Leida"} </strong>  <br /> <br /> <br /> <br />
-                                <button onClick={() => handleDelete(novedad.id_novedad)}>Eliminar</button>
-                            </p>
-                        );
-                    })
-                ) : (
-                    <p>No hay novedades</p>
+                        <button
+                            onClick={() => handleDelete(selectedId)}
+                            className="flex items-center justify-center gap-2 w-[150px] px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-error-400 text-error-50  transition duration-200 hover:bg-error-500 dark:bg-error-500/15 dark:text-error-600 dark:transition duration-200   dark:hover:bg-error-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Confirmar
+                        </button>
+                    </div>
+                </div>
+            </Modal>
 
-                )}
-            </ComponentCard>
         </>
     )
 }

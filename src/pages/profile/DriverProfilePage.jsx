@@ -3,7 +3,7 @@ import { MostrarPerfilDriver } from "../../components/drivers/profile/MostrarPer
 export const DriverProfilePage = () => {
     return (
         <>
-        <MostrarPerfilDriver />
+            <MostrarPerfilDriver />
         </>
     )
 }

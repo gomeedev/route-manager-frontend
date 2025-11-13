@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+import Loading from "../common/Loading";
 import { GetNotifications, MarcarNovedad } from "../../global/api/NovedadesService";
 
 import { Dropdown } from "../ui/dropdown/Dropdown";
@@ -129,9 +130,7 @@ export const NotificationDropdown = () => {
         {/* Lista de notificaciones */}
         <div className="flex-1 overflow-y-auto px-2">
           {cargando ? (
-            <div className="flex items-center justify-center py-12">
-              <p className="text-sm text-gray-500">Cargando...</p>
-            </div>
+            <Loading />
           ) : hayNotificaciones ? (
             <ul className="space-y-1 py-2">
               {novedades.map((novedad) => {
