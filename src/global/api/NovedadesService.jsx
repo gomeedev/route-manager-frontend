@@ -83,3 +83,21 @@ export const MarcarNovedad = async (id_novedad, estado) => {
         throw error
     }
 }
+
+
+// Eliminar novedades para el admin
+export const DeleteNovedad = async (id_novedad) => {
+
+    const token = getToken()
+
+    try {
+        const response = await axios.delete(`${API_URL}/api/v1/novedades/${id_novedad}/`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+
+        return response.data
+    } catch(error) {
+        console.log(error.response?.data || error)
+        throw error
+    }
+}
