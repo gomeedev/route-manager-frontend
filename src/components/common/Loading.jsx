@@ -25,7 +25,7 @@ const Loading = () => {
       </div>
       
       <p className="text-sm text-gray-500 dark:text-gray-400">
-        Cargando
+        Cargando...
       </p>
     </div>
   );
