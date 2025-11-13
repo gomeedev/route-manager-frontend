@@ -1,6 +1,10 @@
+import { HistorialNovedadesAdmin } from "../../components/admin/novedades/HistorialNovedadesAdmin"
+
 export const NovedadesAdminPage = () => {
 
-    return <div>
-        Historial de todas las novedades
-    </div>
+    return (
+        <>
+            <HistorialNovedadesAdmin/>
+        </>
+    )
 }

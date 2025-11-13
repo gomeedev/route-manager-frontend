@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+import { GetNotifications, MarcarNovedad } from "../../global/api/NovedadesService";
+
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { GetNotifications, MarcarNovedad } from "../../global/api/NovedadesService";
 
 
 
@@ -10,7 +13,7 @@ export const NotificationDropdown = () => {
   const [abierto, setAbierto] = useState(false);
   const [cargando, setCargando] = useState(false);
 
-  // 🔄 Obtener las notificaciones al cargar el componente
+
   useEffect(() => {
     const obtenerNovedades = async () => {
       setCargando(true);
@@ -27,7 +30,7 @@ export const NotificationDropdown = () => {
     obtenerNovedades();
   }, []);
 
-  // ✅ Marcar una novedad como leída
+
   const marcarComoLeida = async (id_novedad) => {
     try {
       const novedadActualizada = await MarcarNovedad(id_novedad, { leida: true });
@@ -49,7 +52,7 @@ export const NotificationDropdown = () => {
 
   return (
     <div className="relative">
-      {/* 🔔 Botón de campana con estilo mejorado */}
+
       <button
         className="relative flex items-center justify-center text-gray-500 transition-all duration-200 rounded-lg h-10 w-10 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
         onClick={() => setAbierto(!abierto)}
@@ -80,7 +83,7 @@ export const NotificationDropdown = () => {
         </svg>
       </button>
 
-      {/* 📋 Dropdown mejorado */}
+
       <Dropdown
         isOpen={abierto}
         onClose={() => setAbierto(false)}
@@ -180,8 +183,8 @@ export const NotificationDropdown = () => {
                         </span>
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full ${!novedad.leida
-                              ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400"
-                              : "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500"
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400"
+                            : "bg-success-50 text-success-600 dark:bg-success-500/15 dark:text-success-500"
                             }`}
                         >
                           {novedad.leida ? "Leído" : "No leído"}
@@ -232,13 +235,9 @@ export const NotificationDropdown = () => {
         {/* Footer */}
         {hayNotificaciones && (
           <div className="p-4 pt-3 border-t border-gray-100 dark:border-gray-700">
-            <a
-              href="/admin/novedades"
-              onClick={() => setAbierto(false)}
-              className="flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-gray-600"
-            >
-              Ver todas las notificaciones
-            </a>
+            <Link to="/admin/novedades" className="flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg transition-all duration-200 hover:bg-gray-100 hover:border-gray-300 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:border-gray-600">
+              Ver historial de novedades
+            </Link>
           </div>
         )}
       </Dropdown>

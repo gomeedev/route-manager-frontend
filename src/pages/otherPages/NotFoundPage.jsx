@@ -4,7 +4,7 @@ import GridShape from "../../components/common/GridShape";
 import CustomMeta from "../../components/common/CustomMeta";
 import ThemeTogglerTwo from "../../components/common/ThemeTogglerTwo";
 
-export default function NotFound() {
+export default function NotFoundPage() {
     return (
         <>
             <CustomMeta />
