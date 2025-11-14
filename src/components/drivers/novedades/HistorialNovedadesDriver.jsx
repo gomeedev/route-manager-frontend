@@ -50,11 +50,20 @@ export const HistorialNovedadesAdmin = () => {
             label: "id",
         },
         {
-            key: "imagen",
-            label: "Comprobante",
+            key: "conductor_nombre",
+            label: "Conductor",
             render: (item) => (
-                <img src={item.imagen || "No adjuntó"} alt="N/A" className="w-10 h-10 rounded-full object-cover" />
-            ),
+                <div className="flex items-center gap-3">
+                    <img
+                        src={item.imagen || "https://via.placeholder.com/40"}
+                        alt="Conductor"
+                        className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {item.conductor_nombre}
+                    </span>
+                </div>
+            )
         },
         {
             key: "tipo",
@@ -69,12 +78,14 @@ export const HistorialNovedadesAdmin = () => {
             },
         },
         {
-            key: "conductor_nombre",
-            label: "Conductor",
-        },
-        {
-            key: "descripcion",
-            label: "Descripción",
+            key: 'descripcion',
+            label: 'Descripción',
+            cellClassName: 'max-w-xs',
+            render: (item) => (
+                <div className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2" title={item.descripcion}>
+                    {item.descripcion}
+                </div>
+            ),
         },
         {
             key: "fecha_novedad",

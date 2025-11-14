@@ -1,6 +1,3 @@
-import React, { useState } from 'react';
-
-
 const Table = ({
   title,
   data = [],
@@ -14,13 +11,13 @@ const Table = ({
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
       {/* HEADER */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 p-2">
+        <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 pt-2 pb-2">
           {title}
         </div>
         {onAdd && (
           <button
             onClick={onAdd}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
             Agregar
@@ -30,19 +27,19 @@ const Table = ({
 
       {/* TABLE */}
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full table-auto">
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className="px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase "
+                  className={`px-6 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase whitespace-nowrap ${col.headerClassName || ''}`}
                 >
                   {col.label}
                 </th>
               ))}
               {actions.length > 0 && (
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase">
+                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase whitespace-nowrap w-32">
                   Acciones
                 </th>
               )}
@@ -60,7 +57,7 @@ const Table = ({
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={columns.length + (actions.length > 0 ? 1 : 0)} className="px-6 py-12 text-center text-gray-600 dark:text-gray-400">
+                <td colSpan={columns.length + (actions.length > 0 ? 1 : 0)} className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
                   {emptyMessage}
                 </td>
               </tr>
@@ -68,19 +65,22 @@ const Table = ({
               data.map((item, index) => (
                 <tr
                   key={index}
-                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 "
+                  className="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
                 >
                   {columns.map((col) => (
-                    <td key={col.key} className="px-6 py-4">
+                    <td
+                      key={col.key}
+                      className={`px-6 py-4 ${col.cellClassName || ''}`}
+                    >
                       {col.render ? col.render(item) : (
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                          {item[col.key] || <i className='text-gray-600 dark:text-gray-400'>N/A</i>}
-                        </span>
+                        <div className={`text-sm text-gray-600 dark:text-gray-400 ${col.truncate ? 'max-w-xs truncate' : ''}`}>
+                          {item[col.key] || <i className='text-gray-400'>N/A</i>}
+                        </div>
                       )}
                     </td>
                   ))}
                   {actions.length > 0 && (
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 w-32">
                       <div className="flex items-center justify-center gap-1">
                         {actions.map((action) => (
                           <button
@@ -106,4 +106,4 @@ const Table = ({
 };
 
 
-export default Table
+export default Table;
