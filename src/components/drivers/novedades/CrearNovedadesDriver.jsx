@@ -10,6 +10,7 @@ import Input from "../../form/input/InputField";
 import TextAreaField from "../../form/input/TextArea"
 import Select from "../../form/input/Select";
 import { Modal } from "../../ui/modal/Modal"
+import Loading from "../../common/Loading";
 
 
 export const CrearNovedadesDriver = () => {
@@ -17,6 +18,7 @@ export const CrearNovedadesDriver = () => {
     const [typeNovedad, setTypeNovedad] = useState("")
     const [description, setDescription] = useState("")
     const [photo, setPhoto] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -32,6 +34,7 @@ export const CrearNovedadesDriver = () => {
     const handleSubmit = async (event) => {
 
         event.preventDefault();
+        setLoading(true);
 
         const formData = new FormData();
 
@@ -45,6 +48,7 @@ export const CrearNovedadesDriver = () => {
         try {
 
             const CreateNovedad = await PostNovedades(formData);
+            setLoading(false)
             toast.success("Novedad creada correctamente")
             setIsModalOpen(false)
 
@@ -53,7 +57,7 @@ export const CrearNovedadesDriver = () => {
             toast.error("Error al crear la novedad")
 
         } finally {
-
+            setLoading(false)
             setTypeNovedad("")
             setDescription("")
         }
@@ -72,6 +76,13 @@ export const CrearNovedadesDriver = () => {
 
 
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} showCloseButton={true}>
+                
+                {loading && (
+                    <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
+                        <Loading />
+                    </div>
+                )}
+
                 <div className="mb-6">
                     <h2 className="text-2xl font-semibold text-gray-800 dark:text-white mt-4 mb-2">
                         Crear Novedad
