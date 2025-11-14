@@ -1,4 +1,4 @@
-import React from "react"
+  import React from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
@@ -10,12 +10,12 @@ import { ResetPasswordPage } from "./pages/authPages/ResetPasswordPage";
 import ProtectedRoute from "./hooks/ProtectedRoute";
 
 // Globales
-import NotFound from "./pages/otherPages/NotFound";
+import NotFoundPage from "./pages/otherPages/NotFoundPage";
 
 // Admin
 import AdminLayout from "./layout/adminLayout/AdminLayout";
 import { AdminPage } from "./pages/adminPages/AdminPage";
-import { AdminProfile } from "./pages/profile/AdminProfile";
+import { AdminProfilePage } from "./pages/profile/AdminProfilePage";
 import { PackagesManagementPage } from "./pages/adminPages/PackagesManagementPage";
 import { RoutesManagementPage } from "./pages/adminPages/RoutesManagementPage";
 import { VehiclesManagementPage } from "./pages/adminPages/VehiclesManagementPage";
@@ -26,9 +26,9 @@ import { NovedadesAdminPage } from "./pages/adminPages/NovedadesAdminPage";
 // Driver
 import DriverLayout from "./layout/driverLayout/DriverLayout";
 import { DriverPage } from "./pages/driverPages/DriverPage";
-import { DriverProfile } from "./pages/profile/DriverProfile";
+import { DriverProfilePage } from "./pages/profile/DriverProfilePage";
 import { RutasPage } from "./pages/driverPages/RutasPage";
-import { NovedadesPage } from "./pages/driverPages/NovedadesPage";
+import { NovedadesDriverPage } from "./pages/driverPages/NovedadesDriverPage";
 import { HistorialRutasPage } from "./pages/driverPages/HistorialRutasPage";
 import { NovedadesHistoryPage } from "./pages/driverPages/NovedadesHistoryPage";
 
@@ -51,7 +51,7 @@ function App() {
         <Route element={<ProtectedRoute role="admin" />}>
           <Route path="/admin" element={<AdminLayout />} >
             <Route index element={<AdminPage />} />
-            <Route path="profile" element={< AdminProfile />} />
+            <Route path="profile" element={< AdminProfilePage />} />
             <Route path="packages-management" element={< PackagesManagementPage />} />
             <Route path="routes-management" element={< RoutesManagementPage />} />
             <Route path="vehicles-management" element={< VehiclesManagementPage />} />
@@ -66,16 +66,16 @@ function App() {
         <Route element={<ProtectedRoute role="driver" />}>
           <Route path="/driver" element={<DriverLayout />} >
             <Route index element={<DriverPage />} />
-            <Route path="profile" element={<DriverProfile />} />
+            <Route path="profile" element={<DriverProfilePage />} />
             <Route path="rutas" element={<RutasPage />} />
-            <Route path="novedades" element={<NovedadesPage />} />
+            <Route path="novedades" element={<NovedadesDriverPage />} />
             <Route path="routes-history" element={<HistorialRutasPage />} />
             <Route path="novedades-history" element={<NovedadesHistoryPage />} />
           </Route>
         </Route>
 
         {/* 404 */}
-        < Route path="*" element={<NotFound />} />
+        < Route path="*" element={<NotFoundPage />} />
 
       </Routes>
     </BrowserRouter>

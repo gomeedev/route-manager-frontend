@@ -7,6 +7,7 @@ export const Modal = ({
   className = "",
   showCloseButton = true,
   isFullscreen = false,
+  size = "default",
 }) => {
   const modalRef = useRef(null);
 
@@ -40,9 +41,15 @@ export const Modal = ({
 
   if (!isOpen) return null;
 
+  // SOLO default y sm
+  const sizeClasses = {
+    sm: "w-[90vw] max-w-md h-auto max-h-[90vh]",
+    default: "w-[80vw] max-w-6xl h-[60vh] min-h-[400px] max-h-[90vh]",
+  };
+
   const contentClasses = isFullscreen
     ? "w-full h-full"
-    : "relative w-[80vw] max-w-6xl h-[60vh] min-h-[400px] max-h-[90vh] rounded-2xl bg-white shadow-2xl dark:bg-gray-800 dark:shadow-gray-900/50";
+    : `relative ${sizeClasses[size] || sizeClasses.default} rounded-2xl bg-white shadow-2xl dark:bg-gray-800 dark:shadow-gray-900/50`;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center p-4 modal z-99999 animate-in fade-in-0 duration-300">

@@ -22,8 +22,10 @@ const LayoutContent = () => {
                     } ${isMobileOpen ? "ml-0" : ""}`}
             >
                 <DriverHeader />
-                <div className="p-4 mx-auto max-w-screen-2xl md:p-6 ml-3 mr-3">
-                    <Outlet />
+                <div className="flex justify-center w-full p-4 md:p-6">
+                    <div className="w-full max-w-screen-2xl mr-3 ml-3">
+                        <Outlet />
+                    </div>
                 </div>
                 <div className="fixed z-50 hidden bottom-6 right-6 sm:block">
                     <ThemeTogglerTwo />

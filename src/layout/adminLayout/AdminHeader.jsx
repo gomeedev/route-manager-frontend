@@ -1,8 +1,11 @@
 import { useEffect, useRef } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 
-import UserDropdown from "../../components/header/UserDropdown";
 import { useSidebar } from "../../context/SidebarContext";
+
+import UserDropdown from "../../components/header/UserDropdown";
+import { NotificationDropdown } from "../../components/header/NotificationDropdown";
+
 
 
 const AdminHeader = () => {
@@ -50,10 +53,12 @@ const AdminHeader = () => {
               aria-label="Toggle Sidebar"
             >
               <MenuIcon className="text-gray-500 dark:text-gray-400" />
+
             </button>
           </div>
 
           <div className="ml-auto flex items-center gap-3">
+            <NotificationDropdown />
             <UserDropdown />
           </div>
         </div>
