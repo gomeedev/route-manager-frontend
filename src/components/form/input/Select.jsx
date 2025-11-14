@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 const Select = ({
   options,
-  placeholder = "Select an option",
+  placeholder = "Selecciona una opcion",
   onChange,
   className = "",
   defaultValue = "",

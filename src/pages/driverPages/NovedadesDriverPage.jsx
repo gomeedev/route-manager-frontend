@@ -1,3 +1,10 @@
+import { CrearNovedadesDriver } from "../../components/drivers/novedades/CrearNovedadesDriver"
+
+
 export const NovedadesDriverPage = () => {
-    return <h1>Crear Novedades </h1>
+    return (
+        <>
+            <CrearNovedadesDriver />
+        </>
+    )
 }
