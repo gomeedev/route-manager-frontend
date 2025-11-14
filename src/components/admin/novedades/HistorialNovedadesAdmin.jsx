@@ -94,11 +94,12 @@ export const HistorialNovedadesAdmin = () => {
                 const colorMap = {
                     "problemas_entrega": "error",
                     "problemas_documentacion": "warning",
-                    "demoras_operativas": "primary"
+                    "demoras_operativas": "success"
                 };
                 return <Badge color={colorMap[item.tipo] || "primary"}>{item.tipo}</Badge>
             },
         },
+
         {
             key: "descripcion",
             label: "Descripción",

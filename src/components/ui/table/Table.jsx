@@ -7,6 +7,12 @@ const Table = ({
   loading = false,
   emptyMessage = "No hay datos para mostrar",
 }) => {
+
+
+  const getNestedValue = (obj, key) => {
+    return key.split(".").reduce((acc, part) => acc?.[part], obj);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
       {/* HEADER */}
@@ -74,7 +80,11 @@ const Table = ({
                     >
                       {col.render ? col.render(item) : (
                         <div className={`text-sm text-gray-600 dark:text-gray-400 ${col.truncate ? 'max-w-xs truncate' : ''}`}>
-                          {item[col.key] || <i className='text-gray-400'>N/A</i>}
+
+                          {getNestedValue(item, col.key) ?? (
+                            <i className='text-gray-400'>N/A</i>
+                          )}
+
                         </div>
                       )}
                     </td>
@@ -104,6 +114,5 @@ const Table = ({
     </div>
   );
 };
-
 
 export default Table;

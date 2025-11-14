@@ -1,6 +1,9 @@
+import { DriversManagement } from "../../components/admin/conductores/DriversManagement"
+
+
 export const DriversManagementPage = () => {
 
     return <div>
-        Gestion de conductores
+        <DriversManagement />
     </div>
 }
