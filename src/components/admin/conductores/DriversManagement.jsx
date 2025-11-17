@@ -1,15 +1,15 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Eye } from "lucide-react";
+import { Eye, Edit } from "lucide-react";
 
 import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 
-import { DriversManagementService, /* getDetallesConductorService */ } from "../../../global/api/admin/DriversManagementService";
+import { DriversManagementService } from "../../../global/api/admin/DriversManagementService";
 import { MostrarDetallesConductor } from "./MostrarDetallesConductor";
+import { EditarConductor } from "./EditarConductor";
 
 import Loading from "../../common/Loading";
 import Table from "../../ui/table/Table";
-/* import { Modal } from "../../ui/modal/Modal"; */
 import Badge from "../../ui/badge/Badge";
 
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
@@ -46,25 +46,6 @@ export const DriversManagement = () => {
     useEffect(() => {
         GetConductores();
     }, []);
-
-
-    /*     const handleVerDetalles = async (id_conductor) => {
-    
-            setLoading(true)
-    
-            try {
-    
-                const conductor = await getDetallesConductorService(id_conductor)
-                setDetallesConductor(conductor)
-    
-    
-            } catch (error) {
-                toast.error("No se pudo cargar los detalles del conductor")
-    
-            } finally {
-                setLoading(false)
-            }
-        } */
 
 
     const columns = [
@@ -120,11 +101,22 @@ export const DriversManagement = () => {
             label: "Ver detalles",
             icon: <Eye className="w-4 h-4" />,
             onClick: (item) => {
-                setSelectedIdConductor(item.id_conductor)
-                setIsModalOpen(true);
+                setSelectedIdConductor(item.id_conductor);
+                setIsModalOpen("detalles");
             },
         },
-    ]
+        {
+            key: "editar",
+            label: "Editar información",
+            icon: <Edit className="w-4 h-4" />,
+            onClick: (item) => {
+                setSelectedIdConductor(item.id_conductor);
+                setIsModalOpen("editar");
+            },
+            className: "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-500/10"
+        },
+    ];
+
 
     return (
         <>
@@ -149,12 +141,21 @@ export const DriversManagement = () => {
                 </>
             }
 
-            {isModalOpen === true && (
+            {isModalOpen === "detalles" && (
                 <MostrarDetallesConductor
                     driverId={selectedIdConductor}
                     onClose={() => setIsModalOpen(false)}
                 />
             )}
+
+            {isModalOpen === "editar" && (
+                <EditarConductor
+                    driverId={selectedIdConductor}
+                    onClose={() => setIsModalOpen(false)}
+                    refreshTable={GetConductores}  
+                />
+            )}
+
         </>
     )
 }
