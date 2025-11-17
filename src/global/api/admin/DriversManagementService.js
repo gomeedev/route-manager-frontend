@@ -18,3 +18,21 @@ export const DriversManagementService = async () => {
     }
 
 }
+
+
+// Ver detalles de conductores desde el admin
+export const getDetallesConductorService = async (id_conductor) => {
+
+    try {
+        const response = await axios.get(`${API_URL}/api/v1/drivers/${id_conductor}/`)
+
+        return response.data
+
+    } catch (error) {
+
+        console.log(error.response?.data || error)
+        throw error
+
+    }
+
+}

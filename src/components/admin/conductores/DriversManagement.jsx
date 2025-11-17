@@ -1,15 +1,16 @@
 import { useState, useEffect } from "react";
-
 import { toast } from "sonner";
-
-import { DriversManagementService } from "../../../global/api/admin/DriversManagementService";
+import { Eye } from "lucide-react";
 
 import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 
-import Table from "../../ui/table/Table";
-import { Modal } from "../../ui/modal/Modal";
-import Badge from "../../ui/badge/Badge";
+import { DriversManagementService, /* getDetallesConductorService */ } from "../../../global/api/admin/DriversManagementService";
+import { MostrarDetallesConductor } from "./MostrarDetallesConductor";
+
 import Loading from "../../common/Loading";
+import Table from "../../ui/table/Table";
+/* import { Modal } from "../../ui/modal/Modal"; */
+import Badge from "../../ui/badge/Badge";
 
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
 import AnimatedText from "../../ui/animation/AnimatedText";
@@ -18,9 +19,16 @@ import AnimatedText from "../../ui/animation/AnimatedText";
 export const DriversManagement = () => {
 
     const [drivers, setDrivers] = useState([])
+    const [selectedIdConductor, setSelectedIdConductor] = useState(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [loading, setLoading] = useState(false)
+
 
 
     const GetConductores = async () => {
+
+        setLoading(true)
+
         try {
 
             const response = await DriversManagementService();
@@ -29,12 +37,34 @@ export const DriversManagement = () => {
         } catch (error) {
 
             toast.error("No se puedieron cargar los conductores")
+
+        } finally {
+            setLoading(false)
         }
     }
 
     useEffect(() => {
         GetConductores();
     }, []);
+
+
+    /*     const handleVerDetalles = async (id_conductor) => {
+    
+            setLoading(true)
+    
+            try {
+    
+                const conductor = await getDetallesConductorService(id_conductor)
+                setDetallesConductor(conductor)
+    
+    
+            } catch (error) {
+                toast.error("No se pudo cargar los detalles del conductor")
+    
+            } finally {
+                setLoading(false)
+            }
+        } */
 
 
     const columns = [
@@ -84,18 +114,47 @@ export const DriversManagement = () => {
         }
     ]
 
+    const actions = [
+        {
+            key: "ver_detalles",
+            label: "Ver detalles",
+            icon: <Eye className="w-4 h-4" />,
+            onClick: (item) => {
+                setSelectedIdConductor(item.id_conductor)
+                setIsModalOpen(true);
+            },
+        },
+    ]
+
     return (
         <>
-        <div className="mt-4 mb-8">
-            <AnimatedTitle text="Gestión de condutores" />
-            <AnimatedText text="Gestiona el estado operativo de tus conductores en tiempo real" />
 
-        </div>
-            <Table
-                title={`Total de conductores: ${drivers.length}`}
-                columns={columns}
-                data={drivers}
-            />
+            {loading ? (
+                <div className="w-full h-screen flex items-center justify-center" >
+                    <Loading />
+                </div >
+            ) :
+                <>
+                    <div className="mt-4 mb-8">
+                        <AnimatedTitle text="Gestión de condutores" />
+                        <AnimatedText text="Gestiona el estado operativo de tus conductores en tiempo real" />
+                    </div>
+
+                    <Table
+                        title={`Total de conductores: ${drivers.length}`}
+                        columns={columns}
+                        data={drivers}
+                        actions={actions}
+                    />
+                </>
+            }
+
+            {isModalOpen === true && (
+                <MostrarDetallesConductor
+                    driverId={selectedIdConductor}
+                    onClose={() => setIsModalOpen(false)}
+                />
+            )}
         </>
     )
 }

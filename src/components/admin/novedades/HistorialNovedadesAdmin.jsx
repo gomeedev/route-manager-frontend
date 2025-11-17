@@ -4,14 +4,13 @@ import { BellDot, Trash2, Edit, Eye } from 'lucide-react';
 
 import { GetNovedades, DeleteNovedad } from "../../../global/api/NovedadesService";
 
+import Loading from "../../common/Loading";
 import Table from "../../ui/table/Table";
 import { Modal } from "../../ui/modal/Modal";
 import Badge from "../../ui/badge/Badge";
 
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
 import AnimatedText from "../../ui/animation/AnimatedText";
-
-import Loading from "../../common/Loading";
 
 
 export const HistorialNovedadesAdmin = () => {
@@ -30,11 +29,13 @@ export const HistorialNovedadesAdmin = () => {
 
             const data = await GetNovedades()
             setNovedades(data)
-            setLoading(false)
 
         } catch (error) {
 
             toast.error("No se pudieron cargar las novedades")
+
+        } finally {
+            setLoading(false)
         }
 
     }
@@ -158,10 +159,7 @@ export const HistorialNovedadesAdmin = () => {
                     </div>
 
                     <Table
-                        title={
-                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <p>Total de novedades: <i><span className="text-gray-800 dark:text-white">{novedades.length}</span></i></p>
-                            </div>
+                        title={`Total de novedades: ${novedades.length}`
                         }
                         data={novedades}
                         columns={columns}
