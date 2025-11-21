@@ -3,9 +3,7 @@ import { toast } from "sonner";
 
 import { ArrowRight } from "lucide-react";
 
-import axios from "axios";
 
-import { API_URL } from "../../../global/config/api";
 import { GetRoutesManagementService, AsignarConductorService } from "../../../global/api/admin/RoutesManagementService";
 
 import Table from "../../ui/table/Table";

@@ -34,7 +34,21 @@ export const DriversManagement = () => {
         try {
 
             const response = await DriversManagementService();
-            setDrivers(response);
+
+            // Ordenar los conductores por estado
+            const orderMap = {
+                "disponible": 1,
+                "en_ruta": 2,
+                "no_disponible": 3
+
+            }
+
+            const sorted = response.sort(
+                (a, b) => orderMap[a.estado] - orderMap[b.estado]
+            )
+
+
+            setDrivers(sorted);
 
         } catch (error) {
 
@@ -97,7 +111,7 @@ export const DriversManagement = () => {
             label: "Estado",
             render: (item) => {
                 const colorMap = {
-                    "Disponible": "success",
+                    "disponible": "success",
                     "en_ruta": "warning",
                     "no_disponible": "error",
                 };
@@ -134,6 +148,7 @@ export const DriversManagement = () => {
                 setSelectedIdConductor(item.id_conductor);
                 setIsModalOpen("asignar_conductor");
             },
+            disabled: (item) => item.estado !== "disponible",
             className: "hover:bg-success-50 text-success-600 hover:dark:bg-success-500/15 dark:text-success-500"
         }
 
