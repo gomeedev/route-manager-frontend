@@ -110,13 +110,25 @@ export const DriversManagement = () => {
             key: "estado",
             label: "Estado",
             render: (item) => {
+                const labelMap = {
+                    "disponible": "Disponible",
+                    "en_ruta": "En ruta",
+                    "no_disponible": "No disponible"
+                };
+
                 const colorMap = {
                     "disponible": "success",
                     "en_ruta": "warning",
                     "no_disponible": "error",
                 };
-                return <Badge color={colorMap[item.estado] || "primary"}>{item.estado}</Badge>
+
+                return (
+                    <Badge color={colorMap[item.estado] || "primary"}>
+                        {labelMap[item.estado] || item.estado}
+                    </Badge>
+                );
             }
+
         }
     ]
 
