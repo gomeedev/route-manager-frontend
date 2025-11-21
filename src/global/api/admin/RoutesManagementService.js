@@ -27,7 +27,7 @@ export const GetRoutesManagementService = async () => {
 };
 
 
-// Ver rutas para el módulo de historial de entregas
+// Ver rutas para el módulo de historial de rutas
 export const GetRoutesHistoryService = async () => {
 
   try {
@@ -56,14 +56,31 @@ export const ExportarPdfRutaService = async (id_ruta) => {
 
     try {
 
-        const response = await axios.get(
-            `${API_URL}/api/v1/rutas/${id_ruta}/exportar_pdf/`, { responseType: "blob" });
+        const response = await axios.get(`${API_URL}/api/v1/rutas/${id_ruta}/exportar_pdf/`, { responseType: "blob" });
         return response;
 
     } catch (error) {
 
-        console.error(error);
+        console.log(error);
         throw error;
 
     }
 };
+
+
+// Asignar conductor a una ruta
+export const AsignarConductorService = async (id_ruta, conductor) => {
+
+  try {
+
+    const response = await axios.post(`${API_URL}/api/v1/rutas/${id_ruta}/asignar_conductor/`, 
+      {conductor}
+    )
+    return response
+
+  } catch (error) {
+
+    console.log(error)
+    throw error
+  }
+}

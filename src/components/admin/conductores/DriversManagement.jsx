@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { Eye, Edit } from "lucide-react";
+import { Eye, Edit, ArrowRight } from "lucide-react";
 
 import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 
 import { DriversManagementService } from "../../../global/api/admin/DriversManagementService";
 import { MostrarDetallesConductor } from "./MostrarDetallesConductor";
 import { EditarConductor } from "./EditarConductor";
+import { AsignarConductor } from "./AsignarConductor";
 
 import Loading from "../../common/Loading";
 import Table from "../../ui/table/Table";
@@ -16,13 +17,14 @@ import AnimatedTitle from "../../ui/animation/AnimatedTitle";
 import AnimatedText from "../../ui/animation/AnimatedText";
 
 
+
+
 export const DriversManagement = () => {
 
     const [drivers, setDrivers] = useState([])
     const [selectedIdConductor, setSelectedIdConductor] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
-
 
 
     const GetConductores = async () => {
@@ -70,6 +72,15 @@ export const DriversManagement = () => {
             )
         },
         {
+            key: "ruta_asignada",
+            label: "Ruta asignada",
+            render: (item) => {
+                return (
+                    <span className="text-sm text-gray-500 dark:text-gray-400"><i>{item.ruta_asignada}</i></span>
+                )
+            }
+        },
+        {
             key: "conductor_detalle.tipo_documento",
             label: "Tipo documento",
         },
@@ -115,6 +126,17 @@ export const DriversManagement = () => {
             },
             className: "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-500/10"
         },
+        {
+            key: "asignar",
+            label: "Asignar una ruta",
+            icon: <ArrowRight className="w-4 h-4" />,
+            onClick: (item) => {
+                setSelectedIdConductor(item.id_conductor);
+                setIsModalOpen("asignar_conductor");
+            },
+            className: "hover:bg-success-50 text-success-600 hover:dark:bg-success-500/15 dark:text-success-500"
+        }
+
     ];
 
 
@@ -152,9 +174,18 @@ export const DriversManagement = () => {
                 <EditarConductor
                     driverId={selectedIdConductor}
                     onClose={() => setIsModalOpen(false)}
-                    refreshTable={GetConductores}  
+                    refreshTable={GetConductores}
                 />
             )}
+
+            {isModalOpen === "asignar_conductor" && (
+                <AsignarConductor
+                    driverId={selectedIdConductor}
+                    onClose={() => setIsModalOpen(false)}
+                    refreshTable={GetConductores}
+                />
+            )}
+
 
         </>
     )

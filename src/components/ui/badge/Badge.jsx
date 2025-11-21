@@ -1,3 +1,4 @@
+
 import React from "react";
 
 const Badge = ({
@@ -11,7 +12,7 @@ const Badge = ({
     "inline-flex items-center px-2.5 py-0.5 justify-center gap-1 rounded-full font-medium";
 
   const sizeStyles = {
-    sm: "text-theme-xs",
+    sm: "text-xs",
     md: "text-sm",
   };
 
@@ -28,6 +29,8 @@ const Badge = ({
       "bg-blue-light-50 text-blue-light-500 dark:bg-blue-light-500/15 dark:text-blue-light-500",
     light: "bg-gray-100 text-gray-700 dark:bg-white/5 dark:text-white/80",
     dark: "bg-gray-500 text-white dark:bg-white/5 dark:text-white",
+    purple:
+      "bg-purple-50 text-purple-600 dark:bg-purple-500/15 dark:text-purple-400",
   };
 
   const sizeClass = sizeStyles[size];
@@ -42,4 +45,5 @@ const Badge = ({
   );
 };
 
-export default Badge;
+
+export default Badge

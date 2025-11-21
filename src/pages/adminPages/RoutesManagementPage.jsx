@@ -1,6 +1,9 @@
+import { RoutesManagement } from "../../components/admin/rutas/RoutesManagement"
+
+
 export const RoutesManagementPage = () => {
 
     return <div>
-        Gestion de rutas
+        <RoutesManagement />
     </div>
 }
