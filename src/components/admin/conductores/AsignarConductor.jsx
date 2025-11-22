@@ -30,8 +30,7 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
             // Filtrar rutas sin conductor
             const disponibles = rutasData.filter(
                 (ruta) =>
-                    (ruta.estado === "Pendiente" || ruta.estado === "Asignada") &&
-                    !ruta.conductor_detalle
+                    (ruta.estado === "Pendiente")
             );
 
             setRutas(disponibles);

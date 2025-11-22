@@ -157,6 +157,7 @@ export const DriversManagement = () => {
                 setSelectedIdConductor(item.id_conductor);
                 setIsModalOpen("editar");
             },
+            disabled: (item) => item.estado !== "Disponible",
             className: "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-500/10"
         },
         {
