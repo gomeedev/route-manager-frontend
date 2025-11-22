@@ -1,3 +1,5 @@
+import { Plus } from 'lucide-react';
+
 const Table = ({
   title,
   data = [],
@@ -7,6 +9,12 @@ const Table = ({
   loading = false,
   emptyMessage = "No hay datos para mostrar",
 }) => {
+
+
+  const getNestedValue = (obj, key) => {
+    return key.split(".").reduce((acc, part) => acc?.[part], obj);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow border border-gray-200 dark:border-gray-700">
       {/* HEADER */}
@@ -74,7 +82,11 @@ const Table = ({
                     >
                       {col.render ? col.render(item) : (
                         <div className={`text-sm text-gray-600 dark:text-gray-400 ${col.truncate ? 'max-w-xs truncate' : ''}`}>
-                          {item[col.key] || <i className='text-gray-400'>N/A</i>}
+
+                          {getNestedValue(item, col.key) ?? (
+                            <i className='text-gray-400'>N/A</i>
+                          )}
+
                         </div>
                       )}
                     </td>
@@ -82,16 +94,27 @@ const Table = ({
                   {actions.length > 0 && (
                     <td className="px-6 py-4 w-32">
                       <div className="flex items-center justify-center gap-1">
-                        {actions.map((action) => (
-                          <button
-                            key={action.key}
-                            onClick={() => action.onClick(item)}
-                            className={`p-2 rounded-lg transition-colors ${action.className || 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'}`}
-                            title={action.label}
-                          >
-                            {action.icon}
-                          </button>
-                        ))}
+                        {actions.map((action) => {
+                          const isDisabled = typeof action.disabled === 'function' 
+                            ? action.disabled(item) 
+                            : action.disabled;
+
+                          return (
+                            <button
+                              key={action.key}
+                              onClick={() => !isDisabled && action.onClick(item)}
+                              disabled={isDisabled}
+                              className={`p-2 rounded-lg transition-colors ${
+                                isDisabled 
+                                  ? 'opacity-40 cursor-not-allowed' 
+                                  : action.className || 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'
+                              }`}
+                              title={action.label}
+                            >
+                              {action.icon}
+                            </button>
+                          );
+                        })}
                       </div>
                     </td>
                   )}
@@ -104,6 +127,5 @@ const Table = ({
     </div>
   );
 };
-
 
 export default Table;

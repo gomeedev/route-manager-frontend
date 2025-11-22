@@ -1,0 +1,253 @@
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+
+import { Eye } from "lucide-react";
+import { Download } from "lucide-react";
+
+import { GetRoutesHistoryService, ExportarPdfRutaService } from "../../../global/api/admin/RoutesManagementService";
+
+import Table from "../../ui/table/Table";
+import Loading from "../../common/Loading";
+import { Modal } from "../../ui/modal/Modal";
+import Badge from "../../ui/badge/Badge";
+
+import AnimatedTitle from "../../ui/animation/AnimatedTitle";
+import AnimatedText from "../../ui/animation/AnimatedText";
+import { fotoDefaultUrl } from "../../../global/supabase/storageService";
+
+
+
+
+export const Routeshistory = () => {
+
+    const [routes, setRoutes] = useState([])
+    const [loading, setLoading] = useState(false)
+
+
+    const GetRoutes = async () => {
+
+        setLoading(true)
+
+        try {
+
+            const response = await GetRoutesHistoryService();
+            setRoutes(response);
+
+        } catch (error) {
+
+            toast.error("No se puedieron cargar las rutas")
+
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        GetRoutes()
+    }, [])
+
+
+    const handleView = async (id_ruta) => {
+        try {
+            const response = await ExportarPdfRutaService(id_ruta);
+
+            const blob = new Blob([response.data], { type: "application/pdf" });
+            const fileURL = URL.createObjectURL(blob);
+
+            window.open(fileURL, "_blank");
+        } catch (error) {
+            toast.error("No se pudo abrir el PDF");
+        }
+    };
+
+
+    const handleDownload = async (id_ruta) => {
+        try {
+            const response = await ExportarPdfRutaService(id_ruta);
+
+            const blob = new Blob([response.data], { type: "application/pdf" });
+            const url = window.URL.createObjectURL(blob);
+
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `reporte-ruta_${id_ruta}.pdf`;
+            link.click();
+            URL.revokeObjectURL(url);
+
+        } catch (error) {
+            toast.error("No se pudo descargar el PDF");
+        }
+    };
+
+
+
+
+    const columns = [
+        {
+            key: "codigo_manifiesto",
+            label: "Manifiesto"
+        },
+        {
+            key: "conductor",
+            label: "Conductor",
+            render: (item) => {
+                const conductor = item.conductor_detalle?.conductor_detalle;
+
+                return (
+                    <div className="flex items-center gap-3">
+                        <img src={item.conductor_detalle.conductor_detalle.foto_perfil || fotoDefaultUrl}
+                            alt="Conductor"
+                            className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <span className="text-sm text-gray-600 dark:text-gray-400 gap-4">
+                            {conductor
+                                ? `${conductor.nombre} ${conductor.apellido}`
+                                : <span className="text-gray-500 dark:text-gray-400"><i>Sin asignar</i></span>}
+                        </span>
+                    </div>
+                );
+            }
+        },
+        {
+            key: "vehiculo",
+            label: "Vehiculo",
+            render: (item) => {
+                const vehiculo = item.vehiculo_detalle;
+
+                return (
+                    <div className="flex items-center gap-3" >
+                        {
+                            item.vehiculo_detalle ? (
+                                <>
+                                    <img src={vehiculo.imagen || fotoDefaultUrl}
+                                        alt="vehiculo"
+                                        className="w-10 h-10 rounded-full object-cover"
+                                    />
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                                            {item.vehiculo_detalle.tipo}
+                                        </span>
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                                            {item.vehiculo_detalle.placa}
+                                        </span>
+                                    </div>
+                                </>
+                            ) : (
+                                <span className="text-gray-500 dark:text-gray-400">
+                                    <i>Sin asignar</i>
+                                </span>
+                            )
+                        }
+                    </div >
+                )
+            }
+        },
+        {
+            key: "paquetes",
+            label: "Paquetes",
+            render: (item) => (
+                <div className="flex items-center gap-4">
+                    <Badge color="info">{item.paquetes_asignados.length}</Badge>
+                </div>
+            )
+        },
+        {
+            key: "fecha_inicio",
+            label: "Fecha inicio",
+            render: (item) => {
+                const fecha = new Date(item.fecha_inicio);
+                return (
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {
+                            new Intl.DateTimeFormat("es-CO", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                                hour: "numeric",
+                                minute: "numeric"
+                            }).format(fecha)
+                        }
+                    </span>
+                )
+            }
+        },
+        {
+            key: "fecha_fin",
+            label: "Fecha fin",
+            render: (item) => {
+                const fecha = new Date(item.fecha_fin);
+                return (
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {
+                            new Intl.DateTimeFormat("es-CO", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                                hour: "numeric",
+                                minute: "numeric"
+                            }).format(fecha)
+                        }
+                    </span>
+                )
+            }
+        },
+        {
+            key: "estado",
+            label: "Estado",
+            render: (item) => {
+                const colorMap = {
+                    "Pendiente": "warning",
+                    "Asignada": "primary",
+                    "En ruta": "info",
+                    "Completada": "success",
+                    "Fallida": "error",
+                };
+                return <Badge color={colorMap[item.estado] || "primary"}>{item.estado}</Badge>
+            }
+        }
+
+    ]
+
+
+    const actions = [
+        {
+            key: "ver",
+            label: "Ver reporte",
+            icon: <Eye className="w-4 h-4" />,
+            onClick: (item) => handleView(item.id_ruta)
+        },
+        {
+            key: "descargar",
+            label: "Descargar reporte",
+            icon: <Download className="w-4 h-4" />,
+            onClick: (item) => handleDownload(item.id_ruta)
+        }
+    ]
+
+
+
+    return (
+        <>
+            {loading ? (
+                <div className="w-full h-screen flex items-center justify-center" >
+                    <Loading />
+                </div >
+            ) :
+                <>
+                    <div className="mt-4 mb-8">
+                        <AnimatedTitle text="Historial de rutas" />
+                        <AnimatedText text="Visualiza y genera reportes del historial de entregas de tus conductores" />
+                    </div>
+
+                    <Table
+                        title={`Total de rutas: ${routes.length}`}
+                        columns={columns}
+                        data={routes}
+                        actions={actions}
+                    />
+                </>
+            }
+        </>
+    )
+
+}

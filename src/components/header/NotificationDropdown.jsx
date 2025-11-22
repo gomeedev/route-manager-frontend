@@ -6,6 +6,7 @@ import { GetNotifications, MarcarNovedad } from "../../global/api/NovedadesServi
 
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import { toast } from "sonner";
 
 
 
@@ -43,7 +44,10 @@ export const NotificationDropdown = () => {
         )
       );
     } catch (error) {
+      
       console.error("Error al marcar la novedad como leída:", error);
+      toast.error("No se pudo marcar como leida")
+
     }
   };
 
