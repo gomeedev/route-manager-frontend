@@ -37,9 +37,10 @@ export const DriversManagement = () => {
 
             // Ordenar los conductores por estado
             const orderMap = {
-                "disponible": 1,
-                "en_ruta": 2,
-                "no_disponible": 3
+                "Disponible": 1,
+                "Asignado": 2,
+                "En ruta": 3,
+                "No disponible": 4
 
             }
 
@@ -85,6 +86,29 @@ export const DriversManagement = () => {
                 </div>
             )
         },
+/*         {
+            key: "conductor_detalle.tipo_documento",
+            label: "Tipo documento",
+        }, */
+        {
+            key: "conductor_detalle.correo",
+            label: "Correo"
+        },
+        {
+            key: "conductor_detalle.telefono_movil",
+            label: "telefono"
+        },
+        {
+            key: "vehiculo_detalle",
+            label: "Vehiculo asignado",
+            render: (item) => {
+                return (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                        <i>{item.vehiculo_detalle?.placa ?? "Sin asignar"}</i>
+                    </span>
+                )
+            },
+        },
         {
             key: "ruta_asignada",
             label: "Ruta asignada",
@@ -95,36 +119,19 @@ export const DriversManagement = () => {
             }
         },
         {
-            key: "conductor_detalle.tipo_documento",
-            label: "Tipo documento",
-        },
-        {
-            key: "conductor_detalle.correo",
-            label: "Correo"
-        },
-        {
-            key: "conductor_detalle.telefono_movil",
-            label: "telefono"
-        },
-        {
             key: "estado",
             label: "Estado",
             render: (item) => {
-                const labelMap = {
-                    "disponible": "Disponible",
-                    "en_ruta": "En ruta",
-                    "no_disponible": "No disponible"
-                };
-
                 const colorMap = {
-                    "disponible": "success",
-                    "en_ruta": "warning",
-                    "no_disponible": "error",
+                    "Disponible": "success",
+                    "Asignado": "primary",
+                    "En ruta": "warning",
+                    "No disponible": "error",
                 };
 
                 return (
                     <Badge color={colorMap[item.estado] || "primary"}>
-                        {labelMap[item.estado] || item.estado}
+                        {item.estado}
                     </Badge>
                 );
             }
@@ -160,11 +167,12 @@ export const DriversManagement = () => {
                 setSelectedIdConductor(item.id_conductor);
                 setIsModalOpen("asignar_conductor");
             },
-            disabled: (item) => item.estado !== "disponible",
+            disabled: (item) => item.estado !== "Disponible",
             className: "hover:bg-success-50 text-success-600 hover:dark:bg-success-500/15 dark:text-success-500"
         }
 
     ];
+
 
 
     return (

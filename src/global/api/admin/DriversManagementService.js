@@ -60,5 +60,22 @@ export const EditConductorService = async (id_conductor, driverData) => {
 }
 
 
+// Asignar vehiculo a un conductor
+export const AsignarVehiculoService = async (id_conductor, vehiculo) => {
+
+    try {
+
+    const response = await axios.post(`${API_URL}/api/v1/drivers/${id_conductor}/asignar_vehiculo/`, 
+      {vehiculo}
+    )
+    return response
+
+  } catch (error) {
+
+    console.log(error)
+    throw error
+  }
+}
+
 // Asignar conductor a una ruta
 // - Esta petición la implemente en RoutesManagementService porque pertenece más a rutas

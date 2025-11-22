@@ -22,24 +22,24 @@ const navItems = [
     path: "/admin",
   },
   {
-    icon: <Inventory2 className="menu-item-icon-size fill-current" />,
-    name: "Gestión de paquetes",
-    path: "/admin/packages-management",
-  },
-  {
     icon: <LocationOnIcon className="menu-item-icon-size" />,
     name: "Gestión de rutas",
     path: "/admin/routes-management",
   },
   {
-    icon: <LocalShipping className="menu-item-icon-size" />,
-    name: "Gestión de vehículos",
-    path: "/admin/vehicles-management",
+    icon: <Inventory2 className="menu-item-icon-size fill-current" />,
+    name: "Gestión de paquetes",
+    path: "/admin/packages-management",
   },
   {
     icon: <Groups2Icon className="menu-item-icon-size fill-current" />,
     name: "Gestión de conductores",
     path: "/admin/drivers-management",
+  },
+  {
+    icon: <LocalShipping className="menu-item-icon-size" />,
+    name: "Gestión de vehículos",
+    path: "/admin/vehicles-management",
   },
   {
     icon: <History className="menu-item-icon-size fill-current" />,

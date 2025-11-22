@@ -69,7 +69,7 @@ export const EditarVehiculo = ({ vehicleId, onClose, refreshTable }) => {
         formData.append("placa", placa);
 
         if (photo && typeof photo !== "string") {
-            formData.append("imagen", photo);
+            formData.append("foto", photo);
         }
 
 

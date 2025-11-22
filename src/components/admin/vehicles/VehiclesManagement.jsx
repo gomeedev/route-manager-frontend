@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
-import { ArrowRight, Delete, Edit, Trash2 } from "lucide-react";
+import { ArrowRight, Edit, Trash2 } from "lucide-react";
 
 import { GetVehiclesManagement } from "../../../global/api/admin/VehiclesManagementService";
 import { CrearVehiculos } from "./CrearVehiculos";
 import { EditarVehiculo } from "./EditarVehiculos";
 import { EliminarVehiculo } from "./EliminarVehiculos";
-import { AsignarVehiculo } from "./AisgnarVechiculo";
+import { AsignarVehiculo } from "./AsignarVechiculo";
 
 import Table from "../../ui/table/Table";
 import Loading from "../../common/Loading";
@@ -34,7 +34,21 @@ export const VehiclesManagement = () => {
         try {
 
             const response = await GetVehiclesManagement();
-            setVehicles(response)
+
+            const orderMap = {
+                "Disponible": 1,
+                "Asignado": 2,
+                "En ruta": 3,
+                "No disponible": 4
+
+            }
+
+
+            const sorted = response.sort(
+                (a, b) => orderMap[a.estado] - orderMap[b.estado]
+            )
+
+            setVehicles(sorted)
 
         } catch (error) {
 
@@ -43,6 +57,7 @@ export const VehiclesManagement = () => {
         } finally {
             setLoading(false)
         }
+
 
     }
 
@@ -78,11 +93,11 @@ export const VehiclesManagement = () => {
             label: "Placa"
         },
         {
-            key: "ruta_asignada",
-            label: "Ruta asignada",
+            key: "conductor_asignado",
+            label: "Conductor Asignado",
             render: (item) => {
                 return (
-                    <span className="text-sm text-gray-500 dark:text-gray-400"><i>{item.ruta_asignada}</i></span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400"><i>{item.conductor_asignado}</i></span>
                 )
             }
         },
@@ -126,14 +141,14 @@ export const VehiclesManagement = () => {
             className: "text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10",
         },
         {
-            key: "AsignarVehiculo",
-            label: "Asignar una ruta",
+            key: "asignar",
+            label: "Asignar un conductor",
             icon: <ArrowRight className="w-4 h-4" />,
             onClick: (item) => {
                 setSelectedIdVehicle(item.id_vehiculo)
                 setIsModalOpen("asignar_vehiculo")
             },
-            disable: (item) => item.estado !== "Disponible",
+            disabled: (item) => item.estado !== "Disponible",
             className: "hover:bg-success-50 text-success-600 hover:dark:bg-success-500/15 dark:text-success-500",
         },
 
