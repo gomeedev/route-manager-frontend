@@ -32,7 +32,7 @@ export const getVehiclesDetalles = async (id_vehiculo) => {
 
     console.log(error.response?.data || error);
     throw error;
-    
+
   }
 };
 
@@ -68,4 +68,20 @@ export const EditVehiclesManagement = async (id_vehiculo, vehicleData) => {
         throw error
     }
 
+}
+
+
+// Eliminar vehiculos para el módulo de gestión de vehiculos
+export const DeleteVehiculo = async (id_vehiculo) => {
+
+    try {
+        const response = await axios.delete(`${API_URL}/api/v1/vehiculos/${id_vehiculo}/`);
+        return response.data
+
+    } catch (error) {
+
+        console.log(error.response?.data || error)
+        throw error
+
+    }
 }

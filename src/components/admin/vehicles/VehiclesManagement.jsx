@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
-import { Edit } from "lucide-react";
+import { Delete, Edit, Trash2 } from "lucide-react";
 
 import { GetVehiclesManagement } from "../../../global/api/admin/VehiclesManagementService";
 import { CrearVehiculos } from "./CrearVehiculos";
 import { EditarVehiculo } from "./EditarVehiculos";
+import { EliminarVehiculo } from "./EliminarVehiculos";
 
 import Table from "../../ui/table/Table";
 import Loading from "../../common/Loading";
@@ -104,14 +105,26 @@ export const VehiclesManagement = () => {
 
     const actions = [
         {
-            key: "EditarVehiculos",
-            label: "Editar Vehiculos",
+            key: "EditarVehiculo",
+            label: "Editar Vehiculo",
             icon: <Edit className="w-4 h-4" />,
             onClick: (item) => {
                 setSelectedIdVehicle(item.id_vehiculo)
                 setIsModalOpen("Editar")
-            }
-        }
+            },
+            className: "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-500/10"
+        },
+        {
+            key: "EliminarVehiculo",
+            label: "Eliminar vehiculo",
+            icon: <Trash2 className="w-4 h-4" />,
+            onClick: (item) => {
+                setSelectedIdVehicle(item.id_vehiculo)
+                setIsModalOpen("Eliminar")
+            },
+            className: "text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10",
+        },
+
 
     ]
 
@@ -138,7 +151,7 @@ export const VehiclesManagement = () => {
                 />
 
 
-                {isModalOpen && (
+                {isModalOpen === true && (
                     <CrearVehiculos
                         onClose={() => setIsModalOpen(false)}
                         refreshTable={getVehicles}
@@ -150,6 +163,14 @@ export const VehiclesManagement = () => {
 
             {isModalOpen === "Editar" && (
                 <EditarVehiculo
+                    vehicleId={selectedIdVehicle}
+                    onClose={() => setIsModalOpen(false)}
+                    refreshTable={getVehicles}
+                />
+            )}
+
+            {isModalOpen === "Eliminar" && (
+                <EliminarVehiculo
                     vehicleId={selectedIdVehicle}
                     onClose={() => setIsModalOpen(false)}
                     refreshTable={getVehicles}
