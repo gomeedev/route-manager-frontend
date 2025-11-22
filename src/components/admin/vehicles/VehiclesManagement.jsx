@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
-import { Delete, Edit, Trash2 } from "lucide-react";
+import { ArrowRight, Delete, Edit, Trash2 } from "lucide-react";
 
 import { GetVehiclesManagement } from "../../../global/api/admin/VehiclesManagementService";
 import { CrearVehiculos } from "./CrearVehiculos";
 import { EditarVehiculo } from "./EditarVehiculos";
 import { EliminarVehiculo } from "./EliminarVehiculos";
+import { AsignarVehiculo } from "./AisgnarVechiculo";
 
 import Table from "../../ui/table/Table";
 import Loading from "../../common/Loading";
@@ -124,6 +125,17 @@ export const VehiclesManagement = () => {
             },
             className: "text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10",
         },
+        {
+            key: "AsignarVehiculo",
+            label: "Asignar una ruta",
+            icon: <ArrowRight className="w-4 h-4" />,
+            onClick: (item) => {
+                setSelectedIdVehicle(item.id_vehiculo)
+                setIsModalOpen("asignar_vehiculo")
+            },
+            disable: (item) => item.estado !== "Disponible",
+            className: "hover:bg-success-50 text-success-600 hover:dark:bg-success-500/15 dark:text-success-500",
+        },
 
 
     ]
@@ -171,6 +183,14 @@ export const VehiclesManagement = () => {
 
             {isModalOpen === "Eliminar" && (
                 <EliminarVehiculo
+                    vehicleId={selectedIdVehicle}
+                    onClose={() => setIsModalOpen(false)}
+                    refreshTable={getVehicles}
+                />
+            )}
+
+            {isModalOpen === "asignar_vehiculo" && (
+                <AsignarVehiculo
                     vehicleId={selectedIdVehicle}
                     onClose={() => setIsModalOpen(false)}
                     refreshTable={getVehicles}

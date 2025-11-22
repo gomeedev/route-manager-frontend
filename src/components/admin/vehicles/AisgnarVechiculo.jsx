@@ -3,8 +3,7 @@ import { toast } from "sonner";
 
 import { ArrowRight } from "lucide-react";
 
-
-import { GetRoutesManagementService, AsignarConductorService } from "../../../global/api/admin/RoutesManagementService";
+import { AsignarVehiculoService, GetRoutesManagementService } from "../../../global/api/admin/RoutesManagementService";
 
 import Table from "../../ui/table/Table";
 import Loading from "../../common/Loading";
@@ -13,7 +12,7 @@ import { Modal } from "../../ui/modal/Modal";
 
 
 
-export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
+export const AsignarVehiculo = ({ vehicleId, onClose, refreshTable }) => {
 
     const [rutas, setRutas] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -50,12 +49,11 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
     }, []);
 
 
-    // 2. Asignar conductor a una ruta
     const asignar = async (id_ruta) => {
         try {
-            
-            await AsignarConductorService(id_ruta, driverId)
-            toast.success("Conductor asignado correctamente");
+
+            await AsignarVehiculoService(id_ruta, vehicleId)
+            toast.success("Vehiculo asignado correctamente");
 
             refreshTable();
             onClose();
@@ -65,7 +63,7 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
         }
     };
 
-    // 3. Columnas de tabla
+
     const columns = [
         {
             key: "codigo_manifiesto",
@@ -76,8 +74,8 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
             label: "Paquetes"
         },
         {
-            key: "vehiculo_detalle.ruta_asignada",
-            label: "Vehiculo"
+            key: "conductor_detalle.conductor_detalle.nombre",
+            label: "Conductor"
         },
         {
             key: "estado",
@@ -98,12 +96,10 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
 
     return (
         <>
-            <Modal isOpen={true} onClose={onClose} showCloseButton className="p-4">
-
+            <Modal isOpen={true} onClose={onClose} showCloseButton className="p-4" >
                 <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 pb-6">
-                    Asignar el conductor a una ruta
+                    Asignar el vehiculo a una ruta
                 </h3>
-
 
                 {loading ? (
                     <div className="w-full flex justify-center py-10">
@@ -119,5 +115,6 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
                 )}
             </Modal>
         </>
-    );
-};
+    )
+
+}
