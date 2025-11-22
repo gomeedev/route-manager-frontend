@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
+import { Edit } from "lucide-react";
+
 import { GetVehiclesManagement } from "../../../global/api/admin/VehiclesManagementService";
 import { CrearVehiculos } from "./CrearVehiculos";
+import { EditarVehiculo } from "./EditarVehiculos";
 
 import Table from "../../ui/table/Table";
 import Loading from "../../common/Loading";
@@ -17,6 +20,7 @@ import AnimatedText from "../../ui/animation/AnimatedText";
 export const VehiclesManagement = () => {
 
     const [vehicles, setVehicles] = useState([])
+    const [selectedIdVehicle, setSelectedIdVehicle] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
 
@@ -73,7 +77,12 @@ export const VehiclesManagement = () => {
         },
         {
             key: "ruta_asignada",
-            label: "Ruta asignada"
+            label: "Ruta asignada",
+            render: (item) => {
+                return (
+                    <span className="text-sm text-gray-500 dark:text-gray-400"><i>{item.ruta_asignada}</i></span>
+                )
+            }
         },
         {
             key: "estado",
@@ -90,6 +99,20 @@ export const VehiclesManagement = () => {
                 );
             }
         },
+    ]
+
+
+    const actions = [
+        {
+            key: "EditarVehiculos",
+            label: "Editar Vehiculos",
+            icon: <Edit className="w-4 h-4" />,
+            onClick: (item) => {
+                setSelectedIdVehicle(item.id_vehiculo)
+                setIsModalOpen("Editar")
+            }
+        }
+
     ]
 
 
@@ -110,6 +133,7 @@ export const VehiclesManagement = () => {
                     title={`Total de vehiculos: ${vehicles.length}`}
                     columns={columns}
                     data={vehicles}
+                    actions={actions}
                     onAdd={() => setIsModalOpen(true)}
                 />
 
@@ -122,6 +146,15 @@ export const VehiclesManagement = () => {
                 )}
 
             </>}
+
+
+            {isModalOpen === "Editar" && (
+                <EditarVehiculo
+                    vehicleId={selectedIdVehicle}
+                    onClose={() => setIsModalOpen(false)}
+                    refreshTable={getVehicles}
+                />
+            )}
         </>
     )
 
