@@ -18,3 +18,20 @@ export const GetVehiclesManagement = async () => {
         throw error;
     }
 };
+
+
+// Agregar vehiculos para el módulo de gestión de vehiculos
+export const PostVehiclesManagement = async (formData) => {
+
+    try {
+
+        const response = await axios.post(`${API_URL}/api/v1/vehiculos/`, formData)
+        return response.data
+
+    } catch(error) {
+
+        console.log(error.response?.data || error)
+        throw error
+    }
+
+}

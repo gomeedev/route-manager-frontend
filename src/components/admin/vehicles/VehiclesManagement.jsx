@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 import { GetVehiclesManagement } from "../../../global/api/admin/VehiclesManagementService";
+import { CrearVehiculos } from "./CrearVehiculos";
 
 import Table from "../../ui/table/Table";
 import Loading from "../../common/Loading";
@@ -109,7 +110,17 @@ export const VehiclesManagement = () => {
                     title={`Total de vehiculos: ${vehicles.length}`}
                     columns={columns}
                     data={vehicles}
+                    onAdd={() => setIsModalOpen(true)}
                 />
+
+
+                {isModalOpen && (
+                    <CrearVehiculos
+                        onClose={() => setIsModalOpen(false)}
+                        refreshTable={getVehicles}
+                    />
+                )}
+
             </>}
         </>
     )
