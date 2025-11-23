@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { Modal } from "../../ui/modal/Modal";
-import { DeleteVehiculo } from "../../../global/api/admin/VehiclesManagementService";
+import { DeleteClientsManagementService } from "../../../global/api/admin/ClientsManagementService";
 
-export const EliminarVehiculo = ({ vehicleId, onClose, refreshTable }) => {
+export const EliminarCliente = ({ clientId, onClose, refreshTable }) => {
 
     const [loading, setLoading] = useState(false);
 
@@ -11,15 +11,15 @@ export const EliminarVehiculo = ({ vehicleId, onClose, refreshTable }) => {
         setLoading(true);
 
         try {
-            await DeleteVehiculo(vehicleId);
+            await DeleteClientsManagementService(clientId);
 
-            toast.success("Vehículo eliminado correctamente");
+            toast.success("Cliente eliminado correctamente");
 
-            refreshTable(); 
-            onClose();        
+            refreshTable();  
+            onClose();      
 
         } catch (error) {
-            toast.error("No se pudo eliminar el vehículo");
+            toast.error(error.response?.data?.error || "No se pudo eliminar el cliente");
         } finally {
             setLoading(false);
         }
@@ -29,7 +29,7 @@ export const EliminarVehiculo = ({ vehicleId, onClose, refreshTable }) => {
         <Modal isOpen={true} onClose={onClose} showCloseButton={true} size="sm">
             <div className="flex flex-col items-center justify-center text-center space-y-6 p-6">
                 <p className="text-[16px] font-medium text-gray-800 dark:text-gray-200">
-                    ¿Estás seguro de que deseas eliminar este vehículo?
+                    ¿Estás seguro de que deseas eliminar este cliente?
                 </p>
 
                 <div className="flex gap-4">

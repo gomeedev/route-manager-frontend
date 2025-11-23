@@ -22,6 +22,7 @@ import { VehiclesManagementPage } from "./pages/adminPages/VehiclesManagementPag
 import { DriversManagementPage } from "./pages/adminPages/DriversManagementPage";
 import { DeliveryHistory } from "./pages/adminPages/DeliveryHistory";
 import { NovedadesAdminPage } from "./pages/adminPages/NovedadesAdminPage";
+import { ClientsManagementPage } from "./pages/adminPages/ClientsManagementPage";
 
 // Driver
 import DriverLayout from "./layout/driverLayout/DriverLayout";
@@ -52,6 +53,7 @@ function App() {
           <Route path="/admin" element={<AdminLayout />} >
             <Route index element={<AdminPage />} />
             <Route path="profile" element={< AdminProfilePage />} />
+            <Route path="clients-management" element={<ClientsManagementPage/>} />
             <Route path="packages-management" element={< PackagesManagementPage />} />
             <Route path="routes-management" element={< RoutesManagementPage />} />
             <Route path="vehicles-management" element={< VehiclesManagementPage />} />

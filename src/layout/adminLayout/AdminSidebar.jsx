@@ -7,6 +7,7 @@ import {
   Inventory2,
   LocalShipping,
   Groups2 as Groups2Icon,
+  People,
   History,
 } from "@mui/icons-material";
 
@@ -20,6 +21,11 @@ const navItems = [
     icon: <Home className="menu-item-icon-size fill-current" />,
     name: "Dashboard",
     path: "/admin",
+  },
+  {
+    icon: <People className="menu-item-icon-size fill-current" />,
+    name: "Gestión de clientes",
+    path: "/admin/clients-management",
   },
   {
     icon: <LocationOnIcon className="menu-item-icon-size" />,
