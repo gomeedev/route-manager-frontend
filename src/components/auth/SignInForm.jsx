@@ -53,7 +53,6 @@ export const SignInForm = () => {
 
             // local es persistente aunque cierre el navegador
             localStorage.setItem("token", token);
-            console.log(localStorage.getItem("token"))
 
 
             try {

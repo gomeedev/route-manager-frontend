@@ -148,7 +148,7 @@ const DriverSidebar = () => {
       </div>
 
 
-      <Modal isOpen={!!activeModal} onClose={closeModal} size="default">
+      <Modal isOpen={!!activeModal} onClose={closeModal} size="default" className="p-4">
         {activeModal === "ruta_activa" && (
           <ModalRutaActual onClose={closeModal} />
         )}
