@@ -37,7 +37,7 @@ export const PaquetesManagement = () => {
             const response = await GetPackagesManagementService();
 
             const orderMap = {
-                "Pendiente": 5,
+                "Pendiente": 1,
                 "Asignado": 2,
                 "En ruta": 3,
                 "Entregado": 4,
@@ -150,7 +150,6 @@ export const PaquetesManagement = () => {
                 setSelectedIdPaquetes(item.id_paquete);
                 setIsModalOpen("detalles");
             },
-            disabled: (item) => item.estado_paquete !== "Pendiente",
         },
 
         {
@@ -165,7 +164,7 @@ export const PaquetesManagement = () => {
             className: "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-500/10"
         },
         {
-            key: "EliminarVehiculo",
+            key: "EliminarPaquete",
             label: "Eliminar paquete",
             icon: <Trash2 className="w-4 h-4" />,
             onClick: (item) => {

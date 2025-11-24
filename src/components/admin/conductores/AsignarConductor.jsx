@@ -49,7 +49,6 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
     }, []);
 
 
-    // 2. Asignar conductor a una ruta
     const asignar = async (id_ruta) => {
         try {
             
@@ -64,7 +63,7 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
         }
     };
 
-    // 3. Columnas de tabla
+
     const columns = [
         {
             key: "codigo_manifiesto",

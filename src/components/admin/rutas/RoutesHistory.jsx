@@ -175,7 +175,16 @@ export const Routeshistory = () => {
             key: "fecha_fin",
             label: "Fecha fin",
             render: (item) => {
+                if (!item.fecha_fin) {
+                    return (
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <i>Pendiente</i>
+                        </span>
+                    );
+                }
+
                 const fecha = new Date(item.fecha_fin);
+
                 return (
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                         {
@@ -188,7 +197,7 @@ export const Routeshistory = () => {
                             }).format(fecha)
                         }
                     </span>
-                )
+                );
             }
         },
         {

@@ -28,14 +28,14 @@ const navItems = [
     path: "/admin/clients-management",
   },
   {
-    icon: <LocationOnIcon className="menu-item-icon-size" />,
-    name: "Gestión de rutas",
-    path: "/admin/routes-management",
-  },
-  {
     icon: <Inventory2 className="menu-item-icon-size fill-current" />,
     name: "Gestión de paquetes",
     path: "/admin/packages-management",
+  },
+  {
+    icon: <LocationOnIcon className="menu-item-icon-size" />,
+    name: "Gestión de rutas",
+    path: "/admin/routes-management",
   },
   {
     icon: <Groups2Icon className="menu-item-icon-size fill-current" />,

@@ -51,6 +51,54 @@ export const GetRoutesHistoryService = async () => {
 };
 
 
+// Ver detalles de la ruta para el módulo de gestion de rutas
+export const GetDetailsRoutesManagement = async (id_ruta) => {
+
+  try {
+
+    const response = await axios.get(`${API_URL}/api/v1/rutas/${id_ruta}/`)
+    return response.data
+
+  } catch (error) {
+
+    console.log(error.response?.data || error);
+    throw error
+  }
+}
+
+
+// Agregar rutas para el modulo de gestion de rutas
+export const PostRoutesService = async () => {
+
+  try {
+
+    const response = await axios.post(`${API_URL}/api/v1/rutas/`)
+    return response.data
+
+  } catch(error) {
+
+    console.log(error.response?.data)
+    throw error
+  }
+}
+
+
+// Eliminar ruta para el modulo de gestión de rutas
+export const DeleteRoutesService = async (id_ruta) => {
+
+  try {
+
+    const response = await axios.delete(`${API_URL}/api/v1/rutas/${id_ruta}/`)
+    return response.data
+
+  } catch(error) {
+
+    console.log(error.response?.data)
+    throw error
+  }
+}
+
+
 // ver y dercagar el pdf del historial de rutas
 export const ExportarPdfRutaService = async (id_ruta) => {
 
@@ -92,7 +140,7 @@ export const AsignarPaqueteService = async (id_ruta, paquetes) => {
   try {
 
     const response = await axios.post(`${API_URL}/api/v1/rutas/${id_ruta}/asignar_paquetes/`,
-      {paquetes: [paquetes]}
+      {paquetes}
     )
 
     return response

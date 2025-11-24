@@ -54,14 +54,14 @@ export const AsignarPaquete = ({ paqueteId, onClose, refreshTable }) => {
     const asignar = async (id_ruta) => {
         try {
 
-            await AsignarPaqueteService(id_ruta, paqueteId)
-            toast.success("Vehiculo asignado correctamente");
+            await AsignarPaqueteService(id_ruta, [paqueteId])
+            toast.success("Paquete asignado correctamente");
 
             refreshTable();
             onClose();
 
         } catch (error) {
-            toast.error(error.response?.data?.error || "Error al asignar conductor");
+            toast.error(error.response?.data?.error || "Error al asignar paquete");
         }
     };
 

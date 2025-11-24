@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { DeletePackagesManagementService } from "../../../global/api/admin/PackagesManagementService";
+import { DeleteRoutesService } from "../../../global/api/admin/RoutesManagementService";
 
 import { toast } from "sonner";
 import { Modal } from "../../ui/modal/Modal";
@@ -8,9 +8,9 @@ import { Modal } from "../../ui/modal/Modal";
 
 
 
-export const EliminarPaquete = ({ paqueteId, onClose, refreshTable }) => {
+export const EliminarRuta = ({ routeId, onClose, refreshTable }) => {
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false)
 
 
     const handleDelete = async () => {
@@ -18,28 +18,27 @@ export const EliminarPaquete = ({ paqueteId, onClose, refreshTable }) => {
 
         try {
 
-            await DeletePackagesManagementService(paqueteId);
-            toast.success("Paquete eliminado correctamente");
+            await DeleteRoutesService(routeId)
+            toast.success("Ruta eliminada correctamente");
 
-            refreshTable(); 
-            onClose();        
+            refreshTable();
+            onClose();
 
         } catch (error) {
 
-            toast.error(error.response?.data?.details || "No se pudo eliminar el paquete");
+            toast.error(error.response?.data?.details || "No se pudo eliminar el vehículo");
 
         } finally {
             setLoading(false);
 
         }
-    };
-
+    }
 
     return (
         <Modal isOpen={true} onClose={onClose} showCloseButton={true} size="sm">
             <div className="flex flex-col items-center justify-center text-center space-y-6 p-6">
                 <p className="text-[16px] font-medium text-gray-800 dark:text-gray-200">
-                    ¿Estás seguro de que deseas eliminar este paquete?
+                    ¿Estas seguro que deseas crear una ruta?
                 </p>
 
                 <div className="flex gap-4">
@@ -53,12 +52,13 @@ export const EliminarPaquete = ({ paqueteId, onClose, refreshTable }) => {
                     <button
                         onClick={handleDelete}
                         disabled={loading}
-                        className="w-[150px] px-4 py-3 rounded-lg bg-error-500 text-white hover:bg-error-600 disabled:opacity-50"
+                        className="w-[150px] px-4 py-3 rounded-lg bg-error-500 text-white hover:bg-error-600 disabled:opacity-5"
                     >
                         Confirmar
                     </button>
                 </div>
             </div>
         </Modal>
-    );
-};
+    )
+
+}
