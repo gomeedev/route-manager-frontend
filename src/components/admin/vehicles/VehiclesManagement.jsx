@@ -107,6 +107,7 @@ export const VehiclesManagement = () => {
             render: (item) => {
                 const colorMap = {
                     "Disponible": "success",
+                    "Asignado": "primary",
                     "En ruta": "warning",
                     "No disponible": "error",
                 };

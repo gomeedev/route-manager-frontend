@@ -37,6 +37,8 @@ export const MostrarDetallesConductor = ({ driverId, onClose }) => {
         }
     }, [driverId])
 
+    
+
 
     // Para obtener el color según el estado
     function BadgeColor(estado) {

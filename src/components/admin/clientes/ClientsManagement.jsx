@@ -112,7 +112,7 @@ export const ClientsManagement = () => {
                 <>
                     <div className="mt-4 mb-8">
                         <AnimatedTitle text="Gestión de clientes" />
-                        <AnimatedText text="Gestiona y crear el total de tus clientes" />
+                        <AnimatedText text="Gestiona y organiza la información de tus clientes" />
                     </div>
 
                     <Table

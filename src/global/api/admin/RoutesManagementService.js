@@ -84,3 +84,22 @@ export const AsignarConductorService = async (id_ruta, conductor) => {
     throw error
   }
 }
+
+
+// Asignar paquetes a una ruta
+export const AsignarPaqueteService = async (id_ruta, paquetes) => {
+
+  try {
+
+    const response = await axios.post(`${API_URL}/api/v1/rutas/${id_ruta}/asignar_paquetes/`,
+      {paquetes: [paquetes]}
+    )
+
+    return response
+
+  } catch (error) {
+
+    console.log(error.response?.data)
+    throw error
+  }
+}

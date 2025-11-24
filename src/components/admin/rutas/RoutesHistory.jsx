@@ -102,7 +102,7 @@ export const Routeshistory = () => {
                         <span className="text-sm text-gray-600 dark:text-gray-400 gap-4">
                             {conductor
                                 ? `${conductor.nombre} ${conductor.apellido}`
-                                : <span className="text-gray-500 dark:text-gray-400"><i>Sin asignar</i></span>}
+                                : <span className="text-sm text-gray-500 dark:text-gray-400"><i>Sin asignar</i></span>}
                         </span>
                     </div>
                 );
@@ -112,36 +112,36 @@ export const Routeshistory = () => {
             key: "vehiculo",
             label: "Vehiculo",
             render: (item) => {
-                const vehiculo = item.vehiculo_detalle;
+                const vehiculo = item.conductor_detalle?.vehiculo_detalle;
 
                 return (
-                    <div className="flex items-center gap-3" >
-                        {
-                            item.vehiculo_detalle ? (
-                                <>
-                                    <img src={vehiculo.imagen || fotoDefaultUrl}
-                                        alt="vehiculo"
-                                        className="w-10 h-10 rounded-full object-cover"
-                                    />
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                                            {item.vehiculo_detalle.tipo}
-                                        </span>
-                                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                                            {item.vehiculo_detalle.placa}
-                                        </span>
-                                    </div>
-                                </>
-                            ) : (
-                                <span className="text-gray-500 dark:text-gray-400">
-                                    <i>Sin asignar</i>
-                                </span>
-                            )
-                        }
-                    </div >
-                )
+                    <div className="flex items-center gap-3">
+                        {vehiculo ? (
+                            <>
+                                <img
+                                    src={vehiculo.imagen || fotoDefaultUrl}
+                                    alt="vehiculo"
+                                    className="w-10 h-10 rounded-full object-cover"
+                                />
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                                        {vehiculo.tipo}
+                                    </span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        {vehiculo.placa}
+                                    </span>
+                                </div>
+                            </>
+                        ) : (
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                                <i>Sin asignar</i>
+                            </span>
+                        )}
+                    </div>
+                );
             }
         },
+
         {
             key: "paquetes",
             label: "Paquetes",
