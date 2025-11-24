@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 
 import { Route, Package, User2, Truck, Info } from "lucide-react";
-
+import Directions from '@mui/icons-material/Directions';
 
 import { mostrarRutaActualService } from "../../../global/api/drivers/rutaActual";
 import { getConductorByUserId } from "../../../global/api/drivers/rutaActual";
+import { calcularRuta } from "../../../global/api/drivers/calcularRuta";
 
 import Loading from "../../common/Loading";
 import Badge from "../../ui/badge/Badge";
@@ -12,18 +13,17 @@ import Badge from "../../ui/badge/Badge";
 
 
 
-export const ModalRutaActual = () => {
-
+export const ModalRutaActual = ({ onClose = () => { } }) => {
     const [rutaActual, setRutaActual] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [loadingCalcular, setLoadingCalcular] = useState(false);
+
 
     const getRuta = async () => {
-
         try {
+            setLoading(true);
             const user = JSON.parse(localStorage.getItem("user"));
-
             const conductor = await getConductorByUserId(user.id_usuario);
-
             const ruta = await mostrarRutaActualService(conductor.id_conductor);
 
             if (ruta.mensaje === "No hay rutas asignadas") {
@@ -44,6 +44,30 @@ export const ModalRutaActual = () => {
     }, []);
 
 
+    const handleCalcularRuta = async () => {
+        if (!rutaActual || !rutaActual.id_ruta) {
+            console.warn("No hay ruta seleccionada para calcular.");
+            return;
+        }
+
+        try {
+            setLoadingCalcular(true);
+            // Llamada al endpoint que calcula la ruta (backend)
+            await calcularRuta(rutaActual.id_ruta);
+
+            // Refrescar datos de la ruta para obtener los campos guardados por backend
+            await getRuta();
+
+        } catch (error) {
+
+            console.error("Error al calcular la ruta:", error.response?.data || error.message || error);
+
+        } finally {
+            setLoadingCalcular(false);
+        }
+    };
+
+
     function BadgeColorRuta(estado) {
         const colorMap = {
             "Pendiente": "warning",
@@ -61,7 +85,7 @@ export const ModalRutaActual = () => {
             "Asignado": "primary",
             "En ruta": "warning",
             "No disponible": "error",
-        }
+        };
         return colorMap[estado] || "primary";
     }
 
@@ -94,11 +118,19 @@ export const ModalRutaActual = () => {
                     </p>
                 </div>
             </>
-        )
+        );
     }
 
-
-
+    // Utilidad para mostrar orden de paquetes si existe
+    const ordenPaquetesIds = () => {
+        if (rutaActual.ruta_optimizada?.orden && rutaActual.paquetes_asignados) {
+            return rutaActual.ruta_optimizada.orden.map((idx) => {
+                const paquete = rutaActual.paquetes_asignados[idx];
+                return paquete ? paquete.id_paquete : null;
+            }).filter(Boolean);
+        }
+        return null;
+    };
 
     return (
         <div className="p-6 max-w-4xl mx-auto">
@@ -109,7 +141,7 @@ export const ModalRutaActual = () => {
                 <Badge color={BadgeColorRuta(rutaActual.estado)}>{rutaActual.estado}</Badge>
             </div>
 
-            <div className="md:col-span-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4">
+            <div className="md:col-span-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4 mb-4">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
                     <Route className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" />
                     Información de la ruta
@@ -139,22 +171,80 @@ export const ModalRutaActual = () => {
                             {rutaActual.fecha_fin || "Pendiente"}
                         </p>
                     </div>
-                    <div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Distancia total en km</span>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                            {rutaActual.distancia_total_km || "Pendiente"}
-                        </p>
-                    </div>
-                    <div>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">Tiempo estimado en minutos</span>
-                        <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                            {rutaActual.tiempo_estimado_minutos || "Pendiente"}
-                        </p>
-                    </div>
                 </div>
             </div>
 
-            {/* Información de los paquetes */}
+            {/* === Nueva sección: Estado del cálculo de la ruta === */}
+            <div className="md:col-span-2 bg-white dark:bg-gray-800 rounded-lg p-4 mb-6 border border-gray-100 dark:border-gray-700">
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                    <Directions className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" />
+                    Estado del cálculo de la ruta
+                </h4>
+
+                {!(rutaActual.distancia_total_km && rutaActual.tiempo_estimado_minutos && rutaActual.ruta_optimizada) ? (
+                    // Ruta no calculada
+                    <div className="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
+                        <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                            La ruta no está calculada.
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                            Distancia total: Pendiente · Tiempo estimado: Pendiente
+                        </p>
+
+                        <div className="flex gap-4 justify-center">
+                            <button
+                                onClick={onClose}
+                                className="w-[150px] px-4 py-3 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300"
+                            >
+                                Cancelar
+                            </button>
+
+                            <button
+                                onClick={handleCalcularRuta}
+                                disabled={loadingCalcular}
+                                className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {loadingCalcular ? "Calculando..." : "Calcular ruta"}
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    // Ruta ya calculada: mostrar resultados
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-3">
+                                <span className="text-xs text-gray-600 dark:text-gray-400">Distancia total</span>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                                    {rutaActual.distancia_total_km} km
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-3">
+                                <span className="text-xs text-gray-600 dark:text-gray-400">Tiempo estimado</span>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                                    {rutaActual.tiempo_estimado_minutos} minutos
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-3">
+                                <span className="text-xs text-gray-600 dark:text-gray-400">Paquetes en orden</span>
+                                <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                                    {ordenPaquetesIds() ? ordenPaquetesIds().join(" → ") : "No disponible"}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => alert("Funcionalidad Iniciar Ruta pendiente")}
+                                className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Iniciar ruta
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+
             <div className="mt-6">
                 <h4 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
                     <Package className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" />
@@ -382,4 +472,5 @@ export const ModalRutaActual = () => {
             )}
         </div>
     );
+
 };
