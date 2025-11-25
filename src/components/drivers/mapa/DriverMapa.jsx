@@ -65,21 +65,10 @@ export const DriverMapa = ({ driverId }) => {
   useEffect(() => {
     if (paqueteActual && !modalAbierto) {
       console.log("🔓 Abriendo modal para paquete:", paqueteActual.id_paquete);
-
-      // ✅ VALIDACIÓN: Verificar que el paquete NO esté ya procesado
-      const paqueteEnRuta = ruta?.paquetes_asignados?.find(
-        p => p.id_paquete === paqueteActual.id_paquete
-      );
-
-      if (paqueteEnRuta && (paqueteEnRuta.estado_paquete === "Entregado" || paqueteEnRuta.estado_paquete === "Fallido")) {
-        console.log("⚠️ Paquete ya procesado, ignorando modal");
-        return;
-      }
-
       setPaqueteEnProceso(paqueteActual);
       setModalAbierto(true);
     }
-  }, [paqueteActual, modalAbierto, ruta]);
+  }, [paqueteActual]);
 
   // 🔒 NUEVO: Handler mejorado de completar entrega
   const handleCompletarEntrega = async (estadoEntrega, archivo, observacion) => {
