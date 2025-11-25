@@ -36,7 +36,8 @@ export function useRutaActiva(conductorId = null) {
 
       // Geometry: puede venir como r.ruta_optimizada.geometry (GeoJSON) o como ruta_optimizada.geometry.coordinates
       const geom =
-        (r.ruta_optimizada && (r.ruta_optimizada.geometry || r.ruta_optimizada)) ||
+        (r.ruta_optimizada &&
+          (r.ruta_optimizada.geometry || r.ruta_optimizada)) ||
         (r.geometry && r.geometry) ||
         null;
 
@@ -47,11 +48,10 @@ export function useRutaActiva(conductorId = null) {
       if (r.conductor) {
         const lat = r.conductor.ubicacion_actual_lat;
         const lng = r.conductor.ubicacion_actual_lng;
-        
+
         setConductor({
           ...r.conductor,
-          position:
-            lat && lng ? [parseFloat(lat), parseFloat(lng)] : null
+          position: lat && lng ? [parseFloat(lat), parseFloat(lng)] : null,
         });
       } else {
         setConductor(null);
@@ -82,6 +82,6 @@ export function useRutaActiva(conductorId = null) {
     conductor,
     loading,
     error,
-    refresh: () => fetchRuta(conductorId)
+    refresh: () => fetchRuta(conductorId),
   };
 }

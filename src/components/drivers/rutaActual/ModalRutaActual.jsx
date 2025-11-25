@@ -214,10 +214,10 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
                             Distancia total: Pendiente · Tiempo estimado: Pendiente
                         </p>
 
-                        <div className="flex gap-4 justify-center">
+                        <div className="flex gap-4 justify-center pr-6 mr-6">
                             <button
                                 onClick={onClose}
-                                className="w-[150px] px-4 py-3 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300"
+                                className="flex items-center justify-center w-full px-4 py-3 font-medium text-white transition rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300"
                             >
                                 Cancelar
                             </button>
