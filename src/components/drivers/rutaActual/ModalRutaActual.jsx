@@ -6,9 +6,11 @@ import Directions from '@mui/icons-material/Directions';
 import { mostrarRutaActualService } from "../../../global/api/drivers/rutaActual";
 import { getConductorByUserId } from "../../../global/api/drivers/rutaActual";
 import { calcularRuta } from "../../../global/api/drivers/calcularRuta";
+import { iniciarRutaService } from "../../../global/api/drivers/iniciarRuta";
 
 import Loading from "../../common/Loading";
 import Badge from "../../ui/badge/Badge";
+import { Navigate } from "react-router-dom";
 
 
 
@@ -52,7 +54,6 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
 
         try {
             setLoadingCalcular(true);
-            // Llamada al endpoint que calcula la ruta (backend)
             await calcularRuta(rutaActual.id_ruta);
 
             // Refrescar datos de la ruta para obtener los campos guardados por backend
@@ -64,6 +65,28 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
 
         } finally {
             setLoadingCalcular(false);
+        }
+    };
+
+
+    const handleIniciarRuta = async () => {
+        if (!rutaActual?.id_ruta) return;
+
+        try {
+            // Llamar al endpoint iniciar_ruta
+            await iniciarRutaService(rutaActual.id_ruta);
+
+            // Refrescar datos
+            await getRuta();
+
+            onClose()
+            Navigate("/driver")
+
+            // Aquí podrías redirigir al mapa de simulación
+            // navigate('/driver/mapa-simulacion');
+
+        } catch (error) {
+            console.error("Error al iniciar ruta:", error);
         }
     };
 
@@ -181,7 +204,7 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
                     Estado del cálculo de la ruta
                 </h4>
 
-                {!(rutaActual.distancia_total_km && rutaActual.tiempo_estimado_minutos && rutaActual.ruta_optimizada) ? (
+                {!(rutaActual.estado === "Asignada" && rutaActual.distancia_total_km && rutaActual.tiempo_estimado_minutos && rutaActual.ruta_optimizada) ? (
                     // Ruta no calculada
                     <div className="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
                         <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
@@ -234,7 +257,7 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
 
                         <div className="flex gap-4">
                             <button
-                                onClick={() => alert("Funcionalidad Iniciar Ruta pendiente")}
+                                onClick={handleIniciarRuta}
                                 className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Iniciar ruta
