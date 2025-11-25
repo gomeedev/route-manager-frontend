@@ -19,6 +19,11 @@ export const DriverMapa = ({ driverId }) => {
 
   const [mapLoaded, setMapLoaded] = useState(false);
   const [cerrandoRuta, setCerrandoRuta] = useState(false);
+
+  // 🔒 NUEVO: Estado local para controlar el modal manualmente
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [paqueteEnProceso, setPaqueteEnProceso] = useState(null);
+
   const mapRef = useRef(null);
 
   const ruta = useRutaActivaPolling(driverId);
@@ -41,7 +46,7 @@ export const DriverMapa = ({ driverId }) => {
   const paquetes = ruta?.paquetes_asignados || [];
   const conductorUbic = ruta?.conductor_ubicacion || null;
 
-  // ░░ SIMULACIÓN (⚡ CONFIGURACIÓN CORREGIDA)
+  // ░░ SIMULACIÓN
   const {
     estado,
     paqueteActual,
@@ -51,10 +56,54 @@ export const DriverMapa = ({ driverId }) => {
     ruta,
     geometry,
     {
-      interval: 300,      // ⚡ 300ms = 5x más rápido
-      toleranceKm: 0.15   // 🎯 150 metros (NO 5 metros)
+      interval: 300,
+      toleranceKm: 0.15
     }
   );
+
+  // 🔒 NUEVO: Sincronizar paqueteActual con modal controlado
+  useEffect(() => {
+    if (paqueteActual && !modalAbierto) {
+      console.log("🔓 Abriendo modal para paquete:", paqueteActual.id_paquete);
+
+      // ✅ VALIDACIÓN: Verificar que el paquete NO esté ya procesado
+      const paqueteEnRuta = ruta?.paquetes_asignados?.find(
+        p => p.id_paquete === paqueteActual.id_paquete
+      );
+
+      if (paqueteEnRuta && (paqueteEnRuta.estado_paquete === "Entregado" || paqueteEnRuta.estado_paquete === "Fallido")) {
+        console.log("⚠️ Paquete ya procesado, ignorando modal");
+        return;
+      }
+
+      setPaqueteEnProceso(paqueteActual);
+      setModalAbierto(true);
+    }
+  }, [paqueteActual, modalAbierto, ruta]);
+
+  // 🔒 NUEVO: Handler mejorado de completar entrega
+  const handleCompletarEntrega = async (estadoEntrega, archivo, observacion) => {
+    if (!paqueteEnProceso) return;
+
+    try {
+      await completarEntrega(
+        paqueteEnProceso.id_paquete,
+        estadoEntrega,
+        archivo,
+        observacion
+      );
+
+      console.log("✅ Entrega completada, cerrando modal manualmente");
+
+      // Cerrar modal MANUALMENTE después de éxito
+      setModalAbierto(false);
+      setPaqueteEnProceso(null);
+
+    } catch (error) {
+      console.error("❌ Error al completar entrega:", error);
+      // NO cerrar el modal si hay error
+    }
+  };
 
   // ░░ CARGA DE LEAFLET
   useEffect(() => {
@@ -185,23 +234,21 @@ export const DriverMapa = ({ driverId }) => {
         </div>
       )}
 
-      {/* ░░ MODAL DE ENTREGA (usando tu Modal component) */}
+      {/* 🔒 MODAL CONTROLADO MANUALMENTE (ya no depende de paqueteActual) */}
       <Modal
-        isOpen={!!paqueteActual}
+        isOpen={modalAbierto}
         onClose={() => {
-          console.log("⚠️ Usuario canceló formulario");
-          // Opcional: permitir cancelar o forzar entrega
+          console.log("⚠️ Intento de cerrar modal bloqueado");
+          // NO hacer nada - forzar que complete la entrega
         }}
         size="sm"
-        showCloseButton={false} // ⚠️ No permitir cerrar sin marcar
+        showCloseButton={false}
       >
-        {paqueteActual && (
+        {paqueteEnProceso && (
           <FormularioEntrega
-            paquete={paqueteActual}
-            onSubmit={(estadoEntrega, archivo, observacion) =>
-              completarEntrega(paqueteActual.id_paquete, estadoEntrega, archivo, observacion)
-            }
-            onClose={() => { }} // No hacer nada, forzar entrega
+            paquete={paqueteEnProceso}
+            onSubmit={handleCompletarEntrega}
+            onClose={() => { }}
           />
         )}
       </Modal>
@@ -265,4 +312,4 @@ export const DriverMapa = ({ driverId }) => {
 
     </div>
   );
-};
+}
