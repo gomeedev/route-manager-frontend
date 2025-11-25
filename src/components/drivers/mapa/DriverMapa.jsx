@@ -10,6 +10,8 @@ import { cerrarRutaService } from "../../../global/api/drivers/cerrarRuta";
 import { Modal } from "../../ui/modal/Modal";
 import FormularioEntrega from "./FormularioEntrega";
 
+import Loading from "../../common/Loading";
+
 let MapContainer, TileLayer;
 let PolylineRuta;
 let MarcadoresPaquetes;
@@ -20,9 +22,12 @@ export const DriverMapa = ({ driverId }) => {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [cerrandoRuta, setCerrandoRuta] = useState(false);
 
-  // 🔒 NUEVO: Estado local para controlar el modal manualmente
+  // 🔒 Estado local para controlar el modal manualmente
   const [modalAbierto, setModalAbierto] = useState(false);
   const [paqueteEnProceso, setPaqueteEnProceso] = useState(null);
+
+  // 🎉 NUEVO: Estado para controlar el modal de finalización
+  const [modalFinalizacionAbierto, setModalFinalizacionAbierto] = useState(false);
 
   const mapRef = useRef(null);
 
@@ -61,7 +66,7 @@ export const DriverMapa = ({ driverId }) => {
     }
   );
 
-  // 🔒 NUEVO: Sincronizar paqueteActual con modal controlado
+  // 🔒 Sincronizar paqueteActual con modal controlado
   useEffect(() => {
     if (paqueteActual && !modalAbierto) {
       console.log("🔓 Abriendo modal para paquete:", paqueteActual.id_paquete);
@@ -70,7 +75,14 @@ export const DriverMapa = ({ driverId }) => {
     }
   }, [paqueteActual]);
 
-  // 🔒 NUEVO: Handler mejorado de completar entrega
+  // 🎉 NUEVO: Abrir modal de finalización cuando termine la ruta
+  useEffect(() => {
+    if (estado === "finished") {
+      setModalFinalizacionAbierto(true);
+    }
+  }, [estado]);
+
+  // 🔒 Handler mejorado de completar entrega
   const handleCompletarEntrega = async (estadoEntrega, archivo, observacion) => {
     if (!paqueteEnProceso) return;
 
@@ -82,14 +94,12 @@ export const DriverMapa = ({ driverId }) => {
         observacion
       );
 
-      console.log("✅ Entrega completada, cerrando modal manualmente");
-
       // Cerrar modal MANUALMENTE después de éxito
       setModalAbierto(false);
       setPaqueteEnProceso(null);
 
     } catch (error) {
-      console.error("❌ Error al completar entrega:", error);
+      console.error(error);
       // NO cerrar el modal si hay error
     }
   };
@@ -125,7 +135,11 @@ export const DriverMapa = ({ driverId }) => {
     };
   }, []);
 
-  if (!mapLoaded) return <p>Cargando mapa...</p>;
+  if (!mapLoaded) return (
+                <div className="w-full flex justify-center py-10">
+                <Loading />
+            </div>
+  )
 
   // ░░ SIN RUTA
   if (!ruta) {
@@ -230,7 +244,6 @@ export const DriverMapa = ({ driverId }) => {
           console.log("⚠️ Intento de cerrar modal bloqueado");
           // NO hacer nada - forzar que complete la entrega
         }}
-        size="sm"
         showCloseButton={false}
       >
         {paqueteEnProceso && (
@@ -242,37 +255,37 @@ export const DriverMapa = ({ driverId }) => {
         )}
       </Modal>
 
-      {/* ░░ MENSAJE DE RUTA COMPLETADA */}
-      {estado === "finished" && (
-        <div
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            background: "white",
-            padding: "30px 40px",
-            borderRadius: "16px",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-            zIndex: 10000,
-            textAlign: "center",
-            minWidth: "380px"
-          }}
-        >
-          <div style={{ fontSize: "56px", marginBottom: "15px" }}>🎉</div>
+      {/* 🎉 MODAL DE FINALIZACIÓN DE RUTA */}
+      <Modal
+        isOpen={modalFinalizacionAbierto}
+        onClose={() => { }}
+        showCloseButton={false}
+        size="sm"
+      >
+        <div style={{ textAlign: "center" }}>
           <h2 style={{
-            color: "#16a34a",
-            marginBottom: "10px",
-            fontSize: "26px",
-            fontWeight: "bold"
+            fontSize: "24px",
+            fontWeight: "700",
+            marginBottom: "12px",
+            color: "#111827"
           }}>
-            ¡Todos los paquetes procesados!
+            Fin del dia
           </h2>
-          <p style={{ color: "#6b7280", marginBottom: "8px", fontSize: "15px" }}>
+
+          <p style={{
+            color: "#6b7280",
+            marginBottom: "8px",
+            fontSize: "15px"
+          }}>
             {ruta?.paquetes_entregados || 0} entregados · {ruta?.paquetes_fallidos || 0} fallidos
           </p>
-          <p style={{ color: "#9ca3af", marginBottom: "25px", fontSize: "13px" }}>
-            Presiona "Finalizar ruta" para liberar tu estado y vehículo
+
+          <p style={{
+            color: "#9ca3af",
+            marginBottom: "25px",
+            fontSize: "13px"
+          }}>
+            Presiona <b>Finalizar ruta</b> para liberar tu estado y el vehículo asignado.
           </p>
 
           <button
@@ -289,15 +302,15 @@ export const DriverMapa = ({ driverId }) => {
               fontSize: "16px",
               fontWeight: "600",
               transition: "all 0.2s",
-              boxShadow: "0 2px 8px rgba(37, 99, 235, 0.3)"
+              boxShadow: "0 2px 2px rgba(37, 99, 235, 0.3)"
             }}
             onMouseEnter={(e) => !cerrandoRuta && (e.target.style.background = "#1d4ed8")}
             onMouseLeave={(e) => !cerrandoRuta && (e.target.style.background = "#2563eb")}
           >
-            {cerrandoRuta ? "Finalizando..." : "🏁 Finalizar ruta"}
+            {cerrandoRuta ? "Finalizando..." : "Finalizar ruta"}
           </button>
         </div>
-      )}
+      </Modal>
 
     </div>
   );

@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import { getConductorByUserId } from "../../global/api/drivers/rutaActual";
 import { DriverMapa } from "../../components/drivers/mapa/DriverMapa";
 
+import Loading from "../../components/common/Loading";
+
+
 export const DriverPage = () => {
     // Ejemplo en DriverDashboard.jsx o donde estés
     const [driverId, setDriverId] = useState(null);
@@ -18,14 +21,17 @@ export const DriverPage = () => {
         loadDriver();
     }, []);
 
-    
+
 
     return (
         <>
             {driverId ? (
                 <DriverMapa driverId={driverId} />
             ) : (
-                <p>Cargando información del conductor...</p>
+                <div className="w-full flex justify-center py-10">
+                    <Loading />
+                </div>
+
             )}
         </>
     );

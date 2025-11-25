@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react"
 import { Navigate, Outlet } from "react-router-dom";
 import { supabase } from "../global/supabase/supabaseClient";
 
+import Loading from "../components/common/Loading";
+
 
 function ProtectedRoute({ role }) {
     const [authenticated, setAuthenticated] = useState(false);
@@ -26,7 +28,11 @@ function ProtectedRoute({ role }) {
 
 
     if (loading) {
-        return <div>Cargando...</div>
+        return (
+            <div className="w-full flex justify-center py-10">
+                <Loading />
+            </div>
+        )
     }
 
     if (!authenticated) {
