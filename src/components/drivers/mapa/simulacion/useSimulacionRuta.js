@@ -1,19 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { actualizarUbicacionService } from "../../../../global/api/drivers/ubicacion";
 import { marcarEntregaService } from "../../../../global/api/drivers/entregas";
-
-/**
- * Hook de simulación avanzado y corregido.
- *
- * - Detecta el siguiente paquete pendiente por orden_entrega.
- * - Avanza por la polyline punto a punto.
- * - Actualiza backend (actualizar_ubicacion) con lat/lng correctos.
- * - Pausa cuando llega al paquete (tolerancia configurable).
- * - Llama marcarEntregaService al confirmar entrega y reanuda.
- *
- * Uso:
- * const { estado, paqueteActual, posicionActual, completarEntrega } = useSimulacionRuta(ruta, geometry, { interval: 800, toleranceKm: 0.005 });
- */
+import axios from "axios";
+import { API_URL } from "../../../../global/config/api";
 
 export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
   const [estado, setEstado] = useState("idle");
@@ -23,11 +12,12 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
 
   const intervalRef = useRef(null);
 
-  const intervalMs = opts.interval ?? 900;
-  // tolerancia en km (ej. 0.005 = 5 metros)
-  const toleranceKm = opts.toleranceKm ?? 0.005;
+  const intervalMs = opts.interval ?? 300; // ⚡ 5x más rápido
+  const toleranceKm = opts.toleranceKm ?? 0.15; // 🎯 150 metros
 
-  // Helper Haversine
+  console.log("🔄 useSimulacionRuta - estado:", estado, "indice:", indice);
+
+  // Distancia Haversine en km
   const calcularDistanciaKm = (lat1, lng1, lat2, lng2) => {
     const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -42,120 +32,207 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
-  // Calcula el siguiente paquete pendiente según orden_entrega
+  // Obtener siguiente paquete pendiente
   const obtenerSiguientePaquete = () => {
-    if (!ruta?.paquetes_asignados) return null;
+    if (!ruta?.paquetes_asignados) {
+      console.log("⚠️ No hay paquetes asignados en ruta");
+      return null;
+    }
+
     const pendientes = ruta.paquetes_asignados
-      .filter((p) => p.estado_paquete !== "Entregado" && p.estado_paquete !== "Fallido")
-      .slice()
-      .sort((a, b) => (a.orden_entrega ?? 0) - (b.orden_entrega ?? 0));
-    return pendientes.length > 0 ? pendientes[0] : null;
+      .filter((p) => {
+        const esPendiente =
+          p.estado_paquete !== "Entregado" && p.estado_paquete !== "Fallido";
+        console.log(
+          `📦 Paquete #${p.id_paquete} - Estado: ${p.estado_paquete} - Pendiente: ${esPendiente}`
+        );
+        return esPendiente;
+      })
+      .sort((a, b) => a.orden_entrega - b.orden_entrega);
+
+    const siguiente = pendientes[0] ?? null;
+    if (siguiente) {
+      console.log(
+        `🎯 Siguiente paquete: #${siguiente.id_paquete} en (${siguiente.lat}, ${siguiente.lng})`
+      );
+    } else {
+      console.log("✅ No quedan paquetes pendientes");
+    }
+
+    return siguiente;
   };
 
-  // Reiniciar cuando la ruta se inicia
+  // Inicializar simulación
   useEffect(() => {
     if (!ruta) {
-      setEstado("idle");
-      setIndice(0);
-      setPaqueteActual(null);
-      setPosicionActual(null);
+      console.log("⚠️ No hay ruta disponible");
+      return;
+    }
+    if (estado === "finished") {
+      console.log("🏁 Simulación ya terminó");
+      return;
+    }
+    if (ruta.estado !== "En ruta") {
+      console.log(`⚠️ Ruta no está "En ruta", estado actual: ${ruta.estado}`);
+      return;
+    }
+    if (!polyline || polyline.length === 0) {
+      console.log("⚠️ Polyline vacía");
+      return;
+    }
+    if (estado === "running") {
+      console.log("▶️ Simulación ya corriendo");
       return;
     }
 
-    if (ruta.estado === "En ruta" && Array.isArray(polyline) && polyline.length > 0) {
-      setEstado("running");
-      setIndice(0);
-      setPaqueteActual(null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ruta, polyline]);
+    console.log("🚀 Iniciando simulación con", polyline.length, "puntos");
+    setEstado("running");
+    setIndice(0);
+  }, [ruta, polyline, estado]);
 
-  // Efecto principal: avance cuando estado === running
+  // Loop de simulación
   useEffect(() => {
     if (estado !== "running") return;
     if (!polyline || polyline.length === 0) return;
 
-    // seguridad: si indice fuera mayor que polyline, terminar
     if (indice >= polyline.length) {
+      console.log("🏁 Llegamos al final de la polyline");
       setEstado("finished");
       return;
     }
 
     intervalRef.current = setInterval(async () => {
-      // punto = [lat, lng]
       const punto = polyline[indice];
       if (!punto) return;
 
-      const lat = Number(punto[0]);
-      const lng = Number(punto[1]);
+      const lat = punto[0];
+      const lng = punto[1];
       setPosicionActual({ lat, lng });
 
-      // Actualizo backend (nota: tu endpoint espera lat,lng; mantengo ese orden)
+      console.log(
+        `🚗 Conductor en: (${lat.toFixed(5)}, ${lng.toFixed(
+          5
+        )}) - Índice: ${indice}/${polyline.length}`
+      );
+
+      // Actualizar ubicación en backend
       try {
         await actualizarUbicacionService(ruta.id_ruta, { lat, lng });
       } catch (err) {
-        // no romper simulación por fallo de red
-        console.warn("useSimulacionRuta: actualizarUbicacion error", err);
+        console.error("❌ Error actualizando ubicación:", err);
       }
 
-      // Detectar siguiente paquete dinámico
+      // 🔍 DETECTOR DE PROXIMIDAD
       const siguiente = obtenerSiguientePaquete();
-      if (siguiente && siguiente.lat != null && siguiente.lng != null) {
-        const dist = calcularDistanciaKm(lat, lng, Number(siguiente.lat), Number(siguiente.lng));
-        // si estamos dentro de la tolerancia, pausar y setear paqueteActual
-        if (dist <= toleranceKm) {
+
+      if (siguiente) {
+        const dist = calcularDistanciaKm(
+          lat,
+          lng,
+          Number(siguiente.lat),
+          Number(siguiente.lng)
+        );
+
+        console.log(
+          `📏 Distancia a paquete #${siguiente.id_paquete}: ${(
+            dist * 1000
+          ).toFixed(0)} metros`
+        );
+
+        if (dist < toleranceKm) {
+          console.log(
+            `🎉 ¡LLEGAMOS AL PAQUETE #${siguiente.id_paquete}! Pausando simulación...`
+          );
+
+          // ⚠️ CRÍTICO: Limpiar interval ANTES de cambiar estado
           clearInterval(intervalRef.current);
+          intervalRef.current = null;
+
+          // Cambiar estado en batch para evitar renders intermedios
           setPaqueteActual(siguiente);
           setEstado("paused");
-          return;
+          return; // ⛔ NO avanzar más
         }
       }
 
-      // Avanzar indice (si llegamos al final, marcamos finished)
-      setIndice((i) => {
-        const next = i + 1;
-        if (next >= polyline.length) {
-          clearInterval(intervalRef.current);
-          setEstado("finished");
-        }
-        return next;
-      });
+      // ⚡ Avanzar MÁS RÁPIDO (solo si NO detectó paquete)
+      setIndice((i) => i + 5);
     }, intervalMs);
 
-    return () => {
-      clearInterval(intervalRef.current);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [estado, polyline, indice, ruta?.paquetes_asignados]);
+    return () => clearInterval(intervalRef.current);
+  }, [estado, indice, polyline, ruta]);
 
-  // completarEntrega: llama al servicio, actualiza estado local del paquete y reanuda
-  const completarEntrega = async (paqueteId, estadoEntrega, archivo = null) => {
-    if (!ruta || !paqueteActual) return;
-
-    try {
-      // usar FormData ya que tu endpoint espera multipart
-      await marcarEntregaService(ruta.id_ruta, {
-        paquete: paqueteId,
-        estado: estadoEntrega,
-        lat_entrega: paqueteActual.lat,
-        lng_entrega: paqueteActual.lng,
-        foto: archivo ?? null,
-      });
-    } catch (err) {
-      console.error("useSimulacionRuta: marcarEntrega error", err);
-      // puedes decidir reintentar o notificar al usuario
+  // Completar entrega (sin cerrar ruta automáticamente)
+  const completarEntrega = async (
+    paqueteId,
+    estadoEntrega,
+    archivo,
+    observacion = ""
+  ) => {
+    if (!ruta || !paqueteActual) {
+      console.error("❌ No hay ruta o paquete actual");
+      return;
     }
 
-    // Actualizar estado localmente para evitar volver a pausar en el mismo paquete
-    // Nota: no mutamos ruta directamente (es inmutable). Simplemente buscamos siguiente paq.
-    setPaqueteActual(null);
+    console.log(
+      `📤 Enviando entrega: Paquete #${paqueteActual.id_paquete} - Estado: ${estadoEntrega}`
+    );
 
-    // Pequeña espera para dar tiempo al backend a propagar
-    setTimeout(() => {
-      // reanudar simulación
+    try {
+      // Enviar entrega al backend
+      const respuesta = await marcarEntregaService(ruta.id_ruta, {
+        paquete: paqueteActual.id_paquete,
+        estado: estadoEntrega,
+        foto: archivo,
+        observacion: observacion,
+        lat_entrega: paqueteActual.lat,
+        lng_entrega: paqueteActual.lng,
+      });
+
+      console.log("✅ Entrega registrada:", respuesta);
+
+      // Verificar si quedan paquetes pendientes (con datos locales)
+      const paquetesActualizados = ruta.paquetes_asignados.map((p) =>
+        p.id_paquete === paqueteActual.id_paquete
+          ? { ...p, estado_paquete: estadoEntrega }
+          : p
+      );
+
+      const quedanPendientes = paquetesActualizados.some(
+        (p) =>
+          p.estado_paquete !== "Entregado" && p.estado_paquete !== "Fallido"
+      );
+
+      console.log("📦 ¿Quedan paquetes pendientes?", quedanPendientes);
+
+      if (!quedanPendientes) {
+        // Todos procesados → cambiar a "finished" para mostrar botón
+        console.log(
+          "🏁 Todos los paquetes procesados. Driver debe finalizar manualmente."
+        );
+        setEstado("finished");
+        setPaqueteActual(null);
+        return;
+      }
+
+      // Reanudar simulación
+      console.log("▶️ Reanudando simulación...");
+      setPaqueteActual(null);
       setEstado("running");
-    }, 600);
+    } catch (err) {
+      console.error("❌ Error completando entrega:", err);
+      alert("Error al registrar la entrega. Intenta nuevamente.");
+    }
   };
+
+  // 🔍 LOG cuando cambia paqueteActual
+  useEffect(() => {
+    if (paqueteActual) {
+      console.log("🎯 PAQUETE ACTUAL ESTABLECIDO:", paqueteActual);
+    } else {
+      console.log("🔄 PAQUETE ACTUAL LIMPIADO");
+    }
+  }, [paqueteActual]);
 
   return {
     estado,
