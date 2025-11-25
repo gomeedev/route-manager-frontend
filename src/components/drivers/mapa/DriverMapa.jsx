@@ -11,6 +11,7 @@ import { Modal } from "../../ui/modal/Modal";
 import FormularioEntrega from "./FormularioEntrega";
 
 import Loading from "../../common/Loading";
+import { CustomZoomControl } from "./components/CustomZoomControl";
 
 let MapContainer, TileLayer;
 let PolylineRuta;
@@ -136,17 +137,20 @@ export const DriverMapa = ({ driverId }) => {
   }, []);
 
   if (!mapLoaded) return (
-                <div className="w-full flex justify-center py-10">
-                <Loading />
-            </div>
+    <div className="w-full flex justify-center py-10">
+      <Loading />
+    </div>
   )
 
   // ░░ SIN RUTA
   if (!ruta) {
     const center = [4.65, -74.1];
     return (
-      <div style={{ height: "100vh", width: "100%" }}>
-        <MapContainer center={center} zoom={13} style={{ height: "100%", width: "100%" }}>
+      <div style={{
+        padding: "16px", height: "100vh", width: "100%", borderRadius: "12px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+      }}>
+        <MapContainer center={center} zoom={13} zoomControl={false} style={{ height: "100%", width: "100%" }}>
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         </MapContainer>
 
@@ -161,6 +165,8 @@ export const DriverMapa = ({ driverId }) => {
             borderRadius: "10px",
             boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
             fontWeight: "bold",
+            borderRadius: "12px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
           }}
         >
           Sin ruta asignada
@@ -196,16 +202,24 @@ export const DriverMapa = ({ driverId }) => {
   };
 
   return (
-    <div style={{ height: "100vh", width: "100%" }}>
+    <div style={{
+      height: "calc(100vh - 80px)",
+      width: "100%",
+      overflow: "hidden",
+      borderRadius: "12px"
+    }}>
 
       {/* ░░ MAPA */}
       <MapContainer
         center={mapCenter}
         zoom={13}
-        style={{ height: "100%", width: "100%" }}
+        zoomControl={false}
+        style={{ height: "100%", width: "100%", borderRadius: "12px" }}
         whenCreated={(m) => (mapRef.current = m)}
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+        <CustomZoomControl />
 
         {geometry.length > 0 && <PolylineRuta geometry={geometry} />}
         {paquetes.length > 0 && <MarcadoresPaquetes paquetes={paquetes} />}
@@ -214,7 +228,8 @@ export const DriverMapa = ({ driverId }) => {
           <MarkerConductor
             lat={posicionActual ? posicionActual.lat : Number(conductorUbic.lat)}
             lng={posicionActual ? posicionActual.lng : Number(conductorUbic.lng)}
-            nombre={ruta.conductor_nombre}
+            nombre={ruta.conductor_detalle.conductor_detalle.nombre}
+            fotoUrl={ruta.conductor_detalle.conductor_detalle.foto_perfil}
           />
         )}
       </MapContainer>

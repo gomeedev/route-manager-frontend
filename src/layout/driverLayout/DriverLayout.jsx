@@ -27,7 +27,7 @@ const LayoutContent = () => {
                         <Outlet />
                     </div>
                 </div>
-                <div className="fixed z-50 hidden bottom-6 right-6 sm:block">
+                <div className="fixed hidden bottom-6 right-6 sm:block" style={{ zIndex: 10001 }}>
                     <ThemeTogglerTwo />
                 </div>
             </div>
