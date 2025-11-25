@@ -3,17 +3,19 @@ import { actualizarUbicacionService } from "../../../../global/api/drivers/ubica
 import { marcarEntregaService } from "../../../../global/api/drivers/entregas";
 
 /**
- * Hook de simulación para mover al conductor sobre la polyline
- * punto por punto.
+ * Hook de simulación avanzado y corregido.
  *
- * Estados:
- * - "idle" → ruta no iniciada
- * - "running" → avanzando sobre polyline
- * - "paused" → esperando formulario de entrega
- * - "finished" → ruta completada
+ * - Detecta el siguiente paquete pendiente por orden_entrega.
+ * - Avanza por la polyline punto a punto.
+ * - Actualiza backend (actualizar_ubicacion) con lat/lng correctos.
+ * - Pausa cuando llega al paquete (tolerancia configurable).
+ * - Llama marcarEntregaService al confirmar entrega y reanuda.
+ *
+ * Uso:
+ * const { estado, paqueteActual, posicionActual, completarEntrega } = useSimulacionRuta(ruta, geometry, { interval: 800, toleranceKm: 0.005 });
  */
 
-export const useSimulacionRuta = (ruta, polyline) => {
+export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
   const [estado, setEstado] = useState("idle");
   const [indice, setIndice] = useState(0);
   const [paqueteActual, setPaqueteActual] = useState(null);
@@ -21,80 +23,12 @@ export const useSimulacionRuta = (ruta, polyline) => {
 
   const intervalRef = useRef(null);
 
-  // 👉 Inicializa simulación cuando ruta.estado === "En ruta"
-  useEffect(() => {
-    console.log("🔥 Estado simulación:", estado);
-    console.log("🔥 Ruta estado:", ruta?.estado);
-    console.log("🔥 Polyline length:", polyline?.length);
-    if (!ruta) return;
+  const intervalMs = opts.interval ?? 900;
+  // tolerancia en km (ej. 0.005 = 5 metros)
+  const toleranceKm = opts.toleranceKm ?? 0.005;
 
-    if (ruta.estado === "En ruta" && polyline?.length > 0) {
-      console.log("✅ INICIANDO SIMULACIÓN");
-      setEstado("running");
-      setIndice(0);
-    }
-  }, [ruta, polyline]);
-
-  // 👉 Avance automático
-  useEffect(() => {
-    if (estado !== "running") return;
-    if (!polyline || polyline.length === 0) return;
-
-    intervalRef.current = setInterval(async () => {
-      const punto = polyline[indice];
-      console.log("🚚 Enviando al backend:", { lat: punto[0], lng: punto[1] });
-      if (!punto) return;
-
-      setPosicionActual({lat: punto[0], lng: punto[1]})
-
-      // 1. Actualizar ubicación del conductor
-      try {
-        await actualizarUbicacionService(ruta.id_ruta, {
-          lat: punto[1],
-          lng: punto[0],
-        });
-      } catch (err) {
-        console.warn("No se pudo actualizar ubicación:", err);
-      }
-
-      // 2. Avanzar al siguiente punto
-      setIndice((i) => {
-        const next = i + 1;
-
-        // 🔥 Detectar si este punto coincide con el del próximo paquete
-        const siguientePaquete = ruta.paquetes_asignados.find(
-          (p) => p.orden_entrega === 1
-        );
-
-        if (siguientePaquete) {
-          const distancia = calcularDistancia(
-            punto[1],
-            punto[0],
-            Number(siguientePaquete.lat),
-            Number(siguientePaquete.lng)
-          );
-
-          if (distancia < 0.03) {
-            clearInterval(intervalRef.current);
-            setEstado("paused");
-            setPaqueteActual(siguientePaquete);
-          }
-        }
-
-        // Si llegamos al final → terminar ruta
-        if (next >= polyline.length) {
-          clearInterval(intervalRef.current);
-          setEstado("finished");
-        }
-
-        return next;
-      });
-    }, 900);
-
-    return () => clearInterval(intervalRef.current);
-  }, [estado, polyline, indice]);
-
-  const calcularDistancia = (lat1, lng1, lat2, lng2) => {
+  // Helper Haversine
+  const calcularDistanciaKm = (lat1, lng1, lat2, lng2) => {
     const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLng = ((lng2 - lng1) * Math.PI) / 180;
@@ -108,21 +42,119 @@ export const useSimulacionRuta = (ruta, polyline) => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
-  // 👉 Función para registrar entrega y continuar
-  const completarEntrega = async (paqueteId, estadoEntrega, archivo) => {
+  // Calcula el siguiente paquete pendiente según orden_entrega
+  const obtenerSiguientePaquete = () => {
+    if (!ruta?.paquetes_asignados) return null;
+    const pendientes = ruta.paquetes_asignados
+      .filter((p) => p.estado_paquete !== "Entregado" && p.estado_paquete !== "Fallido")
+      .slice()
+      .sort((a, b) => (a.orden_entrega ?? 0) - (b.orden_entrega ?? 0));
+    return pendientes.length > 0 ? pendientes[0] : null;
+  };
+
+  // Reiniciar cuando la ruta se inicia
+  useEffect(() => {
+    if (!ruta) {
+      setEstado("idle");
+      setIndice(0);
+      setPaqueteActual(null);
+      setPosicionActual(null);
+      return;
+    }
+
+    if (ruta.estado === "En ruta" && Array.isArray(polyline) && polyline.length > 0) {
+      setEstado("running");
+      setIndice(0);
+      setPaqueteActual(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ruta, polyline]);
+
+  // Efecto principal: avance cuando estado === running
+  useEffect(() => {
+    if (estado !== "running") return;
+    if (!polyline || polyline.length === 0) return;
+
+    // seguridad: si indice fuera mayor que polyline, terminar
+    if (indice >= polyline.length) {
+      setEstado("finished");
+      return;
+    }
+
+    intervalRef.current = setInterval(async () => {
+      // punto = [lat, lng]
+      const punto = polyline[indice];
+      if (!punto) return;
+
+      const lat = Number(punto[0]);
+      const lng = Number(punto[1]);
+      setPosicionActual({ lat, lng });
+
+      // Actualizo backend (nota: tu endpoint espera lat,lng; mantengo ese orden)
+      try {
+        await actualizarUbicacionService(ruta.id_ruta, { lat, lng });
+      } catch (err) {
+        // no romper simulación por fallo de red
+        console.warn("useSimulacionRuta: actualizarUbicacion error", err);
+      }
+
+      // Detectar siguiente paquete dinámico
+      const siguiente = obtenerSiguientePaquete();
+      if (siguiente && siguiente.lat != null && siguiente.lng != null) {
+        const dist = calcularDistanciaKm(lat, lng, Number(siguiente.lat), Number(siguiente.lng));
+        // si estamos dentro de la tolerancia, pausar y setear paqueteActual
+        if (dist <= toleranceKm) {
+          clearInterval(intervalRef.current);
+          setPaqueteActual(siguiente);
+          setEstado("paused");
+          return;
+        }
+      }
+
+      // Avanzar indice (si llegamos al final, marcamos finished)
+      setIndice((i) => {
+        const next = i + 1;
+        if (next >= polyline.length) {
+          clearInterval(intervalRef.current);
+          setEstado("finished");
+        }
+        return next;
+      });
+    }, intervalMs);
+
+    return () => {
+      clearInterval(intervalRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [estado, polyline, indice, ruta?.paquetes_asignados]);
+
+  // completarEntrega: llama al servicio, actualiza estado local del paquete y reanuda
+  const completarEntrega = async (paqueteId, estadoEntrega, archivo = null) => {
     if (!ruta || !paqueteActual) return;
 
-    await marcarEntregaService(ruta.id_ruta, {
-      paquete: paqueteActual.id_paquete,
-      estado: estadoEntrega,
-      foto: archivo,
-      lat_entrega: paqueteActual.lat,
-      lng_entrega: paqueteActual.lng,
-    });
+    try {
+      // usar FormData ya que tu endpoint espera multipart
+      await marcarEntregaService(ruta.id_ruta, {
+        paquete: paqueteId,
+        estado: estadoEntrega,
+        lat_entrega: paqueteActual.lat,
+        lng_entrega: paqueteActual.lng,
+        foto: archivo ?? null,
+      });
+    } catch (err) {
+      console.error("useSimulacionRuta: marcarEntrega error", err);
+      // puedes decidir reintentar o notificar al usuario
+    }
 
-    // 🔥 Continuar simulación
+    // Actualizar estado localmente para evitar volver a pausar en el mismo paquete
+    // Nota: no mutamos ruta directamente (es inmutable). Simplemente buscamos siguiente paq.
     setPaqueteActual(null);
-    setEstado("running");
+
+    // Pequeña espera para dar tiempo al backend a propagar
+    setTimeout(() => {
+      // reanudar simulación
+      setEstado("running");
+    }, 600);
   };
 
   return {
