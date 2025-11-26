@@ -125,13 +125,13 @@ export const MostrarDetallesRuta = ({ routeId, onClose }) => {
                             <div>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">Distancia total en km</span>
                                 <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                                    {detallesRuta.distancia_total_km || "Pendiente"}
+                                    {detallesRuta.distancia_total_km || "Pendiente"} km
                                 </p>
                             </div>
                             <div>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">Tiempo estimado en minutos</span>
                                 <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                                    {detallesRuta.tiempo_estimado_minutos || "Pendiente"}
+                                    {detallesRuta.tiempo_estimado_minutos || "Pendiente"} minutos
                                 </p>
                             </div>
                         </div>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { actualizarUbicacionService } from "../../../../global/api/drivers/ubicacion";
 import { marcarEntregaService } from "../../../../global/api/drivers/entregas";
 
@@ -12,6 +12,9 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
 
   const intervalMs = opts.interval ?? 300;
   const toleranceKm = opts.toleranceKm ?? 0.15;
+
+  // NUEVO: Estado local para optimistic updates (evita race conditions)
+  const [paquetesProcesados, setPaquetesProcesados] = useState({});
 
   // Distancia Haversine en km
   const calcularDistanciaKm = (lat1, lng1, lat2, lng2) => {
@@ -28,7 +31,7 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
-
+  // Modificar obtenerSiguientePaquete para usar optimistic state
   const obtenerSiguientePaquete = () => {
     if (!ruta?.paquetes_asignados) {
       return null;
@@ -37,17 +40,16 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
     const pendientes = ruta.paquetes_asignados
       .filter((p) => {
         const esPendiente =
-          p.estado_paquete !== "Entregado" && p.estado_paquete !== "Fallido";
-        console.log(
-        );
+          !paquetesProcesados[p.id_paquete] && // Optimistic check primero
+          p.estado_paquete !== "Entregado" &&
+          p.estado_paquete !== "Fallido";
         return esPendiente;
       })
       .sort((a, b) => a.orden_entrega - b.orden_entrega);
 
     const siguiente = pendientes[0] ?? null;
     if (siguiente) {
-      console.log(
-      );
+      console.log();
     } else {
       console.log("No quedan paquetes pendientes");
     }
@@ -102,7 +104,6 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
       const lng = punto[1];
       setPosicionActual({ lat, lng });
 
-
       // Actualizar ubicación en backend
       try {
         await actualizarUbicacionService(ruta.id_ruta, { lat, lng });
@@ -121,11 +122,8 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
           Number(siguiente.lng)
         );
 
-
         if (dist < toleranceKm) {
-          console.log(
-            `Se llego al paquete #${siguiente.id_paquete}`
-          );
+          console.log(`Se llego al paquete #${siguiente.id_paquete}`);
 
           clearInterval(intervalRef.current);
           intervalRef.current = null;
@@ -142,73 +140,87 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
     return () => clearInterval(intervalRef.current);
   }, [estado, indice, polyline, ruta]);
 
+  // Modificar completarEntrega con optimistic update
+  const completarEntrega = useCallback(
+    async (paqueteId, estadoEntrega, archivo, observacion = "") => {
+      if (!ruta || !paqueteActual) return;
 
-  const completarEntrega = async (
-    paqueteId,
-    estadoEntrega,
-    archivo,
-    observacion = ""
-  ) => {
-    if (!ruta || !paqueteActual) {
-      return;
-    }
-
-    // ✅ VALIDACIÓN EXTRA: Verificar que el paquete no esté ya procesado
-    const paqueteEnRuta = ruta.paquetes_asignados.find(
-      (p) => p.id_paquete === paqueteActual.id_paquete
-    );
-
-    if (paqueteEnRuta && (paqueteEnRuta.estado_paquete === "Entregado" || paqueteEnRuta.estado_paquete === "Fallido")) {
-      setPaqueteActual(null);
-      setEstado("running");
-      return;
-    }
-
-
-    try {
-      const respuesta = await marcarEntregaService(ruta.id_ruta, {
-        paquete: paqueteActual.id_paquete,
-        estado: estadoEntrega,
-        foto: archivo,
-        observacion: observacion,
-        lat_entrega: paqueteActual.lat,
-        lng_entrega: paqueteActual.lng,
-      });
-
-      // ✅ CALCULAR con datos actualizados del backend
-      const paquetesActualizados = ruta.paquetes_asignados.map((p) =>
-        p.id_paquete === paqueteActual.id_paquete
-          ? { ...p, estado_paquete: estadoEntrega }
-          : p
+      const paqueteEnRuta = ruta.paquetes_asignados.find(
+        (p) => p.id_paquete === paqueteActual.id_paquete
       );
 
-      const quedanPendientes = paquetesActualizados.some(
-        (p) =>
-          p.estado_paquete !== "Entregado" && p.estado_paquete !== "Fallido"
-      );
-
-      console.log("¿Quedan paquetes pendientes?", quedanPendientes);
-
-      if (!quedanPendientes) {
-        console.log(
-          "Todos los paquetes procesados. Driver debe finalizar manualmente."
-        );
-        setEstado("finished");
+      if (
+        paqueteEnRuta &&
+        (paqueteEnRuta.estado_paquete === "Entregado" ||
+          paqueteEnRuta.estado_paquete === "Fallido")
+      ) {
         setPaqueteActual(null);
+        setEstado("running");
         return;
       }
 
-      console.log("Reanudando simulación...");
-      setPaqueteActual(null);
-      setEstado("running");
-    } catch (err) {
-      console.error("Error completando entrega:", err);
-      
-      // MEJORAR MENSAJE DE ERROR
-      const errorMsg = err.response?.data?.error || err.response?.data?.non_field_errors?.[0] || "Error desconocido";
-      alert(`Error al registrar la entrega: ${errorMsg}`);
-    }
-  };
+      // OPTIMISTIC: Marca como procesado LOCALMENTE antes del POST
+      setPaquetesProcesados((prev) => ({
+        ...prev,
+        [paqueteActual.id_paquete]: true,
+      }));
+
+      try {
+        await marcarEntregaService(ruta.id_ruta, {
+          paquete: paqueteActual.id_paquete,
+          estado: estadoEntrega,
+          foto: archivo,
+          observacion: observacion,
+          lat_entrega: paqueteActual.lat,
+          lng_entrega: paqueteActual.lng,
+        });
+
+        // CALCULAR con datos actualizados (usa optimistic para quedanPendientes)
+        const paquetesActualizados = ruta.paquetes_asignados.map((p) =>
+          p.id_paquete === paqueteActual.id_paquete
+            ? { ...p, estado_paquete: estadoEntrega }
+            : p
+        );
+
+        const quedanPendientes = paquetesActualizados.some(
+          (p) =>
+            !paquetesProcesados[p.id_paquete] && // Usa optimistic
+            p.estado_paquete !== "Entregado" &&
+            p.estado_paquete !== "Fallido"
+        );
+
+        console.log("¿Quedan paquetes pendientes?", quedanPendientes);
+
+        if (!quedanPendientes) {
+          console.log(
+            "Todos los paquetes procesados. Driver debe finalizar manualmente."
+          );
+          setEstado("finished");
+          setPaqueteActual(null);
+          return;
+        }
+
+        console.log("Reanudando simulación...");
+        setPaqueteActual(null);
+        setEstado("running");
+      } catch (err) {
+        // ROLLBACK optimistic si falla
+        setPaquetesProcesados((prev) => {
+          const nuevo = { ...prev };
+          delete nuevo[paqueteActual.id_paquete];
+          return nuevo;
+        });
+
+        console.error("Error completando entrega:", err);
+        const errorMsg =
+          err.response?.data?.error ||
+          err.response?.data?.non_field_errors?.[0] ||
+          "Error desconocido";
+        alert(`Error al registrar la entrega: ${errorMsg}`);
+      }
+    },
+    [ruta, paqueteActual, paquetesProcesados]
+  ); // Dependencias para memo
 
   useEffect(() => {
     if (paqueteActual) {
