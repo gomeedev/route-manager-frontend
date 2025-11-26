@@ -1,3 +1,8 @@
+import { HistorialRutasDriver } from "../../components/drivers/historialRutas/HistorialRutasDriver"
+
+
 export const HistorialRutasPage = () => {
-    return <h1>Historial de rutas </h1>
+    return (
+        <HistorialRutasDriver />
+    )
 }

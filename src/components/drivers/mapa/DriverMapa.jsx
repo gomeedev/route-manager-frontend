@@ -147,26 +147,32 @@ export const DriverMapa = ({ driverId }) => {
     const center = [4.65, -74.1];
     return (
       <div style={{
-        padding: "16px", height: "100vh", width: "100%", borderRadius: "12px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
+        height: "calc(100vh - 80px)",
+        width: "100%",
+        overflow: "hidden",
+        borderRadius: "12px"
       }}>
-        <MapContainer center={center} zoom={13} zoomControl={false} style={{ height: "100%", width: "100%" }}>
+        <MapContainer
+          center={center}
+          zoom={13}
+          style={{ height: "100%", width: "100%", borderRadius: "12px" }}
+          zoomControl={false}
+        >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <CustomZoomControl />
         </MapContainer>
 
         <div
           style={{
             position: "absolute",
-            top: "20px",
+            top: "-40px",
             left: "50%",
             transform: "translateX(-50%)",
             background: "white",
-            padding: "12px 16px",
+            padding: "0px 16px",
             borderRadius: "10px",
             boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
             fontWeight: "bold",
-            borderRadius: "12px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
           }}
         >
           Sin ruta asignada
@@ -181,20 +187,14 @@ export const DriverMapa = ({ driverId }) => {
   const handleFinalizarRuta = async () => {
     if (!ruta) return;
 
-    const confirmar = window.confirm(
-      "¿Estás seguro de finalizar la ruta? Esta acción liberará el vehículo y tu estado volverá a 'Disponible'."
-    );
-
-    if (!confirmar) return;
 
     setCerrandoRuta(true);
     try {
       await cerrarRutaService(ruta.id_ruta);
-      console.log("✅ Ruta cerrada exitosamente");
-      alert("Ruta finalizada correctamente. Conductor y vehículo liberados.");
+      console.log("Ruta cerrada exitosamente");
       window.location.reload();
     } catch (error) {
-      console.error("❌ Error al cerrar ruta:", error);
+      console.error("Error al cerrar ruta:", error);
       alert("Error al finalizar la ruta: " + (error.response?.data?.error || error.message));
     } finally {
       setCerrandoRuta(false);
@@ -278,52 +278,34 @@ export const DriverMapa = ({ driverId }) => {
         size="sm"
       >
         <div style={{ textAlign: "center" }}>
-          <h2 style={{
-            fontSize: "24px",
-            fontWeight: "700",
-            marginBottom: "12px",
-            color: "#111827"
-          }}>
-            Fin del dia
-          </h2>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold mb-3 text-gray-900 dark:text-white">
+              Fin del día
+            </h2>
 
-          <p style={{
-            color: "#6b7280",
-            marginBottom: "8px",
-            fontSize: "15px"
-          }}>
-            {ruta?.paquetes_entregados || 0} entregados · {ruta?.paquetes_fallidos || 0} fallidos
-          </p>
+            <p className="text-gray-600 dark:text-gray-300 mb-2 text-[15px]">
+              {ruta?.paquetes_entregados || 0} entregados · {ruta?.paquetes_fallidos || 0} fallidos
+            </p>
 
-          <p style={{
-            color: "#9ca3af",
-            marginBottom: "25px",
-            fontSize: "13px"
-          }}>
-            Presiona <b>Finalizar ruta</b> para liberar tu estado y el vehículo asignado.
-          </p>
+            <p className="text-gray-400 dark:text-gray-400 mb-6 text-[13px]">
+              Presiona <b className="text-gray-700 dark:text-gray-200">Finalizar ruta</b> para liberar tu estado y el vehículo asignado.
+            </p>
 
-          <button
-            onClick={handleFinalizarRuta}
-            disabled={cerrandoRuta}
-            style={{
-              width: "100%",
-              padding: "14px 24px",
-              background: cerrandoRuta ? "#9ca3af" : "#2563eb",
-              color: "white",
-              borderRadius: "10px",
-              border: "none",
-              cursor: cerrandoRuta ? "not-allowed" : "pointer",
-              fontSize: "16px",
-              fontWeight: "600",
-              transition: "all 0.2s",
-              boxShadow: "0 2px 2px rgba(37, 99, 235, 0.3)"
-            }}
-            onMouseEnter={(e) => !cerrandoRuta && (e.target.style.background = "#1d4ed8")}
-            onMouseLeave={(e) => !cerrandoRuta && (e.target.style.background = "#2563eb")}
-          >
-            {cerrandoRuta ? "Finalizando..." : "Finalizar ruta"}
-          </button>
+            <button
+              onClick={handleFinalizarRuta}
+              disabled={cerrandoRuta}
+              className={`
+      w-full px-6 py-3.5 text-white rounded-lg text-base font-semibold
+      transition-all shadow-md
+      ${cerrandoRuta
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'
+                }
+    `}
+            >
+              {cerrandoRuta ? "Finalizando..." : "Finalizar ruta"}
+            </button>
+          </div>
         </div>
       </Modal>
 
