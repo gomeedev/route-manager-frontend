@@ -86,59 +86,68 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
   }, [ruta, polyline, estado]);
 
   // Loop de simulación
+  // Loop de simulación — VERSIÓN CORREGIDA
   useEffect(() => {
     if (estado !== "running") return;
     if (!polyline || polyline.length === 0) return;
-
-    if (indice >= polyline.length) {
-      console.log("Llegamos al final de la polyline");
+    if (indice >= polyline.length - 1) {
       setEstado("finished");
       return;
     }
 
-    intervalRef.current = setInterval(async () => {
-      const punto = polyline[indice];
-      if (!punto) return;
+    intervalRef.current = setInterval(() => {
+      setIndice((prev) => {
+        const nuevoIndice = prev + 5;
 
-      const lat = punto[0];
-      const lng = punto[1];
-      setPosicionActual({ lat, lng });
-
-      // Actualizar ubicación en backend
-      try {
-        await actualizarUbicacionService(ruta.id_ruta, { lat, lng });
-      } catch (err) {
-        console.error("❌ Error actualizando ubicación:", err);
-      }
-
-      // 🔍 DETECTOR DE PROXIMIDAD (con datos frescos)
-      const siguiente = obtenerSiguientePaquete();
-
-      if (siguiente) {
-        const dist = calcularDistanciaKm(
-          lat,
-          lng,
-          Number(siguiente.lat),
-          Number(siguiente.lng)
-        );
-
-        if (dist < toleranceKm) {
-          console.log(`Se llego al paquete #${siguiente.id_paquete}`);
-
+        // Si ya llegamos al final → terminar
+        if (nuevoIndice >= polyline.length - 1) {
           clearInterval(intervalRef.current);
           intervalRef.current = null;
-
-          setPaqueteActual(siguiente);
-          setEstado("paused");
-          return;
+          setEstado("finished");
+          return polyline.length - 1;
         }
-      }
 
-      setIndice((i) => i + 5);
+        const punto = polyline[nuevoIndice];
+        const lat = punto[0];
+        const lng = punto[1];
+
+        setPosicionActual({ lat, lng });
+
+        // Actualizar backend
+        actualizarUbicacionService(ruta.id_ruta, { lat, lng }).catch(
+          console.error
+        );
+
+        // Detección de llegada
+        const siguiente = obtenerSiguientePaquete();
+        if (siguiente) {
+          const dist = calcularDistanciaKm(
+            lat,
+            lng,
+            Number(siguiente.lat),
+            Number(siguiente.lng)
+          );
+          if (dist < toleranceKm) {
+            clearInterval(intervalRef.current);
+            intervalRef.current = null;
+            setPaqueteActual(siguiente);
+            setEstado("paused");
+            // ← Aquí ya no sigue avanzando nunca más
+            return prev; // no incrementar más
+          }
+        }
+
+        return nuevoIndice;
+      });
     }, intervalMs);
 
-    return () => clearInterval(intervalRef.current);
-  }, [estado, indice, polyline, ruta]);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [estado, polyline, ruta, toleranceKm, intervalMs]);
 
   // Modificar completarEntrega con optimistic update
   const completarEntrega = useCallback(
@@ -156,6 +165,7 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
       ) {
         setPaqueteActual(null);
         setEstado("running");
+        setIndice((prev) => Math.max(0, prev - 10));
         return;
       }
 
