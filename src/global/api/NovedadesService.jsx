@@ -12,7 +12,10 @@ export const GetNotifications = async () => {
     try {
         const response = await axios.get(`${API_URL}/api/v1/novedades/`, {
             headers: { Authorization: `Bearer ${token}` }, 
-            params: { _limit: 12 },
+            params: { 
+                _limit: 12, 
+                leida: false 
+            },
         })
         
         return response.data

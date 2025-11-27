@@ -282,6 +282,54 @@ export const MostrarDetallesPaquete = ({ paqueteId, onClose }) => {
                             </div>
                         </div>
                     </div>
+
+                    {detallesPaquete.ultimo_intento_entrega && (detallesPaquete.estado_paquete === "Entregado" || detallesPaquete.estado_paquete === "Fallido") && (
+                        <div className={`md:col-span-2 rounded-lg p-4 mt-6 ${
+                            detallesPaquete.estado_paquete === "Entregado" 
+                                ? "bg-success-50 dark:bg-success-500/15" 
+                                : "bg-error-50 dark:bg-error-500/15"
+                        }`}>
+                            <h4 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+                                <Package className="w-5 h-5 mr-2 text-gray-500 dark:text-gray-400" />
+                                Último Intento de Entrega
+                            </h4>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">Fecha</span>
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                                        {new Intl.DateTimeFormat("es-CO", {
+                                            day: "2-digit",
+                                            month: "2-digit",
+                                            year: "2-digit",
+                                            hour: "numeric",
+                                            minute: "numeric"
+                                        }).format(new Date(detallesPaquete.ultimo_intento_entrega.fecha))}
+                                    </p>
+                                </div>
+
+                                <div className="sm:col-span-2">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">Observación</span>
+                                    <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                                        {detallesPaquete.ultimo_intento_entrega.observacion || "No adjuntó observaciones"}
+                                    </p>
+                                </div>
+
+                                {detallesPaquete.ultimo_intento_entrega.imagen && (
+                                    <div className="sm:col-span-2">
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">Imagen</span>
+                                        <div className="mt-2 flex justify-center">
+                                            <img 
+                                                src={detallesPaquete.ultimo_intento_entrega.imagen} 
+                                                alt="Evidencia de entrega" 
+                                                className="w-full max-w-md rounded-lg border border-gray-200 dark:border-gray-600"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </>}
         </Modal>

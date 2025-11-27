@@ -35,19 +35,15 @@ export const NotificationDropdown = () => {
 
   const marcarComoLeida = async (id_novedad) => {
     try {
-      const novedadActualizada = await MarcarNovedad(id_novedad, { leida: true });
+      await MarcarNovedad(id_novedad, { leida: true });
 
-      // Actualizar estado local sin recargar
+      // Remover la novedad del estado local después de marcarla
       setNovedades((prevNovedades) =>
-        prevNovedades.map((n) =>
-          n.id_novedad === id_novedad ? novedadActualizada : n
-        )
+        prevNovedades.filter((n) => n.id_novedad !== id_novedad)
       );
     } catch (error) {
-      
       console.error("Error al marcar la novedad como leída:", error);
-      toast.error("No se pudo marcar como leida")
-
+      toast.error("No se pudo marcar como leida");
     }
   };
 
