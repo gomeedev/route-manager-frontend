@@ -40,6 +40,7 @@ export const SignInForm = () => {
         try {
             data = await SigninUserSupabase(email, password)
             token = data.session.access_token;
+            console.log(token)
 
         } catch (error) {
             setMessage(error.message)

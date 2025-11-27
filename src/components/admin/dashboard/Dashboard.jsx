@@ -5,6 +5,9 @@ import axios from 'axios';
 
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
+import AnimatedTitle from "../../ui/animation/AnimatedTitle";
+import AnimatedText from "../../ui/animation/AnimatedText";
+
 import ComponentCard from '../../common/ComponentCard';
 import Loading from '../../common/Loading';
 
@@ -146,11 +149,9 @@ const Dashboard = () => {
     return (
         <div className="p-6 space-y-6">
             {/* Header */}
-            <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Resumen general del sistema de gestión de rutas
-                </p>
+            <div className="mt-4 mb-12">
+                <AnimatedTitle text="Gestión de paquetes" />
+                <AnimatedText text="Gestiona el estado operativo de tus paquetes en tiempo real" />
             </div>
 
             {/* Grid Layout */}

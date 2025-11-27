@@ -1,6 +1,7 @@
 import { NavLink } from "react-router";
 import { Bell } from "lucide-react";
 import { Ellipsis as HorizontaLDots } from "lucide-react";
+import { Sparkles, Bot } from "lucide-react";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import {
   Home,
@@ -21,6 +22,11 @@ const navItems = [
     icon: <Home className="menu-item-icon-size fill-current" />,
     name: "Dashboard",
     path: "/admin",
+  },
+  {
+    icon: <Sparkles className="menu-item-icon-size fill-current" />,
+    name: "Anàlista",
+    path: "/admin/analista",
   },
   {
     icon: <People className="menu-item-icon-size fill-current" />,
