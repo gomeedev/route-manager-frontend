@@ -28,7 +28,6 @@ import { ClientsManagementPage } from "./pages/adminPages/ClientsManagementPage"
 import DriverLayout from "./layout/driverLayout/DriverLayout";
 import { DriverPage } from "./pages/driverPages/DriverPage";
 import { DriverProfilePage } from "./pages/profile/DriverProfilePage";
-import { RutasPage } from "./pages/driverPages/RutasPage";
 import { NovedadesDriverPage } from "./pages/driverPages/NovedadesDriverPage";
 import { HistorialRutasPage } from "./pages/driverPages/HistorialRutasPage";
 import { NovedadesHistoryPage } from "./pages/driverPages/NovedadesHistoryPage";
@@ -69,7 +68,6 @@ function App() {
           <Route path="/driver" element={<DriverLayout />} >
             <Route index element={<DriverPage />} />
             <Route path="profile" element={<DriverProfilePage />} />
-            <Route path="rutas" element={<RutasPage />} />
             <Route path="novedades" element={<NovedadesDriverPage />} />
             <Route path="routes-history" element={<HistorialRutasPage />} />
             <Route path="novedades-history" element={<NovedadesHistoryPage />} />

@@ -278,7 +278,7 @@ export const DriverMapa = ({ driverId }) => {
           <Polyline
             positions={polylineCompleta}
             pathOptions={{
-              color: "#cbd5e1",
+              color: "#a3b1c2ff",
               weight: 6,
               opacity: 0.7,
               dashArray: "10, 8",
@@ -343,7 +343,7 @@ export const DriverMapa = ({ driverId }) => {
       {/* Modal de finalización */}
       <Modal isOpen={modalFinalizacionAbierto} onClose={() => { }} showCloseButton={false} size="sm">
         <div className="text-center p-6">
-          <h2 className="text-2xl font-bold mb-4">¡Ruta completada!</h2>
+          <h2 className="text-2xl font-bold mb-4">¡Fin del dia!</h2>
           <p className="text-lg mb-6">
             {ruta.paquetes_entregados} entregados · {ruta.paquetes_fallidos} fallidos
           </p>
