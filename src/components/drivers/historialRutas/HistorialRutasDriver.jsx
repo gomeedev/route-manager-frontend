@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getHistorialRutasDriver } from "../../../global/api/drivers/historialRutas";
 import { getConductorByUserId } from "../../../global/api/drivers/rutaActual";
 
+import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
 import AnimatedText from "../../ui/animation/AnimatedText";
@@ -55,7 +56,7 @@ export const HistorialRutasDriver = () => {
             key: "vehiculo",
             label: "Vehiculo",
             render: (item) => {
-                const vehiculo = item.conductor_detalle?.vehiculo_detalle;
+                const vehiculo = item.vehiculo_usado_detalle || item.conductor_detalle?.vehiculo_detalle;
 
                 return (
                     <div className="flex items-center gap-3">

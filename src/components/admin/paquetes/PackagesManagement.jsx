@@ -74,6 +74,15 @@ export const PaquetesManagement = () => {
             label: "Id"
         },
         {
+            key: "ruta_Asignada",
+            label: "Ruta Asignada",
+            render: (item) => {
+                return (
+                    <span className="text-sm text-gray-500 dark:text-gray-400"><i>{item.paquete_asignado}</i></span>
+                )
+            }
+        },
+        {
             key: "fecha_registro",
             label: "Registro",
             render: (item) => {
@@ -96,6 +105,33 @@ export const PaquetesManagement = () => {
         {
             key: "fecha_entrega",
             label: "Entrega",
+            render: (item) => {
+                const fecha = item?.ultimo_intento_entrega?.fecha;
+
+                if (!fecha) {
+                    return (
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <i>Pendiente</i>
+                        </span>
+                    );
+                }
+
+                const fechaFormateada = new Date(fecha);
+
+                return (
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {
+                            new Intl.DateTimeFormat("es-CO", {
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "2-digit",
+                                hour: "numeric",
+                                minute: "numeric"
+                            }).format(fechaFormateada)
+                        }
+                    </span>
+                );
+            }
         },
         {
             key: "cliente_detalle",
@@ -110,15 +146,6 @@ export const PaquetesManagement = () => {
             render: (item) => (
                 <span className="text-sm text-gray-500 dark:text-gray-400">{item.destinatario_nombre} {item.destinatario_apellido}</span>
             )
-        },
-        {
-            key: "paquete_asignado",
-            label: "Ruta Asignada",
-            render: (item) => {
-                return (
-                    <span className="text-sm text-gray-500 dark:text-gray-400"><i>{item.paquete_asignado}</i></span>
-                )
-            }
         },
         {
             key: "estado",

@@ -3,7 +3,7 @@ import axios from "axios";
 import { API_URL } from "../../config/api";
 
 
-// Ver rutas para el modulo de gestión de rutas del conductor
+// Ver rutas para el modulo de gestión de rutas del admin
 export const GetRoutesManagementService = async () => {
 
   try {

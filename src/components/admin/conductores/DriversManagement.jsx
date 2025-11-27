@@ -86,18 +86,6 @@ export const DriversManagement = () => {
                 </div>
             )
         },
-/*         {
-            key: "conductor_detalle.tipo_documento",
-            label: "Tipo documento",
-        }, */
-        {
-            key: "conductor_detalle.correo",
-            label: "Correo"
-        },
-        {
-            key: "conductor_detalle.telefono_movil",
-            label: "telefono"
-        },
         {
             key: "vehiculo_detalle",
             label: "Vehiculo asignado",
@@ -117,6 +105,18 @@ export const DriversManagement = () => {
                     <span className="text-sm text-gray-500 dark:text-gray-400"><i>{item.ruta_asignada}</i></span>
                 )
             }
+        },
+        /*         {
+                    key: "conductor_detalle.tipo_documento",
+                    label: "Tipo documento",
+                }, */
+        {
+            key: "conductor_detalle.correo",
+            label: "Correo"
+        },
+        {
+            key: "conductor_detalle.telefono_movil",
+            label: "telefono"
         },
         {
             key: "estado",

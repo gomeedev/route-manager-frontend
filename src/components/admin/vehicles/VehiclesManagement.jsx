@@ -85,14 +85,6 @@ export const VehiclesManagement = () => {
             )
         },
         {
-            key: "tipo",
-            label: "Tipo"
-        },
-        {
-            key: "placa",
-            label: "Placa"
-        },
-        {
             key: "conductor_asignado",
             label: "Conductor Asignado",
             render: (item) => {
@@ -100,6 +92,14 @@ export const VehiclesManagement = () => {
                     <span className="text-sm text-gray-500 dark:text-gray-400"><i>{item.conductor_asignado}</i></span>
                 )
             }
+        },
+        {
+            key: "tipo",
+            label: "Tipo"
+        },
+        {
+            key: "placa",
+            label: "Placa"
         },
         {
             key: "estado",
@@ -140,7 +140,7 @@ export const VehiclesManagement = () => {
                 setSelectedIdVehicle(item.id_vehiculo)
                 setIsModalOpen("Eliminar")
             },
-            
+
             className: "text-red-500 hover:text-red-700 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-500/10",
         },
         {

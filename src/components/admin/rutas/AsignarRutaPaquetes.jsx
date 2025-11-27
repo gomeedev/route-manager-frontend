@@ -169,7 +169,7 @@ export const AsignarRutaPaquete = ({ routeId, onClose, refreshTable }) => {
                     onClick={() => asignar(seleccionados)}
                     className="w-full mt-10 px-4 py-3 text-sm font-medium text-white bg-brand-500 hover:bg-brand-600 rounded-lg"
                 >
-                    Asignar seleccionados
+                    Asignar paquetes
                 </button>
 
             </Modal>

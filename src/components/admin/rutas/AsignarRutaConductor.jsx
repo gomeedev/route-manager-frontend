@@ -91,14 +91,6 @@ export const AsignarRutaConductor = ({ routeId, onClose, refreshTable }) => {
             )
         },
         {
-            key: "conductor_detalle.tipo_documento",
-            label: "Tipo documento",
-        },
-        {
-            key: "conductor_detalle.correo",
-            label: "Correo"
-        },
-        {
             key: "ruta_asignada",
             label: "Ruta asignada",
             render: (item) => {
@@ -106,6 +98,14 @@ export const AsignarRutaConductor = ({ routeId, onClose, refreshTable }) => {
                     <span className="text-sm text-gray-500 dark:text-gray-400"><i>{item.ruta_asignada}</i></span>
                 )
             }
+        },
+        {
+            key: "conductor_detalle.tipo_documento",
+            label: "Tipo documento",
+        },
+        {
+            key: "conductor_detalle.correo",
+            label: "Correo"
         },
         {
             key: "estado",
@@ -142,9 +142,9 @@ export const AsignarRutaConductor = ({ routeId, onClose, refreshTable }) => {
 
     return (
         <>
-            <Modal isOpen={true} onClose={onClose} showCloseButton className="p-4">
+            <Modal isOpen={true} onClose={onClose} showCloseButton className="p-8">
 
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 pb-6">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 pb-6 mt-4">
                     Asignar el conductor a esta ruta
                 </h3>
 

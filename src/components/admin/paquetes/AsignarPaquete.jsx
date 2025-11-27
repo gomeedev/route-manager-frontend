@@ -72,16 +72,83 @@ export const AsignarPaquete = ({ paqueteId, onClose, refreshTable }) => {
             label: "Manifiesto"
         },
         {
-            key: "total_paquetes",
-            label: "Paquetes"
+            key: "conductor",
+            label: "Conductor",
+            render: (item) => {
+                const conductor = item.conductor_detalle?.conductor_detalle;
+
+                return (
+                    <div className="flex items-center gap-3">
+                        <img src={conductor?.foto_perfil || fotoDefaultUrl}
+                            alt="Conductor"
+                            className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <span className="text-sm text-gray-600 dark:text-gray-400 gap-4">
+                            {conductor
+                                ? `${conductor.nombre} ${conductor.apellido}`
+                                : <span className="text-sm text-gray-500 dark:text-gray-400"><i>Sin asignar</i></span>}
+                        </span>
+                    </div>
+                );
+            }
         },
         {
-            key: "vehiculo_detalle.ruta_asignada",
-            label: "Vehiculo"
+            key: "vehiculo",
+            label: "Vehiculo",
+            render: (item) => {
+                const vehiculo = item.vehiculo_usado_detalle || item.conductor_detalle?.vehiculo_detalle;
+
+                return (
+                    <div className="flex items-center gap-3">
+                        {vehiculo ? (
+                            <>
+                                <img
+                                    src={vehiculo.imagen || fotoDefaultUrl}
+                                    alt="vehiculo"
+                                    className="w-10 h-10 rounded-full object-cover"
+                                />
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                                        {vehiculo.tipo}
+                                    </span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        {vehiculo.placa}
+                                    </span>
+                                </div>
+                            </>
+                        ) : (
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                                <i>Sin asignar</i>
+                            </span>
+                        )}
+                    </div>
+                );
+            }
+        },
+        {
+            key: "paquetes",
+            label: "Paquetes",
+            render: (item) => (
+                <div className="flex items-center gap-4">
+                    <span className="text-sm text-gray-600 dark:text-gray-400 gap-4">
+                        <Badge color="info">{item.total_paquetes}</Badge>
+                    </span>
+                </div>
+            )
         },
         {
             key: "estado",
-            label: "Estado"
+            label: "Estado",
+            render: (item) => {
+                const colorMap = {
+                    "Pendiente": "warning",
+                    "Asignada": "primary",
+                    "En ruta": "info",
+                    "Completada": "success",
+                    "Fallida": "error",
+                };
+                return <Badge color={colorMap[item.estado] || "primary"}>{item.estado}</Badge>
+            }
         },
     ];
 

@@ -205,7 +205,7 @@ export const RoutesManagement = () => {
                 };
                 return <Badge color={colorMap[item.estado] || "primary"}>{item.estado}</Badge>
             }
-        }
+        },
 
     ]
 
