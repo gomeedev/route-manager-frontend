@@ -5,6 +5,7 @@ const Table = ({
   data = [],
   columns = [],
   actions = [],
+  headerActions,
   onAdd,
   loading = false,
   emptyMessage = "No hay datos para mostrar",
@@ -22,16 +23,22 @@ const Table = ({
         <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 pt-2 pb-2">
           {title}
         </div>
-        {onAdd && (
-          <button
-            onClick={onAdd}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-success-700 hover:bg-success-800 disabled:bg-blue-400 text-white font-medium text-sm rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md disabled:cursor-not-allowed"
-          >
-            <Plus className="w-4 h-4" />
-            Agregar
-          </button>
-        )}
+
+        <div className="flex items-center gap-3">
+          {headerActions && <div>{headerActions}</div>}
+
+          {onAdd && (
+            <button
+              onClick={onAdd}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-success-700 hover:bg-success-800 disabled:bg-blue-400 text-white font-medium text-sm rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md disabled:cursor-not-allowed"
+            >
+              <Plus className="w-4 h-4" />
+              Agregar
+            </button>
+          )}
+        </div>
       </div>
+
 
       {/* TABLE */}
       <div className="overflow-x-auto">
@@ -95,8 +102,8 @@ const Table = ({
                     <td className="px-6 py-4 w-32">
                       <div className="flex items-center justify-center gap-1">
                         {actions.map((action) => {
-                          const isDisabled = typeof action.disabled === 'function' 
-                            ? action.disabled(item) 
+                          const isDisabled = typeof action.disabled === 'function'
+                            ? action.disabled(item)
                             : action.disabled;
 
                           return (
@@ -104,11 +111,10 @@ const Table = ({
                               key={action.key}
                               onClick={() => !isDisabled && action.onClick(item)}
                               disabled={isDisabled}
-                              className={`p-2 rounded-lg transition-colors ${
-                                isDisabled 
-                                  ? 'opacity-40 cursor-not-allowed' 
+                              className={`p-2 rounded-lg transition-colors ${isDisabled
+                                  ? 'opacity-40 cursor-not-allowed'
                                   : action.className || 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-700'
-                              }`}
+                                }`}
                               title={action.label}
                             >
                               {action.icon}

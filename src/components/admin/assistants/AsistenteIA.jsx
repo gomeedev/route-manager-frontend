@@ -1,30 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageSquare, Send, Sparkles, ChevronDown } from 'lucide-react';
 
-
 import { API_URL } from '../../../global/config/api';
 
-const ComponentCard = ({className = "",  title, desc, children}) => {
-  return (
-    <div
-      className={`rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] ${className}`}
-    >
-      <div className="px-6 py-5">
-        <h3 className="text-base text-gray-800 font-bold dark:text-white/90">
-          {title}
-        </h3>
-        {desc && (
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            {desc}
-          </p>
-        )}
-      </div>
-      <div className="p-4 border-t border-gray-100 dark:border-gray-800 sm:p-6">
-        <div className="space-y-6">{children}</div>
-      </div>
-    </div>
-  );
-};
+import ComponentCard from '../../common/ComponentCard';
+
 
 const AsistenteIA = () => {
     const [mensajes, setMensajes] = useState([
@@ -122,9 +102,6 @@ const AsistenteIA = () => {
                 <div className="mb-6 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
                     <div className="bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 px-6 py-8">
                         <div className="flex items-center gap-3 mb-2">
-                            <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                                <Sparkles className="w-6 h-6 text-white" />
-                            </div>
                             <div>
                                 <h1 className="text-2xl font-bold text-white">
                                     ¡Hola! Soy Alex, tu asistente de AI

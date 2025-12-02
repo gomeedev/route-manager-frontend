@@ -135,7 +135,7 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
         return (
             <>
                 <div className="flex flex-col items-center justify-center h-full">
-                    <div className="text-center py-8 px-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg w-400">
+                    <div className="text-center py-8 px-6">
                         <Info className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-3" />
                         <p className="text-gray-500 dark:text-gray-400">
                             No tienes rutas asignadas

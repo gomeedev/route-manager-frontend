@@ -11,6 +11,7 @@ import { EliminarPaquete } from "./EliminarPaquete";
 import { AsignarPaquete } from "./AsignarPaquete";
 
 import Table from "../../ui/table/Table";
+import EstadoFilter from "../../../hooks/EstadoFilter";
 import Loading from "../../common/Loading";
 import Badge from "../../ui/badge/Badge";
 
@@ -26,6 +27,14 @@ export const PaquetesManagement = () => {
     const [selectedIdPaquetes, setSelectedIdPaquetes] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [filtroEstado, setFiltroEstado] = useState("");
+
+
+    const ESTADOS_PAQUETE = ["Pendiente", "Asignado", "En ruta", "Entregado", "Fallido"];
+
+    const paquetesFiltrados = filtroEstado === ""
+        ? paquetes
+        : paquetes.filter(p => p.estado_paquete === filtroEstado);
 
 
     const getPaquetes = async () => {
@@ -229,12 +238,23 @@ export const PaquetesManagement = () => {
                 </div>
 
                 <Table
-                    title={`Total de paquetes: ${paquetes.length}`}
+                    title={`Total de paquetes: ${paquetesFiltrados.length}`}
                     columns={columns}
-                    data={paquetes}
+                    data={paquetesFiltrados}
                     actions={actions}
                     onAdd={() => { setIsModalOpen(true) }}
+                    headerActions={
+                        <EstadoFilter
+                            value={filtroEstado}
+                            onChange={setFiltroEstado}
+                            estados={ESTADOS_PAQUETE}
+                            entityLabel="paquetes"
+                            showLabel={false} // si quieres solo icono + tooltip, deja false
+                        />
+                    }
                 />
+
+
 
                 {isModalOpen === true && (
                     <CrearPaquetes
