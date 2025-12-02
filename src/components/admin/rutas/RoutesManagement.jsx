@@ -147,6 +147,13 @@ export const RoutesManagement = () => {
             key: "fecha_inicio",
             label: "Fecha inicio",
             render: (item) => {
+                if (!item.fecha_inicio) {
+                    return (
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <i>Pendiente</i>
+                        </span>
+                    )
+                }
                 const fecha = new Date(item.fecha_inicio);
                 return (
                     <span className="text-sm text-gray-600 dark:text-gray-400">

@@ -12,6 +12,11 @@ const { data: defaultFoto } = supabase.storage
   .from("interfaz")
   .getPublicUrl("foto-default.png");
 
+const { data: defaultFotoVehiculo } = supabase.storage
+  .from("interfaz")
+  .getPublicUrl("vehiculo-default.jpg");
+
 export const logoUrl = logoData.publicUrl;
 export const iconUrl = logoResponsive.publicUrl;
 export const fotoDefaultUrl = defaultFoto.publicUrl;
+export const fotoVehiculoDefaultUrl = defaultFotoVehiculo.publicUrl

@@ -91,13 +91,22 @@ export const AsignarRutaConductor = ({ routeId, onClose, refreshTable }) => {
             )
         },
         {
-            key: "ruta_asignada",
-            label: "Ruta asignada",
+            key: "vehiculo_detalle",
+            label: "Vehiculo asignado",
             render: (item) => {
                 return (
-                    <span className="text-sm text-gray-500 dark:text-gray-400"><i>{item.ruta_asignada}</i></span>
+                    <div className="flex items-center gap-3">
+                        <img
+                            src={item.vehiculo_detalle?.imagen || "Sin foto"}
+                            alt="Vehiculo"
+                            className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <i>{item.vehiculo_detalle?.placa ?? "Sin asignar"}</i>
+                        </span>
+                    </div>
                 )
-            }
+            },
         },
         {
             key: "conductor_detalle.tipo_documento",

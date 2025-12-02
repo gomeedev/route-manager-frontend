@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Eye, Edit, ArrowRight } from "lucide-react";
 
-import { fotoDefaultUrl } from "../../../global/supabase/storageService";
+import { fotoDefaultUrl, fotoVehiculoDefaultUrl } from "../../../global/supabase/storageService";
 
 import { DriversManagementService } from "../../../global/api/admin/DriversManagementService";
 import { MostrarDetallesConductor } from "./MostrarDetallesConductor";
@@ -44,10 +44,16 @@ export const DriversManagement = () => {
 
             }
 
-            const sorted = response.sort(
-                (a, b) => orderMap[a.estado] - orderMap[b.estado]
-            )
+            const sorted = response.sort((a, b) => {
+                const vehicleOrderA = a.vehiculo_detalle ? 0 : 1;
+                const vehicleOrderB = b.vehiculo_detalle ? 0 : 1;
 
+                if (vehicleOrderA !== vehicleOrderB) {
+                    return vehicleOrderA - vehicleOrderB;
+                }
+
+                return orderMap[a.estado] - orderMap[b.estado];
+            });
 
             setDrivers(sorted);
 
@@ -90,10 +96,24 @@ export const DriversManagement = () => {
             key: "vehiculo_detalle",
             label: "Vehiculo asignado",
             render: (item) => {
+                if (!item.vehiculo_detalle) {
+                    return (
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <i>Sin asignar</i>
+                        </span>
+                    )
+                }
                 return (
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                        <i>{item.vehiculo_detalle?.placa ?? "Sin asignar"}</i>
-                    </span>
+                    <div className="flex items-center gap-3">
+                        <img
+                            src={item.vehiculo_detalle?.imagen}
+                            alt="Vehiculo"
+                            className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <i>{item.vehiculo_detalle?.placa}</i>
+                        </span>
+                    </div>
                 )
             },
         },

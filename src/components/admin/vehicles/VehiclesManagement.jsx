@@ -78,7 +78,7 @@ export const VehiclesManagement = () => {
                 <div className="flex items-center gap-3">
                     <img
                         src={item.imagen || "Sin foto"}
-                        alt="Conductor"
+                        alt="Vehiculo"
                         className="w-10 h-10 rounded-full object-cover"
                     />
                 </div>
