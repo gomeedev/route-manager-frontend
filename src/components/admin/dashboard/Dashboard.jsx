@@ -26,9 +26,6 @@ const Dashboard = () => {
     const [eficiencia, setEficiencia] = useState(0);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchDashboardData();
-    }, []);
 
     const fetchDashboardData = async () => {
         try {
@@ -78,6 +75,11 @@ const Dashboard = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        fetchDashboardData();
+    }, []);
+
 
     const processByEstado = (data, estadoField, estados) => {
         return estados.map(estado => ({
@@ -150,8 +152,8 @@ const Dashboard = () => {
         <div className="p-6 space-y-6">
             {/* Header */}
             <div className="mt-4 mb-12">
-                <AnimatedTitle text="Gestión de paquetes" />
-                <AnimatedText text="Gestiona el estado operativo de tus paquetes en tiempo real" />
+                <AnimatedTitle text="Bienvenido Administrador" />
+                <AnimatedText text="Visualiza el rendimiento de tu empresa de forma rapida e intuitiva." />
             </div>
 
             {/* Grid Layout */}
@@ -228,22 +230,29 @@ const Dashboard = () => {
                     className="lg:col-span-2"
                 >
                     <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
+                        <PieChart className='mt-4'>
                             <Pie
                                 data={paquetesData}
                                 cx="50%"
                                 cy="50%"
                                 labelLine={false}
-                                label={({ estado, percent }) => `${estado} ${(percent * 100).toFixed(0)}%`}
+                                label={({ estado, percent, count }) => count > 0 ? `${estado} ${(percent * 100).toFixed(0)}%` : ""}
+                                innerRadius={40}
+                                paddingAngle={4}
                                 outerRadius={100}
                                 fill="#8884d8"
                                 dataKey="count"
+                                nameKey="estado"
                             >
                                 {paquetesData.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[entry.estado]} />
                                 ))}
                             </Pie>
                             <Tooltip content={<CustomTooltip />} />
+                            <Legend
+                                verticalAlign='bottom'
+                                formatter={(value, entry) => `${value}: ${entry.payload.count}`}
+                            />
                         </PieChart>
                     </ResponsiveContainer>
                 </ComponentCard>
@@ -291,7 +300,7 @@ const Dashboard = () => {
                                 type="monotone"
                                 dataKey="completadas"
                                 stroke="#10b981"
-                                strokeWidth={3}
+                                strokeWidth={1}
                                 name="Completadas"
                                 dot={{ fill: '#10b981', r: 5 }}
                                 activeDot={{ r: 7 }}
@@ -300,7 +309,7 @@ const Dashboard = () => {
                                 type="monotone"
                                 dataKey="fallidas"
                                 stroke="#ef4444"
-                                strokeWidth={3}
+                                strokeWidth={1}
                                 name="Fallidas"
                                 dot={{ fill: '#ef4444', r: 5 }}
                                 activeDot={{ r: 7 }}
