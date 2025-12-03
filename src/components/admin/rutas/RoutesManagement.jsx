@@ -13,8 +13,8 @@ import { AsignarRutaPaquete } from "./AsignarRutaPaquetes";
 import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 
 import Table from "../../ui/table/Table";
+import EstadoFilter from "../../../hooks/EstadoFilter";
 import Loading from "../../common/Loading";
-import { Modal } from "../../ui/modal/Modal";
 import Badge from "../../ui/badge/Badge";
 
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
@@ -29,6 +29,14 @@ export const RoutesManagement = () => {
     const [selectedIdRoutes, setSelectedIdRoutes] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [filtroEstado, setFiltroEstado] = useState("");
+
+    
+    const ESTADOS_ROUTES = ["Pendiente", "Asignada", "En ruta", "Entregada", "Fallida"];
+
+    const routesFiltradas = filtroEstado === ""
+        ? routes
+        : routes.filter(r => r.estado === filtroEstado);
 
 
     const GetRoutes = async () => {
@@ -278,11 +286,20 @@ export const RoutesManagement = () => {
                     </div>
 
                     <Table
-                        title={`Total de rutas: ${routes.length}`}
+                        title={`Total de rutas: ${routesFiltradas.length}`}
                         columns={columns}
-                        data={routes}
+                        data={routesFiltradas}
                         actions={actions}
                         onAdd={() => { setIsModalOpen(true) }}
+                        headerActions={
+                            <EstadoFilter
+                            value={filtroEstado}
+                            onChange={setFiltroEstado}
+                            estados={ESTADOS_ROUTES}
+                            entityLabel="rutas"
+                            showLabel={true}
+                             />
+                        }
                     />
 
                     {isModalOpen === true && (

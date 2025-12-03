@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
-import { Eye } from "lucide-react";
-import { Download } from "lucide-react";
+import { Eye, Download } from "lucide-react";
+
+import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 
 import { GetRoutesHistoryService, ExportarPdfRutaService } from "../../../global/api/admin/RoutesManagementService";
 
-import Table from "../../ui/table/Table";
 import Loading from "../../common/Loading";
-import { Modal } from "../../ui/modal/Modal";
+import Table from "../../ui/table/Table";
+import EstadoFilter from "../../../hooks/EstadoFilter";
 import Badge from "../../ui/badge/Badge";
 
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
 import AnimatedText from "../../ui/animation/AnimatedText";
-import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 
 
 
@@ -22,6 +22,14 @@ export const Routeshistory = () => {
 
     const [routes, setRoutes] = useState([])
     const [loading, setLoading] = useState(false)
+    const [filtroEstado, setFiltroEstado] = useState("");
+
+
+    const ESTADOS_ROUTES = ["Completada", "Fallida"];
+
+    const routesFiltradas = filtroEstado === ""
+        ? routes
+        : routes.filter(r => r.estado === filtroEstado);
 
 
     const GetRoutes = async () => {
@@ -249,10 +257,19 @@ export const Routeshistory = () => {
                     </div>
 
                     <Table
-                        title={`Total de rutas: ${routes.length}`}
+                        title={`Total de rutas: ${routesFiltradas.length}`}
                         columns={columns}
-                        data={routes}
+                        data={routesFiltradas}
                         actions={actions}
+                        headerActions={
+                            <EstadoFilter
+                                value={filtroEstado}
+                                onChange={setFiltroEstado}
+                                estados={ESTADOS_ROUTES}
+                                entityLabel="rutas"
+                                showLabel={true}
+                            />
+                        }
                     />
                 </>
             }

@@ -9,8 +9,9 @@ import { MostrarDetallesConductor } from "./MostrarDetallesConductor";
 import { EditarConductor } from "./EditarConductor";
 import { AsignarConductor } from "./AsignarConductor";
 
-import Loading from "../../common/Loading";
 import Table from "../../ui/table/Table";
+import EstadoFilter from "../../../hooks/EstadoFilter";
+import Loading from "../../common/Loading";
 import Badge from "../../ui/badge/Badge";
 
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
@@ -25,7 +26,14 @@ export const DriversManagement = () => {
     const [selectedIdConductor, setSelectedIdConductor] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [filtroEstado, setFiltroEstado] = useState("");
 
+    
+    const ESTADOS_DRIVERS = ["Disponible", "Asignado", "En ruta", "No Disponible"];
+
+    const driversFiltrados = filtroEstado === ""
+        ? drivers
+        : drivers.filter(d => d.estado === filtroEstado);
 
     const GetConductores = async () => {
 
@@ -211,10 +219,19 @@ export const DriversManagement = () => {
                     </div>
 
                     <Table
-                        title={`Total de conductores: ${drivers.length}`}
+                        title={`Total de conductores: ${driversFiltrados.length}`}
                         columns={columns}
-                        data={drivers}
+                        data={driversFiltrados}
                         actions={actions}
+                        headerActions={
+                            <EstadoFilter 
+                            value={filtroEstado}
+                            onChange={setFiltroEstado}
+                            estados={ESTADOS_DRIVERS}
+                            entityLabel="conductores"
+                            showLabel={true}
+                            />
+                        }
                     />
                 </>
             }

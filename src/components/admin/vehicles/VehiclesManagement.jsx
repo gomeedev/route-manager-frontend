@@ -10,6 +10,7 @@ import { EliminarVehiculo } from "./EliminarVehiculos";
 import { AsignarVehiculo } from "./AsignarVechiculo";
 
 import Table from "../../ui/table/Table";
+import EstadoFilter from "../../../hooks/EstadoFilter";
 import Loading from "../../common/Loading";
 import Badge from "../../ui/badge/Badge";
 
@@ -25,6 +26,14 @@ export const VehiclesManagement = () => {
     const [selectedIdVehicle, setSelectedIdVehicle] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [filtroEstado, setFiltroEstado] = useState("");
+
+    
+    const ESTADOS_VEHICLES = ["Disponible", "Asignado", "En ruta", "No Disponible"];
+
+    const vehiclesFiltrados = filtroEstado === ""
+        ? vehicles
+        : vehicles.filter(v => v.estado === filtroEstado);
 
 
     const getVehicles = async () => {
@@ -173,11 +182,20 @@ export const VehiclesManagement = () => {
                 </div>
 
                 <Table
-                    title={`Total de vehiculos: ${vehicles.length}`}
+                    title={`Total de vehiculos: ${vehiclesFiltrados.length}`}
                     columns={columns}
-                    data={vehicles}
+                    data={vehiclesFiltrados}
                     actions={actions}
                     onAdd={() => setIsModalOpen(true)}
+                    headerActions={
+                        <EstadoFilter
+                            value={filtroEstado}
+                            onChange={setFiltroEstado}
+                            estados={ESTADOS_VEHICLES}
+                            entityLabel="Vehiculos"
+                            showLabel={true}
+                        />
+                    }
                 />
 
 

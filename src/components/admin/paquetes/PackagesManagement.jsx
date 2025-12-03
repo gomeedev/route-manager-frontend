@@ -249,7 +249,7 @@ export const PaquetesManagement = () => {
                             onChange={setFiltroEstado}
                             estados={ESTADOS_PAQUETE}
                             entityLabel="paquetes"
-                            showLabel={false} // si quieres solo icono + tooltip, deja false
+                            showLabel={true}
                         />
                     }
                 />

@@ -33,7 +33,7 @@ export default function EstadoFilter({
             </button>
 
             {open && (
-                <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow z-50">
+                <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow z-50 mt-[180px]">
                     {/* Opción TODOS */}
                     <button
                         onClick={() => { onChange(""); setOpen(false); }}
