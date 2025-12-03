@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { User } from "lucide-react";
+
+import { User, Truck } from "lucide-react";
 
 import { getDetallesConductorService } from "../../../global/api/admin/DriversManagementService";
 
@@ -38,8 +39,10 @@ export const MostrarDetallesConductor = ({ driverId, onClose }) => {
     }, [driverId])
 
 
-    // Para obtener el color según el estado
-    function BadgeColor(estado) {
+
+
+    // Para obtener el color del driver según el estado
+    function BadgeColorDriver(estado) {
         const colorMap = {
             "Disponible": "success",
             "en_ruta": "warning",
@@ -48,6 +51,21 @@ export const MostrarDetallesConductor = ({ driverId, onClose }) => {
 
         return colorMap[estado] || "primary";
     }
+
+    //Para obtener el color del vehiculo según el estado
+    function BadgeColorVehicle(estado) {
+        const colorMap = {
+            "Disponible": "success",
+            "Asignado": "primary",
+            "En ruta": "warning",
+            "No disponible": "error",
+        }
+        return colorMap[estado] || "primary";
+    }
+
+    // Esto para que react no se queje y no diga: "vehiculo_detalle is not defined"
+    const conductor_detalle = detallesConductor?.conductor_detalle;
+    const vehiculo_detalle = detallesConductor?.vehiculo_detalle;
 
 
     return (
@@ -67,7 +85,7 @@ export const MostrarDetallesConductor = ({ driverId, onClose }) => {
                             <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
                                 Detalles del Conductor
                             </h3>
-                            <Badge color={BadgeColor(detallesConductor.estado)}>{detallesConductor.estado}</Badge>
+                            <Badge color={BadgeColorDriver(detallesConductor.estado)}>{detallesConductor.estado}</Badge>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -123,6 +141,57 @@ export const MostrarDetallesConductor = ({ driverId, onClose }) => {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Información del vehículo */}
+                            {vehiculo_detalle?.id_vehiculo ? (
+                                <div className="md:col-span-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4 mt-6">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            {vehiculo_detalle?.imagen ? (
+                                                <img
+                                                    src={vehiculo_detalle.imagen}
+                                                    alt="Vehículo"
+                                                    className="w-12 h-12 rounded-full object-cover border-2 border-blue-500 dark:border-blue-400"
+                                                />
+                                            ) : (
+                                                <div className="w-16 h-12 rounded-lg bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center shadow-sm">
+                                                    <Truck className="w-7 h-7 text-white" />
+                                                </div>
+                                            )}
+                                            <h4 className="font-semibold text-gray-900 dark:text-white flex items-center">
+                                                Información del vehículo
+                                            </h4>
+                                        </div>
+                                        <Badge color={BadgeColorVehicle(vehiculo_detalle.estado)}>
+                                            {vehiculo_detalle?.estado || "Pendiente"}
+                                        </Badge>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div>
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">Tipo de vehículo</span>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                                                {vehiculo_detalle?.tipo || "Pendiente"}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <span className="text-sm text-gray-600 dark:text-gray-400">Placa</span>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                                                {vehiculo_detalle?.placa || "Pendiente"}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : conductor_detalle && (
+                                <div className="md:col-span-2 bg-gray-50 dark:bg-gray-700/30 rounded-lg p-4 mt-6">
+                                    <div className="text-center py-8">
+                                        <Truck className="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-3" />
+                                        <p className="text-gray-500 dark:text-gray-400">
+                                            No hay vehículo asignado a este conductor
+                                        </p>
+                                    </div>
+                                </ div>
+                            )}
                         </div>
                     </div>
                 </>}

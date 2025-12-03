@@ -40,6 +40,7 @@ export const SignInForm = () => {
         try {
             data = await SigninUserSupabase(email, password)
             token = data.session.access_token;
+            console.log(token)
 
         } catch (error) {
             setMessage(error.message)
@@ -53,7 +54,6 @@ export const SignInForm = () => {
 
             // local es persistente aunque cierre el navegador
             localStorage.setItem("token", token);
-            console.log(localStorage.getItem("token"))
 
 
             try {

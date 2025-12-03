@@ -2,15 +2,16 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Eye, Edit, ArrowRight } from "lucide-react";
 
-import { fotoDefaultUrl } from "../../../global/supabase/storageService";
+import { fotoDefaultUrl, fotoVehiculoDefaultUrl } from "../../../global/supabase/storageService";
 
 import { DriversManagementService } from "../../../global/api/admin/DriversManagementService";
 import { MostrarDetallesConductor } from "./MostrarDetallesConductor";
 import { EditarConductor } from "./EditarConductor";
 import { AsignarConductor } from "./AsignarConductor";
 
-import Loading from "../../common/Loading";
 import Table from "../../ui/table/Table";
+import EstadoFilter from "../../../hooks/EstadoFilter";
+import Loading from "../../common/Loading";
 import Badge from "../../ui/badge/Badge";
 
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
@@ -25,7 +26,14 @@ export const DriversManagement = () => {
     const [selectedIdConductor, setSelectedIdConductor] = useState(null)
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [filtroEstado, setFiltroEstado] = useState("");
 
+    
+    const ESTADOS_DRIVERS = ["Disponible", "Asignado", "En ruta", "No Disponible"];
+
+    const driversFiltrados = filtroEstado === ""
+        ? drivers
+        : drivers.filter(d => d.estado === filtroEstado);
 
     const GetConductores = async () => {
 
@@ -37,16 +45,23 @@ export const DriversManagement = () => {
 
             // Ordenar los conductores por estado
             const orderMap = {
-                "disponible": 1,
-                "en_ruta": 2,
-                "no_disponible": 3
+                "Disponible": 1,
+                "Asignado": 2,
+                "En ruta": 3,
+                "No disponible": 4
 
             }
 
-            const sorted = response.sort(
-                (a, b) => orderMap[a.estado] - orderMap[b.estado]
-            )
+            const sorted = response.sort((a, b) => {
+                const vehicleOrderA = a.vehiculo_detalle ? 0 : 1;
+                const vehicleOrderB = b.vehiculo_detalle ? 0 : 1;
 
+                if (vehicleOrderA !== vehicleOrderB) {
+                    return vehicleOrderA - vehicleOrderB;
+                }
+
+                return orderMap[a.estado] - orderMap[b.estado];
+            });
 
             setDrivers(sorted);
 
@@ -86,6 +101,31 @@ export const DriversManagement = () => {
             )
         },
         {
+            key: "vehiculo_detalle",
+            label: "Vehiculo asignado",
+            render: (item) => {
+                if (!item.vehiculo_detalle) {
+                    return (
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <i>Sin asignar</i>
+                        </span>
+                    )
+                }
+                return (
+                    <div className="flex items-center gap-3">
+                        <img
+                            src={item.vehiculo_detalle?.imagen}
+                            alt="Vehiculo"
+                            className="w-10 h-10 rounded-full object-cover"
+                        />
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <i>{item.vehiculo_detalle?.placa}</i>
+                        </span>
+                    </div>
+                )
+            },
+        },
+        {
             key: "ruta_asignada",
             label: "Ruta asignada",
             render: (item) => {
@@ -94,10 +134,10 @@ export const DriversManagement = () => {
                 )
             }
         },
-        {
-            key: "conductor_detalle.tipo_documento",
-            label: "Tipo documento",
-        },
+        /*         {
+                    key: "conductor_detalle.tipo_documento",
+                    label: "Tipo documento",
+                }, */
         {
             key: "conductor_detalle.correo",
             label: "Correo"
@@ -110,21 +150,16 @@ export const DriversManagement = () => {
             key: "estado",
             label: "Estado",
             render: (item) => {
-                const labelMap = {
-                    "disponible": "Disponible",
-                    "en_ruta": "En ruta",
-                    "no_disponible": "No disponible"
-                };
-
                 const colorMap = {
-                    "disponible": "success",
-                    "en_ruta": "warning",
-                    "no_disponible": "error",
+                    "Disponible": "success",
+                    "Asignado": "primary",
+                    "En ruta": "warning",
+                    "No disponible": "error",
                 };
 
                 return (
                     <Badge color={colorMap[item.estado] || "primary"}>
-                        {labelMap[item.estado] || item.estado}
+                        {item.estado}
                     </Badge>
                 );
             }
@@ -150,6 +185,7 @@ export const DriversManagement = () => {
                 setSelectedIdConductor(item.id_conductor);
                 setIsModalOpen("editar");
             },
+            disabled: (item) => item.estado !== "Disponible",
             className: "text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-500/10"
         },
         {
@@ -160,11 +196,12 @@ export const DriversManagement = () => {
                 setSelectedIdConductor(item.id_conductor);
                 setIsModalOpen("asignar_conductor");
             },
-            disabled: (item) => item.estado !== "disponible",
+            disabled: (item) => item.estado !== "Disponible",
             className: "hover:bg-success-50 text-success-600 hover:dark:bg-success-500/15 dark:text-success-500"
         }
 
     ];
+
 
 
     return (
@@ -182,10 +219,19 @@ export const DriversManagement = () => {
                     </div>
 
                     <Table
-                        title={`Total de conductores: ${drivers.length}`}
+                        title={`Total de conductores: ${driversFiltrados.length}`}
                         columns={columns}
-                        data={drivers}
+                        data={driversFiltrados}
                         actions={actions}
+                        headerActions={
+                            <EstadoFilter 
+                            value={filtroEstado}
+                            onChange={setFiltroEstado}
+                            estados={ESTADOS_DRIVERS}
+                            entityLabel="conductores"
+                            showLabel={true}
+                            />
+                        }
                     />
                 </>
             }

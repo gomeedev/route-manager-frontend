@@ -1,4 +1,4 @@
-  import React from "react"
+import React from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
@@ -22,12 +22,14 @@ import { VehiclesManagementPage } from "./pages/adminPages/VehiclesManagementPag
 import { DriversManagementPage } from "./pages/adminPages/DriversManagementPage";
 import { DeliveryHistory } from "./pages/adminPages/DeliveryHistory";
 import { NovedadesAdminPage } from "./pages/adminPages/NovedadesAdminPage";
+import { ClientsManagementPage } from "./pages/adminPages/ClientsManagementPage";
+
+import { AsistenteIAPage } from "./pages/adminPages/AsistenteAIPage";
 
 // Driver
 import DriverLayout from "./layout/driverLayout/DriverLayout";
 import { DriverPage } from "./pages/driverPages/DriverPage";
 import { DriverProfilePage } from "./pages/profile/DriverProfilePage";
-import { RutasPage } from "./pages/driverPages/RutasPage";
 import { NovedadesDriverPage } from "./pages/driverPages/NovedadesDriverPage";
 import { HistorialRutasPage } from "./pages/driverPages/HistorialRutasPage";
 import { NovedadesHistoryPage } from "./pages/driverPages/NovedadesHistoryPage";
@@ -52,13 +54,15 @@ function App() {
           <Route path="/admin" element={<AdminLayout />} >
             <Route index element={<AdminPage />} />
             <Route path="profile" element={< AdminProfilePage />} />
+            <Route path="analista" element={<AsistenteIAPage />} />
+            <Route path="clients-management" element={<ClientsManagementPage />} />
             <Route path="packages-management" element={< PackagesManagementPage />} />
             <Route path="routes-management" element={< RoutesManagementPage />} />
             <Route path="vehicles-management" element={< VehiclesManagementPage />} />
             <Route path="drivers-management" element={< DriversManagementPage />} />
             <Route path="delivery-history" element={< DeliveryHistory />} />
             <Route path="novedades" element={< NovedadesAdminPage />} />
-            
+
           </Route>
         </Route>
 
@@ -67,7 +71,6 @@ function App() {
           <Route path="/driver" element={<DriverLayout />} >
             <Route index element={<DriverPage />} />
             <Route path="profile" element={<DriverProfilePage />} />
-            <Route path="rutas" element={<RutasPage />} />
             <Route path="novedades" element={<NovedadesDriverPage />} />
             <Route path="routes-history" element={<HistorialRutasPage />} />
             <Route path="novedades-history" element={<NovedadesHistoryPage />} />

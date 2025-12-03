@@ -1,12 +1,14 @@
 import { NavLink } from "react-router";
 import { Bell } from "lucide-react";
 import { Ellipsis as HorizontaLDots } from "lucide-react";
+import { Sparkles, Bot } from "lucide-react";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import {
   Home,
   Inventory2,
   LocalShipping,
   Groups2 as Groups2Icon,
+  People,
   History,
 } from "@mui/icons-material";
 
@@ -22,6 +24,16 @@ const navItems = [
     path: "/admin",
   },
   {
+    icon: <Sparkles className="menu-item-icon-size fill-current" />,
+    name: "Anàlista",
+    path: "/admin/analista",
+  },
+  {
+    icon: <People className="menu-item-icon-size fill-current" />,
+    name: "Gestión de clientes",
+    path: "/admin/clients-management",
+  },
+  {
     icon: <Inventory2 className="menu-item-icon-size fill-current" />,
     name: "Gestión de paquetes",
     path: "/admin/packages-management",
@@ -32,14 +44,14 @@ const navItems = [
     path: "/admin/routes-management",
   },
   {
-    icon: <LocalShipping className="menu-item-icon-size" />,
-    name: "Gestión de vehículos",
-    path: "/admin/vehicles-management",
-  },
-  {
     icon: <Groups2Icon className="menu-item-icon-size fill-current" />,
     name: "Gestión de conductores",
     path: "/admin/drivers-management",
+  },
+  {
+    icon: <LocalShipping className="menu-item-icon-size" />,
+    name: "Gestión de vehículos",
+    path: "/admin/vehicles-management",
   },
   {
     icon: <History className="menu-item-icon-size fill-current" />,

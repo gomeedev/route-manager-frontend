@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
-import { Eye } from "lucide-react";
-import { Download } from "lucide-react";
+import { Eye, Download } from "lucide-react";
+
+import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 
 import { GetRoutesHistoryService, ExportarPdfRutaService } from "../../../global/api/admin/RoutesManagementService";
 
-import Table from "../../ui/table/Table";
 import Loading from "../../common/Loading";
-import { Modal } from "../../ui/modal/Modal";
+import Table from "../../ui/table/Table";
+import EstadoFilter from "../../../hooks/EstadoFilter";
 import Badge from "../../ui/badge/Badge";
 
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
 import AnimatedText from "../../ui/animation/AnimatedText";
-import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 
 
 
@@ -22,6 +22,14 @@ export const Routeshistory = () => {
 
     const [routes, setRoutes] = useState([])
     const [loading, setLoading] = useState(false)
+    const [filtroEstado, setFiltroEstado] = useState("");
+
+
+    const ESTADOS_ROUTES = ["Completada", "Fallida"];
+
+    const routesFiltradas = filtroEstado === ""
+        ? routes
+        : routes.filter(r => r.estado === filtroEstado);
 
 
     const GetRoutes = async () => {
@@ -102,7 +110,7 @@ export const Routeshistory = () => {
                         <span className="text-sm text-gray-600 dark:text-gray-400 gap-4">
                             {conductor
                                 ? `${conductor.nombre} ${conductor.apellido}`
-                                : <span className="text-gray-500 dark:text-gray-400"><i>Sin asignar</i></span>}
+                                : <span className="text-sm text-gray-500 dark:text-gray-400"><i>Sin asignar</i></span>}
                         </span>
                     </div>
                 );
@@ -112,36 +120,36 @@ export const Routeshistory = () => {
             key: "vehiculo",
             label: "Vehiculo",
             render: (item) => {
-                const vehiculo = item.vehiculo_detalle;
+                const vehiculo = item.vehiculo_usado_detalle || item.conductor_detalle?.vehiculo_detalle;
 
                 return (
-                    <div className="flex items-center gap-3" >
-                        {
-                            item.vehiculo_detalle ? (
-                                <>
-                                    <img src={vehiculo.imagen || fotoDefaultUrl}
-                                        alt="vehiculo"
-                                        className="w-10 h-10 rounded-full object-cover"
-                                    />
-                                    <div className="flex flex-col gap-1">
-                                        <span className="text-sm text-gray-600 dark:text-gray-400">
-                                            {item.vehiculo_detalle.tipo}
-                                        </span>
-                                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                                            {item.vehiculo_detalle.placa}
-                                        </span>
-                                    </div>
-                                </>
-                            ) : (
-                                <span className="text-gray-500 dark:text-gray-400">
-                                    <i>Sin asignar</i>
-                                </span>
-                            )
-                        }
-                    </div >
-                )
+                    <div className="flex items-center gap-3">
+                        {vehiculo ? (
+                            <>
+                                <img
+                                    src={vehiculo.imagen || fotoDefaultUrl}
+                                    alt="vehiculo"
+                                    className="w-10 h-10 rounded-full object-cover"
+                                />
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                                        {vehiculo.tipo}
+                                    </span>
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                                        {vehiculo.placa}
+                                    </span>
+                                </div>
+                            </>
+                        ) : (
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                                <i>Sin asignar</i>
+                            </span>
+                        )}
+                    </div>
+                );
             }
         },
+
         {
             key: "paquetes",
             label: "Paquetes",
@@ -175,7 +183,16 @@ export const Routeshistory = () => {
             key: "fecha_fin",
             label: "Fecha fin",
             render: (item) => {
+                if (!item.fecha_fin) {
+                    return (
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                            <i>Pendiente</i>
+                        </span>
+                    );
+                }
+
                 const fecha = new Date(item.fecha_fin);
+
                 return (
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                         {
@@ -188,7 +205,7 @@ export const Routeshistory = () => {
                             }).format(fecha)
                         }
                     </span>
-                )
+                );
             }
         },
         {
@@ -240,10 +257,19 @@ export const Routeshistory = () => {
                     </div>
 
                     <Table
-                        title={`Total de rutas: ${routes.length}`}
+                        title={`Total de rutas: ${routesFiltradas.length}`}
                         columns={columns}
-                        data={routes}
+                        data={routesFiltradas}
                         actions={actions}
+                        headerActions={
+                            <EstadoFilter
+                                value={filtroEstado}
+                                onChange={setFiltroEstado}
+                                estados={ESTADOS_ROUTES}
+                                entityLabel="rutas"
+                                showLabel={true}
+                            />
+                        }
                     />
                 </>
             }

@@ -1,4 +1,5 @@
 import { NavLink } from "react-router";
+import { useState } from "react";
 import { Bell } from "lucide-react";
 import { Ellipsis as HorizontaLDots } from "lucide-react";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
@@ -10,9 +11,10 @@ import {
   History,
 } from "@mui/icons-material";
 
-
+import { Modal } from "../../components/ui/modal/Modal";
 import { useSidebar } from "../../context/SidebarContext";
-
+import { ModalRutaActual } from "../../components/drivers/rutaActual/ModalRutaActual";
+import { FormularioCrearNovedad } from "../../components/drivers/novedades/CrearNovedadesDriver";
 
 
 const navItems = [
@@ -23,13 +25,13 @@ const navItems = [
   },
   {
     icon: <Inventory2 className="menu-item-icon-size fill-current" />,
-    name: "Rutas",
-    path: "/driver/rutas",
+    name: "Ruta activa",
+    openModal: "ruta_activa",
   },
   {
     icon: <LocalShipping className="menu-item-icon-size" />,
     name: "Crear Novedades",
-    path: "/driver/novedades",
+    openModal: "crear_novedad",
   },
   {
     icon: <LocationOnIcon className="menu-item-icon-size" />,
@@ -41,11 +43,16 @@ const navItems = [
     name: "Historial de novedades",
     path: "/driver/novedades-history",
   },
-
 ];
 
 const DriverSidebar = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+
+  const [activeModal, setActiveModal] = useState(null);
+
+  const openModal = (modalName) => setActiveModal(modalName);
+  const closeModal = () => setActiveModal(null);
+
   const IconStudyImpetus = "https://kimrxdkvtxfnxzvgtxxj.supabase.co/storage/v1/object/public/interfaz/logo.png";
   const IconResponsive = "https://kimrxdkvtxfnxzvgtxxj.supabase.co/storage/v1/object/public/interfaz/logo_responsive.png";
 
@@ -53,26 +60,39 @@ const DriverSidebar = () => {
     <ul className="flex flex-col gap-4">
       {items.map((nav) => (
         <li key={nav.name}>
-          <NavLink
-            to={nav.path}
-            end={nav.path === "/driver"}
-            className={({ isActive }) =>
-              `menu-item group flex items-center gap-2 p-2 rounded-lg ${isActive
-                ? "bg-gray-100 dark:bg-gray-800 dark:text-gray-300 font-bold"
-                : "text-gray-700 hover:text-gray-950 dark:text-gray-400 dark:hover:text-gray-300"
-              } ${!isExpanded && !isHovered
-                ? "lg:justify-center"
-                : "lg:justify-start"
-              }`
-            }
-          >
-            <span className="menu-item-icon-size text-sm">{nav.icon}</span>
-            {(isExpanded || isHovered || isMobileOpen) && (
-              <span className="menu-item-text max-w-[200px] truncate text-sm">
-                {nav.name}
-              </span>
-            )}
-          </NavLink>
+          {nav.path ? (
+            <NavLink
+              to={nav.path}
+              end={nav.path === "/driver"}
+              className={({ isActive }) =>
+                `menu-item group flex items-center gap-2 p-2 rounded-lg ${
+                  isActive
+                    ? "bg-gray-100 dark:bg-gray-800 dark:text-gray-300 font-bold"
+                    : "text-gray-700 hover:text-gray-950 dark:text-gray-400 dark:hover:text-gray-300"
+                } ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"}`
+              }
+            >
+              <span className="menu-item-icon-size text-sm">{nav.icon}</span>
+              {(isExpanded || isHovered || isMobileOpen) && (
+                <span className="menu-item-text max-w-[200px] truncate text-sm">
+                  {nav.name}
+                </span>
+              )}
+            </NavLink>
+          ) : (
+            <button
+              onClick={() => openModal(nav.openModal)}
+              className={`menu-item group flex items-center gap-2 p-2 rounded-lg text-gray-700 dark:text-gray-400 hover:text-gray-950 dark:hover:text-gray-200 w-full
+          ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"}`}
+            >
+              <span className="menu-item-icon-size text-sm">{nav.icon}</span>
+              {(isExpanded || isHovered || isMobileOpen) && (
+                <span className="menu-item-text max-w-[200px] truncate text-sm">
+                  {nav.name}
+                </span>
+              )}
+            </button>
+          )}
         </li>
       ))}
     </ul>
@@ -80,7 +100,8 @@ const DriverSidebar = () => {
 
   return (
     <aside
-      className={`fixed flex flex-col top-0 left-0 bottom-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 transition-all duration-300 z-50 border-r border-gray-200
+      style={{zIndex: 10001}}
+      className={`fixed flex flex-col top-0 left-0 bottom-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 transition-all duration-300 border-r border-gray-200
         ${isExpanded || isMobileOpen
           ? "w-[290px]"
           : isHovered
@@ -100,15 +121,15 @@ const DriverSidebar = () => {
         />
       </div>
 
-
       <div className="px-5 pt-5 flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             <h2
-              className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
-                ? "lg:justify-center"
-                : "justify-start"
-                }`}
+              className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                !isExpanded && !isHovered
+                  ? "lg:justify-center"
+                  : "justify-start"
+              }`}
             >
               {isExpanded || isHovered || isMobileOpen ? (
                 "Menu"
@@ -120,6 +141,17 @@ const DriverSidebar = () => {
           </div>
         </nav>
       </div>
+
+      <Modal isOpen={!!activeModal} onClose={closeModal} size="default" className="p-4">
+        {activeModal === "ruta_activa" && (
+          <ModalRutaActual onClose={closeModal} />
+        )}
+
+        {activeModal === "crear_novedad" && (
+          <FormularioCrearNovedad onClose={closeModal} />
+
+        )}
+      </Modal>
     </aside>
   );
 };
