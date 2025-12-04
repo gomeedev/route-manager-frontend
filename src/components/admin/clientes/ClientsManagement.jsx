@@ -1,59 +1,63 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { Eye, Edit, ArrowRight, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 
 import { ClientsManagementService } from "../../../global/api/admin/ClientsManagementService";
 import { CrearClientes } from "./CrearClientes";
 import { EditarCliente } from "./EditarClientes";
-
+import { EliminarCliente } from "./EliminarClientes";
 
 import Loading from "../../common/Loading";
 import Table from "../../ui/table/Table";
 import Badge from "../../ui/badge/Badge";
-
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
 import AnimatedText from "../../ui/animation/AnimatedText";
-import { EliminarCliente } from "./EliminarClientes";
 
 
 
 
 export const ClientsManagement = () => {
 
-    const [clients, setClients] = useState([])
-    const [selectedIdClient, setSelectedIdConductor] = useState(null)
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [loading, setLoading] = useState(false)
+    const [clients, setClients] = useState([]);
+    const [selectedIdClient, setSelectedIdConductor] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [search, setSearch] = useState("");
 
 
     const GetClientes = async () => {
-
-        setLoading(true)
-
+        setLoading(true);
         try {
-
-            const response = await ClientsManagementService();
-
+            const response = await ClientsManagementService("");
             const sorted = response.sort((a, b) => {
-
                 const paquetesComparison = (b.total_paquetes || 0) - (a.total_paquetes || 0);
-                return paquetesComparison
-
-            })
+                return paquetesComparison;
+            });
             setClients(sorted);
-
         } catch (error) {
-
-            toast.error("No se puedieron cargar los clientes")
-
+            toast.error("No se pudieron cargar los clientes");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
         GetClientes();
     }, []);
+
+
+    const filteredClients = useMemo(() => {
+        if (!search.trim()) return clients;
+
+        const searchLower = search.toLowerCase();
+
+        return clients.filter(client =>
+            client.nombre?.toLowerCase().includes(searchLower) ||
+            client.apellido?.toLowerCase().includes(searchLower) ||
+            client.correo?.toLowerCase().includes(searchLower) ||
+            client.telefono_movil?.toLowerCase().includes(searchLower)
+        );
+    }, [clients, search]);
 
 
     const columns = [
@@ -92,7 +96,7 @@ export const ClientsManagement = () => {
                 </div>
             )
         },
-    ]
+    ];
 
 
     const actions = [
@@ -118,16 +122,13 @@ export const ClientsManagement = () => {
         }
     ];
 
-
-
     return (
         <>
-
             {loading ? (
-                <div className="w-full h-screen flex items-center justify-center" >
+                <div className="w-full h-screen flex items-center justify-center">
                     <Loading />
-                </div >
-            ) :
+                </div>
+            ) : (
                 <>
                     <div className="mt-4 mb-8">
                         <AnimatedTitle text="Gestión de clientes" />
@@ -137,11 +138,13 @@ export const ClientsManagement = () => {
                     <Table
                         title={`Total de clientes: ${clients.length}`}
                         columns={columns}
-                        data={clients}
+                        data={filteredClients}
                         actions={actions}
                         onAdd={() => setIsModalOpen(true)}
+                        searchValue={search}
+                        onSearchChange={setSearch}
+                        searchPlaceholder="Buscar clientes"
                     />
-
 
                     {isModalOpen === true && (
                         <CrearClientes
@@ -150,8 +153,7 @@ export const ClientsManagement = () => {
                         />
                     )}
                 </>
-            }
-
+            )}
 
             {isModalOpen === "editar" && (
                 <EditarCliente
@@ -168,7 +170,6 @@ export const ClientsManagement = () => {
                     refreshTable={GetClientes}
                 />
             )}
-
         </>
-    )
-}
+    );
+};

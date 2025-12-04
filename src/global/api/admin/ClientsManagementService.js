@@ -4,11 +4,11 @@ import { API_URL } from "../../config/api";
 
 
 // ver clientes para el modulo de gestion de clientes desde el admin
-export const ClientsManagementService = async () => {
+export const ClientsManagementService = async (search = "") => {
 
   try {
     
-    const response = await axios.get(`${API_URL}/api/v1/paquetes/clientes/`);
+    const response = await axios.get(`${API_URL}/api/v1/paquetes/clientes/?search=${search}`);
     return response.data;
 
   } catch (error) {
