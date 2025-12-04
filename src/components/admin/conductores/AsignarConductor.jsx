@@ -36,7 +36,11 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
                     (ruta.estado === "Pendiente")
             );
 
-            setRutas(disponibles);
+            const rutasOrdenadas = disponibles.sort(
+                (a, b) => (b.total_paquetes || 0) - (a.total_paquetes || 0)
+            );
+
+            setRutas(rutasOrdenadas);
 
         } catch (error) {
             toast.error("No se pudieron cargar las rutas disponibles");

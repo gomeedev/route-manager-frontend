@@ -29,7 +29,7 @@ export const DriversManagement = () => {
     const [filtroEstado, setFiltroEstado] = useState("");
 
     
-    const ESTADOS_DRIVERS = ["Disponible", "Asignado", "En ruta", "No Disponible"];
+    const ESTADOS_DRIVERS = ["Disponible", "Asignado", "En ruta", "No disponible"];
 
     const driversFiltrados = filtroEstado === ""
         ? drivers

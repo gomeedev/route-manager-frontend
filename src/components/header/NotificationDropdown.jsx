@@ -47,6 +47,21 @@ export const NotificationDropdown = () => {
     }
   };
 
+
+  const tiempoRelativo = (fecha) => {
+    const ahora = new Date();
+    const fechaNovedad = new Date(fecha);
+    const diferencia = Math.floor((ahora - fechaNovedad) / 1000); // diferencia en segundos
+
+    if (diferencia < 60) return 'Ahora';
+    if (diferencia < 3600) return `Hace ${Math.floor(diferencia / 60)} min`;
+    if (diferencia < 86400) return `Hace ${Math.floor(diferencia / 3600)} h`;
+    if (diferencia < 604800) return `Hace ${Math.floor(diferencia / 86400)} d`;
+    if (diferencia < 2592000) return `Hace ${Math.floor(diferencia / 604800)} sem`;
+    if (diferencia < 31536000) return `Hace ${Math.floor(diferencia / 2592000)} mes`;
+    return `Hace ${Math.floor(diferencia / 31536000)} año`;
+  };
+
   // Calcular notificaciones no leídas
   const notificacionesNoLeidas = novedades.filter((n) => !n.leida).length;
   const hayNotificaciones = novedades.length > 0;
@@ -178,7 +193,7 @@ export const NotificationDropdown = () => {
                       {/* Cuarta fila: Fecha y estado */}
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(novedad.fecha_novedad).toLocaleString()}
+                          {tiempoRelativo(novedad.fecha_novedad)}
                         </span>
                         <span
                           className={`text-xs px-2 py-0.5 rounded-full ${!novedad.leida

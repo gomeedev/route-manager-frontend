@@ -278,7 +278,7 @@ export const DriverMapa = ({ driverId }) => {
           <Polyline
             positions={polylineCompleta}
             pathOptions={{
-              color: "#a3b1c2ff",
+              color: "#7b8188ff",
               weight: 6,
               opacity: 0.7,
               dashArray: "10, 8",

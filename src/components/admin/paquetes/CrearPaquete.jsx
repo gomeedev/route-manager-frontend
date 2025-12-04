@@ -38,26 +38,26 @@ export const CrearPaquetes = ({ onClose, refreshTable }) => {
 
 
     const opcionesTipoLocalidad = [
-        { value: 16, label: "Antonio Nariño" },
-        { value: 13, label: "Barrios Unidos" },
-        { value: 2, label: "Bosa" },
-        { value: 3, label: "Chapinero" },
-        { value: 20, label: "Ciudad Bolívar" },
-        { value: 11, label: "Engativá" },
-        { value: 10, label: "Fontibón" },
-        { value: 9, label: "Kennedy" },
-        { value: 18, label: "La Candelaria" },
-        { value: 15, label: "Los Mártires" },
-        { value: 17, label: "Puente Aranda" },
-        { value: 19, label: "Rafael Uribe Uribe" },
-        { value: 6, label: "San Cristóbal" },
-        { value: 5, label: "Santa Fe" },
-        { value: 12, label: "Suba" },
-        { value: 21, label: "Sumapaz" },
-        { value: 14, label: "Teusaquillo" },
-        { value: 8, label: "Tunjuelito" },
-        { value: 4, label: "Usaquén" },
-        { value: 7, label: "Usme" }
+        { value: 15, label: "Antonio Nariño" },
+        { value: 12, label: "Barrios Unidos" },
+        { value: 7, label: "Bosa" },
+        { value: 2, label: "Chapinero" },
+        { value: 19, label: "Ciudad Bolívar" },
+        { value: 10, label: "Engativá" },
+        { value: 9, label: "Fontibón" },
+        { value: 8, label: "Kennedy" },
+        { value: 17, label: "La Candelaria" },
+        { value: 14, label: "Los Mártires" },
+        { value: 16, label: "Puente Aranda" },
+        { value: 18, label: "Rafael Uribe Uribe" },
+        { value: 4, label: "San Cristóbal" },
+        { value: 3, label: "Santa Fe" },
+        { value: 11, label: "Suba" },
+        { value: 20, label: "Sumapaz" },
+        { value: 13, label: "Teusaquillo" },
+        { value: 6, label: "Tunjuelito" },
+        { value: 1, label: "Usaquén" },
+        { value: 5, label: "Usme" }
     ];
 
 
