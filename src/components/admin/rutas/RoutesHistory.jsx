@@ -103,13 +103,13 @@ export const Routeshistory = () => {
 
                 return (
                     <div className="flex items-center gap-3">
-                        <img src={item.conductor_detalle.conductor_detalle.foto_perfil || fotoDefaultUrl}
+                        <img src={conductor?.foto_perfil || fotoDefaultUrl}
                             alt="Conductor"
                             className="w-10 h-10 rounded-full object-cover"
                         />
                         <span className="text-sm text-gray-600 dark:text-gray-400 gap-4">
                             {conductor
-                                ? `${conductor.nombre} ${conductor.apellido}`
+                                ? `${conductor?.nombre} ${conductor?.apellido}`
                                 : <span className="text-sm text-gray-500 dark:text-gray-400"><i>Sin asignar</i></span>}
                         </span>
                     </div>
