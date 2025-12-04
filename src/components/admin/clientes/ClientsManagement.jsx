@@ -9,6 +9,7 @@ import { EditarCliente } from "./EditarClientes";
 
 import Loading from "../../common/Loading";
 import Table from "../../ui/table/Table";
+import Badge from "../../ui/badge/Badge";
 
 import AnimatedTitle from "../../ui/animation/AnimatedTitle";
 import AnimatedText from "../../ui/animation/AnimatedText";
@@ -32,7 +33,14 @@ export const ClientsManagement = () => {
         try {
 
             const response = await ClientsManagementService();
-            setClients(response);
+
+            const sorted = response.sort((a, b) => {
+
+                const paquetesComparison = (b.total_paquetes || 0) - (a.total_paquetes || 0);
+                return paquetesComparison
+
+            })
+            setClients(sorted);
 
         } catch (error) {
 
@@ -72,6 +80,17 @@ export const ClientsManagement = () => {
         {
             key: "direccion",
             label: "Dirección"
+        },
+        {
+            key: "total_paquetes",
+            label: "Total de pedidos",
+            render: (item) => (
+                <div className="flex items-center gap-4">
+                    <span className="text-sm text-gray-600 dark:text-gray-400 gap-4">
+                        <Badge color="info">{item.total_paquetes}</Badge>
+                    </span>
+                </div>
+            )
         },
     ]
 
@@ -148,7 +167,7 @@ export const ClientsManagement = () => {
                     onClose={() => setIsModalOpen(false)}
                     refreshTable={GetClientes}
                 />
-            )} 
+            )}
 
         </>
     )
