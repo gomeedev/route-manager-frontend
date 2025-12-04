@@ -51,7 +51,6 @@ export const Modal = ({
     ? "w-full h-full"
     : `relative ${sizeClasses[size] || sizeClasses.default} rounded-2xl bg-white shadow-2xl dark:bg-gray-800 dark:shadow-gray-900/50`;
 
-  // ✨ Aquí usamos Portal. Este return ya NO se renderiza dentro del sidebar.
   return createPortal(
     <div className="fixed inset-0 flex items-center justify-center p-4 z-[99999] animate-in fade-in-0 duration-300">
       {!isFullscreen && (
@@ -75,11 +74,37 @@ export const Modal = ({
           </button>
         )}
 
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-6 custom-scrollbar">
           {children}
         </div>
       </div>
+
+      {/* Estilos inline para scrollbar consistente */}
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(156, 163, 175, 0.4);
+          border-radius: 4px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(156, 163, 175, 0.6);
+        }
+
+        /* Para Firefox */
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(156, 163, 175, 0.4) transparent;
+        }
+      `}</style>
     </div>,
-    document.body // <-- Esto hace la magia
+    document.body
   );
 };
