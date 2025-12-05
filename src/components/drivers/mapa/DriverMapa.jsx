@@ -11,6 +11,7 @@ import { Modal } from "../../ui/modal/Modal";
 import FormularioEntrega from "./FormularioEntrega";
 import Loading from "../../common/Loading";
 import { CustomZoomControl } from "./components/CustomZoomControl";
+import { toast } from "sonner";
 
 let MapContainer, TileLayer, Polyline, Marker, Popup;
 let MarcadoresPaquetes, MarkerConductor;
@@ -267,12 +268,12 @@ export const DriverMapa = ({ driverId }) => {
     } catch (error) {
       if (error.response?.status === 400) {
         // La ruta ya estaba cerrada
-        alert("¡Ruta ya completada! Redirigiendo...");
+        toast.error("¡Ruta ya completada! Redirigiendo...")
         setTimeout(() => {
           window.location.href = "/driver";
         }, 1500);
       } else {
-        alert("Error al finalizar ruta: " + (error.response?.data?.error || error.message));
+        toast.error("Error al finalizar ruta: " + (error.response?.data?.error || error.message));
         setCerrandoRuta(false);
       }
     }
