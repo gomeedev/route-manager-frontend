@@ -22,6 +22,14 @@ export const DriverMapa = ({ driverId }) => {
   const [modalFinalizacionAbierto, setModalFinalizacionAbierto] = useState(false);
   const [cerrandoRuta, setCerrandoRuta] = useState(false);
 
+
+  const [progresoActual, setProgresoActual] = useState({
+    entregados: 0,
+    fallidos: 0,
+    total: 0
+  });
+
+
   // Agrega este estado para forzar reinicio de simulación
   const [rutaKey, setRutaKey] = useState(0);
 
@@ -185,15 +193,40 @@ export const DriverMapa = ({ driverId }) => {
   // Finalización automática
   useEffect(() => {
     if (estado === "finished") {
-      console.log("🏁 Simulación terminada, deteniendo polling");
-      detenerPolling();
+      console.log("🏁 Simulación terminada");
 
-      // Verificar si la ruta ya se cerró automáticamente
-      setTimeout(() => {
+      // Esperar 1 segundo para que el backend procese la última entrega
+      setTimeout(async () => {
+        // Refrescar datos una última vez
+        if (refrescarRuta) {
+          await refrescarRuta();
+        }
+
+        console.log("🛑 Deteniendo polling");
+        detenerPolling();
+
+        console.log("📊 Estado final:", {
+          entregados: ruta?.paquetes_entregados,
+          fallidos: ruta?.paquetes_fallidos,
+          total: ruta?.total_paquetes
+        });
+
         setModalFinalizacionAbierto(true);
       }, 1000);
     }
-  }, [estado, detenerPolling]);
+  }, [estado, detenerPolling, refrescarRuta]);
+
+
+  useEffect(() => {
+    if (ruta) {
+      setProgresoActual({
+        entregados: ruta.paquetes_entregados || 0,
+        fallidos: ruta.paquetes_fallidos || 0,
+        total: ruta.total_paquetes || 0
+      });
+    }
+  }, [ruta]);
+
 
   const handleCompletarEntrega = async (estadoEntrega, archivo, observacion) => {
     if (!paqueteEnProceso) return;
@@ -207,6 +240,12 @@ export const DriverMapa = ({ driverId }) => {
         archivo,
         observacion
       );
+
+      if (refrescarRuta) {
+        setTimeout(() => {
+          refrescarRuta();
+        }, 500);
+      }
 
       // Cerrar modal después de completar
       setTimeout(() => {
@@ -351,7 +390,7 @@ export const DriverMapa = ({ driverId }) => {
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Ubicación base
+                  Tu Ubicación
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   {conductorData?.direccion_base || "Dirección no configurada"}
@@ -456,9 +495,9 @@ export const DriverMapa = ({ driverId }) => {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+{/*               <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Estado: <span className="font-bold">{estado === "running" ? "En ruta" : estado}</span>
-              </p>
+              </p> */}
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 {ruta.total_paquetes - (ruta.paquetes_entregados + ruta.paquetes_fallidos)} paquetes pendientes
               </p>
@@ -469,7 +508,7 @@ export const DriverMapa = ({ driverId }) => {
           {conductorData?.direccion_base && (
             <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                📍 Base: {conductorData.direccion_base}
+                Tu dirección: {conductorData.direccion_base}
               </p>
             </div>
           )}
@@ -503,9 +542,22 @@ export const DriverMapa = ({ driverId }) => {
       >
         <div className="text-center p-6">
           <h2 className="text-2xl font-bold mb-4">¡Fin del día!</h2>
-          <p className="text-lg mb-6">
-            {ruta?.paquetes_entregados || 0} entregados · {ruta?.paquetes_fallidos || 0} fallidos
-          </p>
+
+          {/* Mostrar datos actualizados */}
+          <div className="mb-6">
+            <p className="text-lg">
+              {progresoActual.entregados} entregados · {progresoActual.fallidos} fallidos
+            </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              Total de paquetes: {progresoActual.total}
+            </p>
+            {progresoActual.entregados + progresoActual.fallidos < progresoActual.total && (
+              <p className="text-sm text-amber-600 dark:text-amber-400 mt-2">
+                Parece que no se registraron todas las entregas
+              </p>
+            )}
+          </div>
+
           <button
             onClick={handleFinalizarRuta}
             disabled={cerrandoRuta}
