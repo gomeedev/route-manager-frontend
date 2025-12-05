@@ -1,249 +1,252 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { actualizarUbicacionService } from "../../../../global/api/drivers/ubicacion";
 import { marcarEntregaService } from "../../../../global/api/drivers/entregas";
+import { obtenerProximoPaqueteService } from "../../../../global/api/drivers/proximoPaquete";
+import { obtenerProgresoRutaService } from "../../../../global/api/drivers/progreso";
 
 export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
-  const [estado, setEstado] = useState("idle");
-  const [indice, setIndice] = useState(0);
+  const [estado, setEstado] = useState("loading");
   const [paqueteActual, setPaqueteActual] = useState(null);
   const [posicionActual, setPosicionActual] = useState(null);
+  const [siguientePaquete, setSiguientePaquete] = useState(null);
 
   const intervalRef = useRef(null);
+  const indiceRef = useRef(0);
+
+  // Refs críticos para evitar bucles
+  const rutaIdRef = useRef(null);
+  const inicializadoRef = useRef(false);
+  const polylineRef = useRef([]); // ← NUEVO: Guardar polyline en ref
+  const siguientePaqueteRef = useRef(null); // ← NUEVO
 
   const intervalMs = opts.interval ?? 300;
   const toleranceKm = opts.toleranceKm ?? 0.15;
 
-  // NUEVO: Estado local para optimistic updates (evita race conditions)
-  const [paquetesProcesados, setPaquetesProcesados] = useState({});
+  // Sincronizar polyline con ref (sin re-renders)
+  useEffect(() => {
+    if (polyline && polyline.length > 0) {
+      polylineRef.current = polyline;
+    }
+  }, [polyline]);
 
-  // Distancia Haversine en km
+  // Sincronizar siguientePaquete con ref
+  useEffect(() => {
+    siguientePaqueteRef.current = siguientePaquete;
+  }, [siguientePaquete]);
+
+  // Distancia Haversine
   const calcularDistanciaKm = (lat1, lng1, lat2, lng2) => {
     const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLng = ((lng2 - lng1) * Math.PI) / 180;
-
     const a =
       Math.sin(dLat / 2) ** 2 +
       Math.cos((lat1 * Math.PI) / 180) *
         Math.cos((lat2 * Math.PI) / 180) *
         Math.sin(dLng / 2) ** 2;
-
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
-  // Modificar obtenerSiguientePaquete para usar optimistic state
-  const obtenerSiguientePaquete = () => {
-    if (!ruta?.paquetes_asignados) {
-      return null;
-    }
-
-    const pendientes = ruta.paquetes_asignados
-      .filter((p) => {
-        const esPendiente =
-          !paquetesProcesados[p.id_paquete] && // Optimistic check primero
-          p.estado_paquete !== "Entregado" &&
-          p.estado_paquete !== "Fallido";
-        return esPendiente;
-      })
-      .sort((a, b) => a.orden_entrega - b.orden_entrega);
-
-    const siguiente = pendientes[0] ?? null;
-    if (siguiente) {
-      console.log();
-    } else {
-      console.log("No quedan paquetes pendientes");
-    }
-
-    return siguiente;
-  };
-
-  // Inicializar simulación
+  // 🆕 INICIALIZAR - SOLO UNA VEZ
   useEffect(() => {
-    if (!ruta) {
-      console.log("No hay ruta disponible");
-      return;
-    }
-    if (estado === "finished") {
-      console.log("Simulación ya terminó");
-      return;
-    }
-    if (ruta.estado !== "En ruta") {
-      console.log(`⚠️ Ruta no está "En ruta", estado actual: ${ruta.estado}`);
-      return;
-    }
-    if (!polyline || polyline.length === 0) {
-      console.log("⚠️ Polyline vacía");
-      return;
-    }
-    if (estado === "running") {
-      console.log("Simulación ya corriendo");
+    if (
+      !ruta?.id_ruta ||
+      rutaIdRef.current === ruta.id_ruta ||
+      inicializadoRef.current
+    ) {
       return;
     }
 
-    console.log("Iniciando simulación con", polyline.length, "puntos");
-    setEstado("running");
-    setIndice(0);
-  }, [ruta, polyline, estado]);
+    const inicializarSimulacion = async () => {
+      try {
+        console.log(`🚀 Inicializando simulación para ruta ${ruta.id_ruta}`);
+        setEstado("loading");
+        rutaIdRef.current = ruta.id_ruta;
 
-  // Loop de simulación
-  // Loop de simulación — VERSIÓN CORREGIDA
+        // 1. Obtener progreso
+        const progreso = await obtenerProgresoRutaService(ruta.id_ruta);
+        console.log("📊 Progreso:", {
+          total: progreso.total_paquetes,
+          entregados: progreso.paquetes_entregados,
+          fallidos: progreso.paquetes_fallidos,
+        });
+
+        // 2. Calcular índice inicial
+        const totalEntregados =
+          progreso.paquetes_entregados + progreso.paquetes_fallidos;
+
+        if (totalEntregados > 0 && polylineRef.current.length > 0) {
+          const porcentaje = totalEntregados / progreso.total_paquetes;
+          indiceRef.current = Math.floor(
+            polylineRef.current.length * porcentaje
+          );
+          console.log(`📍 Iniciando en índice ${indiceRef.current}`);
+        } else {
+          indiceRef.current = 0;
+        }
+
+        // 3. Obtener próximo paquete
+        const respuesta = await obtenerProximoPaqueteService(ruta.id_ruta);
+        const siguiente = respuesta.proximo || null;
+        setSiguientePaquete(siguiente);
+
+        // 4. Marcar como inicializado
+        inicializadoRef.current = true;
+
+        if (!siguiente) {
+          console.log("🏁 Sin paquetes pendientes");
+          setEstado("finished");
+        } else if (ruta.estado === "En ruta") {
+          console.log(`✅ Listo. Próximo: #${siguiente.id_paquete}`);
+          setEstado("running");
+        } else {
+          console.log(`⏸️ Estado: ${ruta.estado}`);
+          setEstado("idle");
+        }
+      } catch (error) {
+        console.error("❌ Error inicializando:", error);
+        setEstado("idle");
+      }
+    };
+
+    inicializarSimulacion();
+  }, [ruta?.id_ruta]); // ← SOLO depende de ruta.id_ruta
+
+  // 🆕 LOOP DE SIMULACIÓN - SIN DEPENDENCIAS PROBLEMÁTICAS
   useEffect(() => {
-    if (estado !== "running") return;
-    if (!polyline || polyline.length === 0) return;
-    if (indice >= polyline.length - 1) {
-      setEstado("finished");
+    // Solo iniciar cuando estado cambie a "running"
+    if (estado !== "running") {
       return;
     }
+
+    // Validar que tenemos lo necesario
+    if (polylineRef.current.length === 0 || !siguientePaqueteRef.current) {
+      console.warn("⚠️ Sin polyline o paquete");
+      return;
+    }
+
+    // Prevenir múltiples intervalos
+    if (intervalRef.current !== null) {
+      console.warn("⚠️ Ya hay un intervalo activo");
+      return;
+    }
+
+    console.log("▶️ Iniciando loop de simulación");
 
     intervalRef.current = setInterval(() => {
-      setIndice((prev) => {
-        const nuevoIndice = prev + 5;
+      const poly = polylineRef.current;
+      const siguiente = siguientePaqueteRef.current;
 
-        // Si ya llegamos al final → terminar
-        if (nuevoIndice >= polyline.length - 1) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-          setEstado("finished");
-          return polyline.length - 1;
-        }
+      // Validaciones dentro del intervalo
+      if (!poly || poly.length === 0 || !siguiente) {
+        console.log("⏹️ Deteniendo: sin datos");
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        return;
+      }
 
-        const punto = polyline[nuevoIndice];
-        const lat = punto[0];
-        const lng = punto[1];
+      // Avanzar
+      const nuevoIndice = Math.min(indiceRef.current + 5, poly.length - 1);
+      indiceRef.current = nuevoIndice;
 
-        setPosicionActual({ lat, lng });
+      const punto = poly[nuevoIndice];
+      setPosicionActual({ lat: punto[0], lng: punto[1] });
 
-        // Actualizar backend
-        actualizarUbicacionService(ruta.id_ruta, { lat, lng }).catch(
-          console.error
-        );
+      // Actualizar backend
+      if (ruta?.id_ruta) {
+        actualizarUbicacionService(ruta.id_ruta, {
+          lat: punto[0],
+          lng: punto[1],
+        }).catch(() => {});
+      }
 
-        // Detección de llegada
-        const siguiente = obtenerSiguientePaquete();
-        if (siguiente) {
-          const dist = calcularDistanciaKm(
-            lat,
-            lng,
-            Number(siguiente.lat),
-            Number(siguiente.lng)
-          );
-          if (dist < toleranceKm) {
-            clearInterval(intervalRef.current);
-            intervalRef.current = null;
-            setPaqueteActual(siguiente);
-            setEstado("paused");
-            // ← Aquí ya no sigue avanzando nunca más
-            return prev; // no incrementar más
-          }
-        }
+      // Verificar llegada al paquete
+      const distancia = calcularDistanciaKm(
+        punto[0],
+        punto[1],
+        Number(siguiente.lat),
+        Number(siguiente.lng)
+      );
 
-        return nuevoIndice;
-      });
+      if (distancia < toleranceKm) {
+        console.log(`🎯 ¡LLEGASTE! Paquete #${siguiente.id_paquete}`);
+
+        // DETENER INMEDIATAMENTE
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+
+        // Cambiar estado
+        setEstado("paused");
+
+        // Establecer paquete actual
+        setPaqueteActual(siguiente);
+      }
     }, intervalMs);
 
+    // Cleanup
     return () => {
       if (intervalRef.current) {
+        console.log("🧹 Cleanup del loop");
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
     };
-  }, [estado, polyline, ruta, toleranceKm, intervalMs]);
+  }, [estado]); // ← SOLO depende de estado
 
-  // Modificar completarEntrega con optimistic update
+  // 📝 COMPLETAR ENTREGA
   const completarEntrega = useCallback(
     async (paqueteId, estadoEntrega, archivo, observacion = "") => {
-      if (!ruta || !paqueteActual) return;
-
-      const paqueteEnRuta = ruta.paquetes_asignados.find(
-        (p) => p.id_paquete === paqueteActual.id_paquete
-      );
-
-      if (
-        paqueteEnRuta &&
-        (paqueteEnRuta.estado_paquete === "Entregado" ||
-          paqueteEnRuta.estado_paquete === "Fallido")
-      ) {
-        setPaqueteActual(null);
-        setEstado("running");
-        setIndice((prev) => Math.max(0, prev - 10));
+      if (!ruta || !paqueteActual) {
+        console.error("⚠️ Sin paquete actual");
         return;
       }
 
-      // OPTIMISTIC: Marca como procesado LOCALMENTE antes del POST
-      setPaquetesProcesados((prev) => ({
-        ...prev,
-        [paqueteActual.id_paquete]: true,
-      }));
+      console.log(
+        `📝 Marcando #${paqueteActual.id_paquete} como ${estadoEntrega}`
+      );
 
       try {
+        // Marcar entrega
         await marcarEntregaService(ruta.id_ruta, {
           paquete: paqueteActual.id_paquete,
           estado: estadoEntrega,
           foto: archivo,
-          observacion: observacion,
+          observacion,
           lat_entrega: paqueteActual.lat,
           lng_entrega: paqueteActual.lng,
         });
 
-        // CALCULAR con datos actualizados (usa optimistic para quedanPendientes)
-        const paquetesActualizados = ruta.paquetes_asignados.map((p) =>
-          p.id_paquete === paqueteActual.id_paquete
-            ? { ...p, estado_paquete: estadoEntrega }
-            : p
-        );
+        console.log(`✅ Entrega registrada`);
 
-        const quedanPendientes = paquetesActualizados.some(
-          (p) =>
-            !paquetesProcesados[p.id_paquete] && // Usa optimistic
-            p.estado_paquete !== "Entregado" &&
-            p.estado_paquete !== "Fallido"
-        );
-
-        console.log("¿Quedan paquetes pendientes?", quedanPendientes);
-
-        if (!quedanPendientes) {
-          console.log(
-            "Todos los paquetes procesados. Driver debe finalizar manualmente."
-          );
-          setEstado("finished");
-          setPaqueteActual(null);
-          return;
-        }
-
-        console.log("Reanudando simulación...");
+        // Limpiar
         setPaqueteActual(null);
-        setEstado("running");
-      } catch (err) {
-        // ROLLBACK optimistic si falla
-        setPaquetesProcesados((prev) => {
-          const nuevo = { ...prev };
-          delete nuevo[paqueteActual.id_paquete];
-          return nuevo;
-        });
 
-        console.error("Error completando entrega:", err);
-        const errorMsg =
-          err.response?.data?.error ||
-          err.response?.data?.non_field_errors?.[0] ||
-          "Error desconocido";
-        alert(`Error al registrar la entrega: ${errorMsg}`);
+        // Obtener siguiente
+        const respuesta = await obtenerProximoPaqueteService(ruta.id_ruta);
+        const nuevoSiguiente = respuesta.proximo || null;
+
+        if (!nuevoSiguiente) {
+          console.log("🏁 ¡Completado!");
+          setSiguientePaquete(null);
+          setEstado("finished");
+        } else {
+          console.log(`📦 Siguiente: #${nuevoSiguiente.id_paquete}`);
+          setSiguientePaquete(nuevoSiguiente);
+          setEstado("running");
+        }
+      } catch (err) {
+        console.error("❌ Error:", err);
+        alert(err.response?.data?.error || "Error al registrar entrega");
       }
     },
-    [ruta, paqueteActual, paquetesProcesados]
-  ); // Dependencias para memo
-
-  useEffect(() => {
-    if (paqueteActual) {
-      console.log("PAQUETE ACTUAL ESTABLECIDO:", paqueteActual);
-    } else {
-      console.log("PAQUETE ACTUAL LIMPIADO");
-    }
-  }, [paqueteActual]);
+    [ruta, paqueteActual]
+  );
 
   return {
     estado,
     paqueteActual,
     posicionActual,
+    siguientePaquete,
     completarEntrega,
   };
 };

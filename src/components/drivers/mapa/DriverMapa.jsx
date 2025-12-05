@@ -15,22 +15,14 @@ import { CustomZoomControl } from "./components/CustomZoomControl";
 let MapContainer, TileLayer, Polyline, Marker, Popup;
 let MarcadoresPaquetes, MarkerConductor;
 
-
-const POSICION_SENA = [4.6390764, -74.0660737];// Cl. 52 #13-65, Bogotá
-
-
-
-
 export const DriverMapa = ({ driverId }) => {
-
-
   const [mapLoaded, setMapLoaded] = useState(false);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [paqueteEnProceso, setPaqueteEnProceso] = useState(null);
   const [modalFinalizacionAbierto, setModalFinalizacionAbierto] = useState(false);
   const [cerrandoRuta, setCerrandoRuta] = useState(false);
 
-  // NUEVO: Estado para datos del conductor (independiente de la ruta)
+  // Estado para datos del conductor
   const [conductorData, setConductorData] = useState(null);
   const [loadingConductor, setLoadingConductor] = useState(true);
 
@@ -39,10 +31,46 @@ export const DriverMapa = ({ driverId }) => {
   const [polylineRecorrida, setPolylineRecorrida] = useState([]);
 
   const mapRef = useRef(null);
-
   const ruta = useRutaActivaPolling(driverId);
 
-  // NUEVO: Obtener datos del conductor independientemente de si tiene ruta
+  // 🆕 FUNCIÓN: Obtener posición base del conductor (REAL)
+  const obtenerPosicionBase = () => {
+    // Prioridad 1: Conductor ya cargado independientemente
+    if (conductorData?.base_lat && conductorData?.base_lng) {
+      const lat = parseFloat(conductorData.base_lat);
+      const lng = parseFloat(conductorData.base_lng);
+      if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+        console.log("📍 Usando posición base de conductorData:", { lat, lng });
+        return [lat, lng];
+      }
+    }
+
+    // Prioridad 2: Conductor en la ruta actual
+    if (ruta?.conductor_detalle?.base_lat && ruta?.conductor_detalle?.base_lng) {
+      const lat = parseFloat(ruta.conductor_detalle.base_lat);
+      const lng = parseFloat(ruta.conductor_detalle.base_lng);
+      if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+        console.log("📍 Usando posición base de ruta.conductor_detalle:", { lat, lng });
+        return [lat, lng];
+      }
+    }
+
+    // Prioridad 3: Ubicación actual del conductor
+    if (conductorData?.ubicacion_actual_lat && conductorData?.ubicacion_actual_lng) {
+      const lat = parseFloat(conductorData.ubicacion_actual_lat);
+      const lng = parseFloat(conductorData.ubicacion_actual_lng);
+      if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+        console.log("📍 Usando ubicación actual de conductorData:", { lat, lng });
+        return [lat, lng];
+      }
+    }
+
+    // Fallback: Posición del SENA (solo si TODO falla)
+    console.warn("⚠️ Usando posición fallback SENA");
+    return [4.6390764, -74.0660737];
+  };
+
+  // Obtener datos del conductor
   useEffect(() => {
     const obtenerConductor = async () => {
       try {
@@ -50,6 +78,12 @@ export const DriverMapa = ({ driverId }) => {
         const user = JSON.parse(localStorage.getItem("user"));
         if (user?.id_usuario) {
           const conductor = await getConductorByUserId(user.id_usuario);
+          console.log("🚗 Datos del conductor obtenidos:", {
+            nombre: conductor?.conductor_detalle?.nombre,
+            base_lat: conductor?.base_lat,
+            base_lng: conductor?.base_lng,
+            direccion_base: conductor?.direccion_base
+          });
           setConductorData(conductor);
         }
       } catch (error) {
@@ -94,7 +128,7 @@ export const DriverMapa = ({ driverId }) => {
     { interval: 300, toleranceKm: 0.15 }
   );
 
-  // Actualizar polyline recorrida siguiendo la ruta real
+  // Actualizar polyline recorrida
   useEffect(() => {
     if (!posicionActual || !polylineCompleta.length) return;
 
@@ -116,11 +150,17 @@ export const DriverMapa = ({ driverId }) => {
 
   // Abrir modal cuando detecta paquete
   useEffect(() => {
-    if (paqueteActual && !modalAbierto) {
+    if (paqueteActual) {
+      console.log("🛑 PAQUETE DETECTADO: Abriendo modal");
       setPaqueteEnProceso(paqueteActual);
       setModalAbierto(true);
+  
+    } else if (!paqueteActual && modalAbierto) {
+      // Cerrar modal cuando paqueteActual se limpia
+      setModalAbierto(false);
+      setPaqueteEnProceso(null);
     }
-  }, [paqueteActual]);
+  }, [paqueteActual]); // Solo depende de paqueteActual
 
   // Finalización automática
   useEffect(() => {
@@ -132,6 +172,8 @@ export const DriverMapa = ({ driverId }) => {
   const handleCompletarEntrega = async (estadoEntrega, archivo, observacion) => {
     if (!paqueteEnProceso) return;
 
+    console.log("🔄 Procesando entrega...");
+
     try {
       await completarEntrega(
         paqueteEnProceso.id_paquete,
@@ -139,10 +181,14 @@ export const DriverMapa = ({ driverId }) => {
         archivo,
         observacion
       );
-      setModalAbierto(false);
-      setPaqueteEnProceso(null);
+
+      // Cerrar modal después de completar
+      setTimeout(() => {
+        setModalAbierto(false);
+        setPaqueteEnProceso(null);
+      }, 100);
     } catch (error) {
-      console.error(error);
+      console.error("Error al completar entrega:", error);
     }
   };
 
@@ -156,6 +202,31 @@ export const DriverMapa = ({ driverId }) => {
     } finally {
       setCerrandoRuta(false);
     }
+  };
+
+  // 🆕 FUNCIÓN: Determinar posición del conductor
+  const obtenerPosicionConductor = () => {
+    // Prioridad 1: Posición actual de la simulación
+    if (posicionActual?.lat && posicionActual?.lng) {
+      return { lat: posicionActual.lat, lng: posicionActual.lng };
+    }
+
+    // Prioridad 2: Posición base del conductor (REAL)
+    const posicionBase = obtenerPosicionBase();
+    if (posicionBase[0] && posicionBase[1]) {
+      return {
+        lat: posicionBase[0],
+        lng: posicionBase[1]
+      };
+    }
+
+    // Prioridad 3: Primer punto de la ruta calculada
+    if (polylineCompleta.length > 0) {
+      return { lat: polylineCompleta[0][0], lng: polylineCompleta[0][1] };
+    }
+
+    // Prioridad 4: Fallback extremo
+    return { lat: 4.6390764, lng: -74.0660737 };
   };
 
   // Carga dinámica de Leaflet
@@ -185,7 +256,7 @@ export const DriverMapa = ({ driverId }) => {
 
   if (!mapLoaded) return <div className="w-full flex justify-center py-10"><Loading /></div>;
 
-  // Determinar nombre y foto del conductor (priorizar datos frescos)
+  // Determinar nombre y foto del conductor
   const nombreConductor =
     ruta?.conductor_detalle?.conductor_detalle?.nombre ||
     ruta?.conductor_nombre ||
@@ -197,52 +268,66 @@ export const DriverMapa = ({ driverId }) => {
     conductorData?.conductor_detalle?.foto_perfil ||
     null;
 
-  // Determinar posición del conductor
-  const obtenerPosicionConductor = () => {
-    // Prioridad 1: Posición actual de la simulación
-    if (posicionActual?.lat && posicionActual?.lng) {
-      return { lat: posicionActual.lat, lng: posicionActual.lng };
-    }
+  // Obtener posición del conductor
+  const posicionConductor = obtenerPosicionConductor();
 
-    // Prioridad 2: Primer punto de la ruta calculada
+  // 🆕 CENTRO DEL MAPA: Usar posición base del conductor
+  const obtenerCentroMapa = () => {
     if (polylineCompleta.length > 0) {
-      return { lat: polylineCompleta[0][0], lng: polylineCompleta[0][1] };
+      return polylineCompleta[0]; // Primera posición de la ruta
     }
-
-    // Prioridad 3: Ubicación guardada en el conductor (si es válida)
-    if (ruta?.conductor_detalle?.ubicacion_actual_lat &&
-      ruta?.conductor_detalle?.ubicacion_actual_lng) {
-      const lat = parseFloat(ruta.conductor_detalle.ubicacion_actual_lat);
-      const lng = parseFloat(ruta.conductor_detalle.ubicacion_actual_lng);
-      if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-        return { lat, lng };
-      }
-    }
-
-    // Prioridad 4: Posición por defecto (SENA)
-    return { lat: POSICION_SENA[0], lng: POSICION_SENA[1] };
+    return obtenerPosicionBase(); // Posición base del conductor
   };
+
+  const centroMapa = obtenerCentroMapa();
 
   // Sin ruta asignada
   if (!ruta) {
     return (
       <div className="h-screen relative">
-        <MapContainer center={POSICION_SENA} zoom={12} zoomControl={false} style={{ height: "100%", width: "100%" }}>
+        <MapContainer
+          center={centroMapa}
+          zoom={14}
+          zoomControl={false}
+          style={{ height: "100%", width: "100%" }}
+        >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <CustomZoomControl />
 
-          {/* Conductor en posición SENA cuando no hay ruta */}
+          {/* Mostrar posición base del conductor */}
           {!loadingConductor && (
             <MarkerConductor
-              lat={POSICION_SENA[0]}
-              lng={POSICION_SENA[1]}
+              lat={posicionConductor.lat}
+              lng={posicionConductor.lng}
               nombre={nombreConductor}
               fotoUrl={fotoConductor}
             />
           )}
         </MapContainer>
-        {/* Z-INDEX CORREGIDO */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[9999] animate-slideDown">
+
+        {/* Información de ubicación base */}
+        <div className="absolute top-4 left-4 z-[9999]">
+          <div className="bg-white dark:bg-gray-800 px-4 py-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-w-md">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0">
+                <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Ubicación base
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {conductorData?.direccion_base || "Dirección no configurada"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sin ruta asignada */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[9998]">
           <div className="flex items-center gap-3 bg-white dark:bg-gray-800 px-4 py-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
             <div className="flex-shrink-0">
               <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
@@ -258,13 +343,10 @@ export const DriverMapa = ({ driverId }) => {
     );
   }
 
-  const center = polylineCompleta.length > 0 ? polylineCompleta[0] : POSICION_SENA;
-  const posicionConductor = obtenerPosicionConductor();
-
   return (
     <div className="h-screen relative overflow-hidden rounded-xl">
       <MapContainer
-        center={center}
+        center={centroMapa}
         zoom={14}
         zoomControl={false}
         style={{ height: "100%", width: "100%" }}
@@ -320,7 +402,7 @@ export const DriverMapa = ({ driverId }) => {
           <MarcadoresPaquetes paquetes={ruta.paquetes_asignados} />
         )}
 
-        {/* Conductor - SIEMPRE VISIBLE con posición por defecto */}
+        {/* Conductor */}
         <MarkerConductor
           lat={posicionConductor.lat}
           lng={posicionConductor.lng}
@@ -328,6 +410,36 @@ export const DriverMapa = ({ driverId }) => {
           fotoUrl={fotoConductor}
         />
       </MapContainer>
+
+      {/* Información de simulación */}
+      <div className="absolute top-4 left-4 z-[9999]">
+        <div className="bg-white dark:bg-gray-800 px-4 py-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="flex-shrink-0">
+              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Estado: <span className="font-bold">{estado === "running" ? "En ruta" : estado}</span>
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {ruta.total_paquetes - (ruta.paquetes_entregados + ruta.paquetes_fallidos)} paquetes pendientes
+              </p>
+            </div>
+          </div>
+
+          {/* Mostrar dirección base si existe */}
+          {conductorData?.direccion_base && (
+            <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                📍 Base: {conductorData.direccion_base}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Modal de entrega */}
       <Modal isOpen={modalAbierto} onClose={() => { }} showCloseButton={false}>
