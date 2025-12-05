@@ -39,7 +39,23 @@ export const Routeshistory = () => {
         try {
 
             const response = await GetRoutesHistoryService();
-            setRoutes(response);
+            
+            const ordenadas = response.sort((a, b) => {
+                const fechaA = a.fecha_fin ? new Date(a.fecha_fin) : null;
+                const fechaB = b.fecha_fin ? new Date(b.fecha_fin) : null;
+
+                // Si una tiene fecha_fin y la otra no
+                if (fechaA && !fechaB) return -1; // A va primero
+                if (!fechaA && fechaB) return 1;  // B va primero
+
+                // Si ninguna tiene fecha_fin, mantener orden
+                if (!fechaA && !fechaB) return 0;
+
+                // Ambas tienen fecha: ordenar desc (más reciente primero)
+                return fechaB - fechaA;
+            });
+
+            setRoutes(ordenadas);
 
         } catch (error) {
 

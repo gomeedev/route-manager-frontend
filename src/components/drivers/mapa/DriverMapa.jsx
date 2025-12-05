@@ -22,6 +22,9 @@ export const DriverMapa = ({ driverId }) => {
   const [modalFinalizacionAbierto, setModalFinalizacionAbierto] = useState(false);
   const [cerrandoRuta, setCerrandoRuta] = useState(false);
 
+  // Agrega este estado para forzar reinicio de simulación
+  const [rutaKey, setRutaKey] = useState(0);
+
   // Estado para datos del conductor
   const [conductorData, setConductorData] = useState(null);
   const [loadingConductor, setLoadingConductor] = useState(true);
@@ -31,7 +34,7 @@ export const DriverMapa = ({ driverId }) => {
   const [polylineRecorrida, setPolylineRecorrida] = useState([]);
 
   const mapRef = useRef(null);
-  const ruta = useRutaActivaPolling(driverId);
+  const { ruta, detenerPolling, refrescarRuta } = useRutaActivaPolling(driverId);
 
   // 🆕 FUNCIÓN: Obtener posición base del conductor (REAL)
   const obtenerPosicionBase = () => {
@@ -96,6 +99,23 @@ export const DriverMapa = ({ driverId }) => {
     obtenerConductor();
   }, []);
 
+  // Efecto para detectar cuando la ruta cambia a "En ruta"
+  useEffect(() => {
+    if (!ruta) return;
+
+    if (ruta.estado === "En ruta") {
+      console.log("🎯 Ruta en estado 'En ruta', forzando actualización");
+
+      // Forzar un refresh del polling
+      if (refrescarRuta) {
+        refrescarRuta();
+      }
+
+      // Incrementar la key para forzar remontaje del hook de simulación
+      setRutaKey(prev => prev + 1);
+    }
+  }, [ruta?.estado, refrescarRuta]);
+
   // GEOMETRY → Polyline completa
   useEffect(() => {
     if (!ruta?.ruta_optimizada?.geometry) {
@@ -125,7 +145,8 @@ export const DriverMapa = ({ driverId }) => {
   } = useSimulacionRuta(
     ruta,
     polylineCompleta,
-    { interval: 300, toleranceKm: 0.25 }
+    { interval: 300, toleranceKm: 0.25 },
+    rutaKey // Pasa la key como parámetro extra
   );
 
   // Actualizar polyline recorrida
@@ -146,7 +167,7 @@ export const DriverMapa = ({ driverId }) => {
 
     const nuevaRecorrida = polylineCompleta.slice(0, indiceMasCercano + 10);
     setPolylineRecorrida(nuevaRecorrida);
-  }, [posicionActual, polylineCompleta]);
+  }, [posicionActual, polylineCompleta, rutaKey]); // Agrega rutaKey aquí
 
   // Abrir modal cuando detecta paquete
   useEffect(() => {
@@ -154,20 +175,25 @@ export const DriverMapa = ({ driverId }) => {
       console.log("🛑 PAQUETE DETECTADO: Abriendo modal");
       setPaqueteEnProceso(paqueteActual);
       setModalAbierto(true);
-
     } else if (!paqueteActual && modalAbierto) {
       // Cerrar modal cuando paqueteActual se limpia
       setModalAbierto(false);
       setPaqueteEnProceso(null);
     }
-  }, [paqueteActual]); // Solo depende de paqueteActual
+  }, [paqueteActual]);
 
   // Finalización automática
   useEffect(() => {
     if (estado === "finished") {
-      setModalFinalizacionAbierto(true);
+      console.log("🏁 Simulación terminada, deteniendo polling");
+      detenerPolling();
+
+      // Verificar si la ruta ya se cerró automáticamente
+      setTimeout(() => {
+        setModalFinalizacionAbierto(true);
+      }, 1000);
     }
-  }, [estado]);
+  }, [estado, detenerPolling]);
 
   const handleCompletarEntrega = async (estadoEntrega, archivo, observacion) => {
     if (!paqueteEnProceso) return;
@@ -196,11 +222,20 @@ export const DriverMapa = ({ driverId }) => {
     setCerrandoRuta(true);
     try {
       await cerrarRutaService(ruta.id_ruta);
-      window.location.reload();
+      setTimeout(() => {
+        window.location.href = "/driver";
+      }, 1500);
     } catch (error) {
-      alert("Error al finalizar ruta");
-    } finally {
-      setCerrandoRuta(false);
+      if (error.response?.status === 400) {
+        // La ruta ya estaba cerrada
+        alert("¡Ruta ya completada! Redirigiendo...");
+        setTimeout(() => {
+          window.location.href = "/driver";
+        }, 1500);
+      } else {
+        alert("Error al finalizar ruta: " + (error.response?.data?.error || error.message));
+        setCerrandoRuta(false);
+      }
     }
   };
 
@@ -274,9 +309,9 @@ export const DriverMapa = ({ driverId }) => {
   // 🆕 CENTRO DEL MAPA: Usar posición base del conductor
   const obtenerCentroMapa = () => {
     if (polylineCompleta.length > 0) {
-      return polylineCompleta[0]; // Primera posición de la ruta
+      return polylineCompleta[0];
     }
-    return obtenerPosicionBase(); // Posición base del conductor
+    return obtenerPosicionBase();
   };
 
   const centroMapa = obtenerCentroMapa();
@@ -456,18 +491,37 @@ export const DriverMapa = ({ driverId }) => {
       </Modal>
 
       {/* Modal de finalización */}
-      <Modal isOpen={modalFinalizacionAbierto} onClose={() => { }} showCloseButton={false} size="sm">
+      <Modal
+        isOpen={modalFinalizacionAbierto}
+        onClose={() => {
+          if (!cerrandoRuta) {
+            setModalFinalizacionAbierto(false);
+          }
+        }}
+        showCloseButton={!cerrandoRuta}
+        size="sm"
+      >
         <div className="text-center p-6">
-          <h2 className="text-2xl font-bold mb-4">¡Fin del dia!</h2>
+          <h2 className="text-2xl font-bold mb-4">¡Fin del día!</h2>
           <p className="text-lg mb-6">
-            {ruta.paquetes_entregados} entregados · {ruta.paquetes_fallidos} fallidos
+            {ruta?.paquetes_entregados || 0} entregados · {ruta?.paquetes_fallidos || 0} fallidos
           </p>
           <button
             onClick={handleFinalizarRuta}
             disabled={cerrandoRuta}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg disabled:opacity-50"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg disabled:opacity-50 transition-colors"
           >
-            {cerrandoRuta ? "Finalizando..." : "Finalizar ruta"}
+            {cerrandoRuta ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin h-5 w-5 mr-2 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Finalizando...
+              </span>
+            ) : (
+              "Finalizar ruta"
+            )}
           </button>
         </div>
       </Modal>

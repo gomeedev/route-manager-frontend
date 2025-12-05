@@ -4,7 +4,7 @@ import { marcarEntregaService } from "../../../../global/api/drivers/entregas";
 import { obtenerProximoPaqueteService } from "../../../../global/api/drivers/proximoPaquete";
 import { obtenerProgresoRutaService } from "../../../../global/api/drivers/progreso";
 
-export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
+export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
   const [estado, setEstado] = useState("loading");
   const [paqueteActual, setPaqueteActual] = useState(null);
   const [posicionActual, setPosicionActual] = useState(null);
@@ -21,6 +21,30 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
 
   const intervalMs = opts.interval ?? 300;
   const toleranceKm = opts.toleranceKm ?? 0.25; // Cambiado a 0.25 km
+
+
+  // Efecto para resetear cuando cambia resetKey
+  useEffect(() => {
+    if (resetKey > 0) {
+      console.log(`🔄 Reset key cambiada: ${resetKey}, reiniciando simulación`);
+
+      // Resetear todos los refs
+      rutaIdRef.current = null;
+      inicializadoRef.current = false;
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+      indiceRef.current = 0;
+
+      // Resetear estados
+      setEstado("loading");
+      setPaqueteActual(null);
+      setPosicionActual(null);
+      setSiguientePaquete(null);
+    }
+  }, [resetKey]);
+
 
   // Sincronizar polyline con ref
   useEffect(() => {
@@ -128,7 +152,7 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
     };
 
     inicializarSimulacion();
-  }, [ruta?.id_ruta]);
+  }, [ruta?.id_ruta, resetKey]);
 
   // LOOP DE SIMULACIÓN
   useEffect(() => {

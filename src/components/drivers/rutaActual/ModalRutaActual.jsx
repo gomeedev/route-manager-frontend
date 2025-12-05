@@ -10,7 +10,7 @@ import { iniciarRutaService } from "../../../global/api/drivers/iniciarRuta";
 
 import Loading from "../../common/Loading";
 import Badge from "../../ui/badge/Badge";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -20,6 +20,7 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
     const [loading, setLoading] = useState(true);
     const [loadingCalcular, setLoadingCalcular] = useState(false);
 
+    const navigate = useNavigate();
 
     const getRuta = async () => {
         try {
@@ -73,17 +74,19 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
         if (!rutaActual?.id_ruta) return;
 
         try {
-            // Llamar al endpoint iniciar_ruta
             await iniciarRutaService(rutaActual.id_ruta);
-
-            // Refrescar datos
             await getRuta();
+            onClose();
 
-            onClose()
-            Navigate("/driver")
+            // Redirigir inmediatamente
+            setTimeout(() => {
+                navigate("/driver", { replace: true });
 
-            // Aquí podrías redirigir al mapa de simulación
-            // navigate('/driver/mapa-simulacion');
+                // Recargar después de 500ms para forzar actualización
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            }, 100);
 
         } catch (error) {
             console.error("Error al iniciar ruta:", error);
