@@ -16,13 +16,13 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
   // Refs críticos para evitar bucles
   const rutaIdRef = useRef(null);
   const inicializadoRef = useRef(false);
-  const polylineRef = useRef([]); // ← NUEVO: Guardar polyline en ref
-  const siguientePaqueteRef = useRef(null); // ← NUEVO
+  const polylineRef = useRef([]);
+  const siguientePaqueteRef = useRef(null);
 
   const intervalMs = opts.interval ?? 300;
-  const toleranceKm = opts.toleranceKm ?? 0.15;
+  const toleranceKm = opts.toleranceKm ?? 0.25; // Cambiado a 0.25 km
 
-  // Sincronizar polyline con ref (sin re-renders)
+  // Sincronizar polyline con ref
   useEffect(() => {
     if (polyline && polyline.length > 0) {
       polylineRef.current = polyline;
@@ -47,7 +47,7 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
-  // 🆕 INICIALIZAR - SOLO UNA VEZ
+  // INICIALIZAR
   useEffect(() => {
     if (
       !ruta?.id_ruta ||
@@ -88,6 +88,19 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
         // 3. Obtener próximo paquete
         const respuesta = await obtenerProximoPaqueteService(ruta.id_ruta);
         const siguiente = respuesta.proximo || null;
+
+        // ✅ Convertir coordenadas a número
+        if (siguiente) {
+          siguiente.lat = parseFloat(siguiente.lat);
+          siguiente.lng = parseFloat(siguiente.lng);
+
+          if (isNaN(siguiente.lat) || isNaN(siguiente.lng)) {
+            console.error("❌ Coordenadas inválidas:", siguiente);
+            setEstado("idle");
+            return;
+          }
+        }
+
         setSiguientePaquete(siguiente);
 
         // 4. Marcar como inicializado
@@ -97,7 +110,12 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
           console.log("🏁 Sin paquetes pendientes");
           setEstado("finished");
         } else if (ruta.estado === "En ruta") {
-          console.log(`✅ Listo. Próximo: #${siguiente.id_paquete}`);
+          console.log(`✅ Listo. Próximo: #${siguiente.id_paquete}`, {
+            lat: siguiente.lat,
+            lng: siguiente.lng,
+            tipo_lat: typeof siguiente.lat,
+            tipo_lng: typeof siguiente.lng,
+          });
           setEstado("running");
         } else {
           console.log(`⏸️ Estado: ${ruta.estado}`);
@@ -110,22 +128,19 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
     };
 
     inicializarSimulacion();
-  }, [ruta?.id_ruta]); // ← SOLO depende de ruta.id_ruta
+  }, [ruta?.id_ruta]);
 
-  // 🆕 LOOP DE SIMULACIÓN - SIN DEPENDENCIAS PROBLEMÁTICAS
+  // LOOP DE SIMULACIÓN
   useEffect(() => {
-    // Solo iniciar cuando estado cambie a "running"
     if (estado !== "running") {
       return;
     }
 
-    // Validar que tenemos lo necesario
     if (polylineRef.current.length === 0 || !siguientePaqueteRef.current) {
       console.warn("⚠️ Sin polyline o paquete");
       return;
     }
 
-    // Prevenir múltiples intervalos
     if (intervalRef.current !== null) {
       console.warn("⚠️ Ya hay un intervalo activo");
       return;
@@ -137,7 +152,6 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
       const poly = polylineRef.current;
       const siguiente = siguientePaqueteRef.current;
 
-      // Validaciones dentro del intervalo
       if (!poly || poly.length === 0 || !siguiente) {
         console.log("⏹️ Deteniendo: sin datos");
         clearInterval(intervalRef.current);
@@ -152,7 +166,30 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
       const punto = poly[nuevoIndice];
       setPosicionActual({ lat: punto[0], lng: punto[1] });
 
-      // Actualizar backend
+      // ✅ CALCULAR DISTANCIA PRIMERO
+      const distancia = calcularDistanciaKm(
+        punto[0],
+        punto[1],
+        siguiente.lat,
+        siguiente.lng
+      );
+
+      // Log cada 20 iteraciones
+      if (nuevoIndice % 20 === 0) {
+        console.log(
+          `📍 Posición actual: [${punto[0].toFixed(6)}, ${punto[1].toFixed(6)}]`
+        );
+        console.log(
+          `📦 Paquete objetivo: [${siguiente.lat}, ${siguiente.lng}]`
+        );
+        console.log(
+          `📏 Distancia: ${distancia.toFixed(
+            4
+          )} km | Tolerancia: ${toleranceKm} km`
+        );
+      }
+
+      // Actualizar backend (sin esperar respuesta)
       if (ruta?.id_ruta) {
         actualizarUbicacionService(ruta.id_ruta, {
           lat: punto[0],
@@ -160,16 +197,17 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
         }).catch(() => {});
       }
 
-      // Verificar llegada al paquete
-      const distancia = calcularDistanciaKm(
-        punto[0],
-        punto[1],
-        Number(siguiente.lat),
-        Number(siguiente.lng)
-      );
-
-      if (distancia < toleranceKm) {
-        console.log(`🎯 ¡LLEGASTE! Paquete #${siguiente.id_paquete}`);
+      // ✅ VERIFICAR LLEGADA
+      if (distancia <= toleranceKm) {
+        console.log(
+          `🎯 ¡LLEGASTE! Paquete #${siguiente.id_paquete} (${distancia.toFixed(
+            4
+          )} km)`
+        );
+        console.log(
+          "🔍 Verificando si el intervalo está activo:",
+          intervalRef.current !== null
+        );
 
         // DETENER INMEDIATAMENTE
         clearInterval(intervalRef.current);
@@ -177,9 +215,11 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
 
         // Cambiar estado
         setEstado("paused");
+        console.log("📝 Estado cambiado a 'paused'");
 
         // Establecer paquete actual
         setPaqueteActual(siguiente);
+        console.log("📦 Paquete actual establecido:", siguiente.id_paquete);
       }
     }, intervalMs);
 
@@ -191,9 +231,9 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
         intervalRef.current = null;
       }
     };
-  }, [estado]); // ← SOLO depende de estado
+  }, [estado, ruta?.id_ruta, intervalMs, toleranceKm]);
 
-  // 📝 COMPLETAR ENTREGA
+  // COMPLETAR ENTREGA
   const completarEntrega = useCallback(
     async (paqueteId, estadoEntrega, archivo, observacion = "") => {
       if (!ruta || !paqueteActual) {
@@ -206,14 +246,20 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
       );
 
       try {
+        // ✅ Convertir coordenadas a número
+        const paqueteCoords = {
+          lat: parseFloat(paqueteActual.lat),
+          lng: parseFloat(paqueteActual.lng),
+        };
+
         // Marcar entrega
         await marcarEntregaService(ruta.id_ruta, {
           paquete: paqueteActual.id_paquete,
           estado: estadoEntrega,
           foto: archivo,
           observacion,
-          lat_entrega: paqueteActual.lat,
-          lng_entrega: paqueteActual.lng,
+          lat_entrega: paqueteCoords.lat,
+          lng_entrega: paqueteCoords.lng,
         });
 
         console.log(`✅ Entrega registrada`);
@@ -224,6 +270,12 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}) => {
         // Obtener siguiente
         const respuesta = await obtenerProximoPaqueteService(ruta.id_ruta);
         const nuevoSiguiente = respuesta.proximo || null;
+
+        if (nuevoSiguiente) {
+          // ✅ Convertir coordenadas
+          nuevoSiguiente.lat = parseFloat(nuevoSiguiente.lat);
+          nuevoSiguiente.lng = parseFloat(nuevoSiguiente.lng);
+        }
 
         if (!nuevoSiguiente) {
           console.log("🏁 ¡Completado!");

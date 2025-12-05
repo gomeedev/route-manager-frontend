@@ -125,7 +125,7 @@ export const DriverMapa = ({ driverId }) => {
   } = useSimulacionRuta(
     ruta,
     polylineCompleta,
-    { interval: 300, toleranceKm: 0.15 }
+    { interval: 300, toleranceKm: 0.25 }
   );
 
   // Actualizar polyline recorrida
@@ -154,7 +154,7 @@ export const DriverMapa = ({ driverId }) => {
       console.log("🛑 PAQUETE DETECTADO: Abriendo modal");
       setPaqueteEnProceso(paqueteActual);
       setModalAbierto(true);
-  
+
     } else if (!paqueteActual && modalAbierto) {
       // Cerrar modal cuando paqueteActual se limpia
       setModalAbierto(false);
@@ -442,7 +442,10 @@ export const DriverMapa = ({ driverId }) => {
       </div>
 
       {/* Modal de entrega */}
-      <Modal isOpen={modalAbierto} onClose={() => { }} showCloseButton={false}>
+      <Modal isOpen={modalAbierto} onClose={() => {
+        setModalAbierto(false);
+        setPaqueteEnProceso(null);
+      }} showCloseButton={false}>
         {paqueteEnProceso && (
           <FormularioEntrega
             paquete={paqueteEnProceso}
