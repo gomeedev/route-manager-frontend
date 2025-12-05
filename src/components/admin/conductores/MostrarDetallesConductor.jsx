@@ -139,6 +139,12 @@ export const MostrarDetallesConductor = ({ driverId, onClose }) => {
                                             {detallesConductor.conductor_detalle.telefono_movil}
                                         </p>
                                     </div>
+                                    <div>
+                                        <span className="text-sm text-gray-600 dark:text-gray-400">Direccion</span>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
+                                            {detallesConductor.direccion_base}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
 

@@ -57,16 +57,17 @@ export const RoutesManagement = () => {
             }
 
             const sorted = response.sort((a, b) => {
-                // Comparar por cantidad de paquetes
-                const paquetesComparison = (b.total_paquetes || 0) - (a.total_paquetes || 0);
+                const estadoComparison = orderMap[a.estado] - orderMap[b.estado];
 
-                // Si tienen la misma cantidad de paquetes, ordenar por estado
-                if (paquetesComparison === 0) {
-                    return orderMap[a.estado] - orderMap[b.estado];
+                // Si los estados son distintos, priorizar el estado
+                if (estadoComparison !== 0) {
+                    return estadoComparison;
                 }
 
-                return paquetesComparison;
+                // Si tienen el mismo estado, ordenar por cantidad de paquetes (desc)
+                return (b.total_paquetes || 0) - (a.total_paquetes || 0);
             });
+
 
             setRoutes(sorted);
 
