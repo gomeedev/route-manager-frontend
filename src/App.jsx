@@ -10,6 +10,7 @@ import { ResetPasswordPage } from "./pages/authPages/ResetPasswordPage";
 import ProtectedRoute from "./hooks/ProtectedRoute";
 
 // Globales
+import { UserAutoLogout } from "./components/auth/UserAutoLogout";
 import NotFoundPage from "./pages/otherPages/NotFoundPage";
 
 // Admin
@@ -36,10 +37,14 @@ import { NovedadesHistoryPage } from "./pages/driverPages/NovedadesHistoryPage";
 
 
 
+
 function App() {
 
   return (
     <BrowserRouter>
+    
+    <UserAutoLogout />      
+
       <Routes>
 
         {/* Pagina de auth */}

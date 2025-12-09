@@ -55,6 +55,10 @@ export const SignInForm = () => {
             // local es persistente aunque cierre el navegador
             localStorage.setItem("token", token);
 
+            if (isChecked) {
+                localStorage.setItem("keepConnected");
+            }
+
 
             try {
                 
