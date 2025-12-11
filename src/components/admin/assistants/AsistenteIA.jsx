@@ -115,7 +115,7 @@ const AsistenteIA = () => {
                 </div>
 
                 {/* Messages Card */}
-                <ComponentCard 
+                <ComponentCard
                     className="mb-6"
                     title="Conversación"
                     desc="Historial de mensajes con nuestro Analista"
@@ -132,13 +132,12 @@ const AsistenteIA = () => {
                                 }}
                             >
                                 <div
-                                    className={`max-w-[85%] rounded-2xl px-4 py-3 transition-all duration-200 hover:scale-[1.02] ${
-                                        mensaje.tipo === 'usuario'
-                                            ? 'bg-blue-600 text-white shadow-md'
-                                            : mensaje.tipo === 'error'
-                                                ? 'bg-red-50 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800'
-                                                : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-white shadow-sm'
-                                    }`}
+                                    className={`max-w-[85%] rounded-2xl px-4 py-3 transition-all duration-200 hover:scale-[1.02] ${mensaje.tipo === 'usuario'
+                                        ? 'bg-blue-600 text-white shadow-md'
+                                        : mensaje.tipo === 'error'
+                                            ? 'bg-red-50 text-red-800 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800'
+                                            : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-white shadow-sm'
+                                        }`}
                                 >
                                     {mensaje.tipo === 'asistente' && (
                                         <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-200 dark:border-gray-700">
@@ -209,7 +208,7 @@ const AsistenteIA = () => {
                         <button
                             onClick={enviarPregunta}
                             disabled={loading || !pregunta.trim()}
-                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-xl disabled:cursor-not-allowed transition-all duration-200 font-medium flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105 disabled:hover:scale-100"
+                            className="px-3 sm:px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white rounded-xl disabled:cursor-not-allowed transition-all duration-200 font-medium flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105 disabled:hover:scale-100 flex-shrink-0"
                         >
                             {loading ? (
                                 <>
@@ -218,6 +217,7 @@ const AsistenteIA = () => {
                                 </>
                             ) : (
                                 <>
+                                    <Send className='w-4' />
                                     <span className="hidden sm:inline">Enviar</span>
                                 </>
                             )}
@@ -226,7 +226,8 @@ const AsistenteIA = () => {
                 </div>
             </div>
 
-            <style dangerouslySetInnerHTML={{__html: `
+            <style dangerouslySetInnerHTML={{
+                __html: `
                 @keyframes fadeIn {
                     from {
                         opacity: 0;

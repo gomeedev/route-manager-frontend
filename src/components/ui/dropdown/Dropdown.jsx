@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
+
 export const Dropdown = ({
   isOpen,
   onClose,
@@ -30,7 +31,9 @@ export const Dropdown = ({
   return (
     <div
       ref={dropdownRef}
-      className={`absolute z-40 right-0 mt-2 rounded-xl border border-gray-200 bg-white shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark ${className}`}
+      // ELIMINAMOS: absolute z-40 right-0 mt-2
+      // Dejamos solo las clases base de estilo
+      className={`z-40 rounded-xl border border-gray-200 bg-white shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark ${className}`}
     >
       {children}
     </div>

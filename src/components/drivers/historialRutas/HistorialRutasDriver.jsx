@@ -95,7 +95,7 @@ export const HistorialRutasDriver = () => {
             )
         },
         {
-            key: "paquetes_entregados",
+            key: "paquetes_fallidos",
             label: "Paquetes fallidos",
             render: (item) => (
                 <div className="flex items-center gap-4">
