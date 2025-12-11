@@ -257,6 +257,7 @@ const Dashboard = () => {
                                 fill="#8884d8"
                                 dataKey="count"
                                 nameKey="estado"
+                                className="[&_text]:hidden md:[&_text]:block"
                             >
                                 {paquetesData.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={COLORS[entry.estado]} />
