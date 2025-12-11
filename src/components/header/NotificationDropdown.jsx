@@ -103,9 +103,9 @@ export const NotificationDropdown = () => {
       <Dropdown
         isOpen={abierto}
         onClose={() => setAbierto(false)}
-        className="absolute mt-3 flex h-[480px] flex-col rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900 z-50
-          right-1/2 translate-x-1/2 w-[calc(100vw-2rem)] max-w-[350px]
-          sm:right-0 sm:translate-x-0 sm:w-[380px] sm:max-w-none
+        className="fixed mt-3 flex h-[480px] flex-col
+          right-4 top-16 w-[calc(100vw-2rem)] max-w-[350px]
+          sm:absolute sm:right-0 sm:top-auto sm:w-[380px] sm:max-w-none
         "
       >
         {/* Header */}
