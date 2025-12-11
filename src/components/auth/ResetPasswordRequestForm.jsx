@@ -14,10 +14,11 @@ export const ResetPasswordRequestForm = () => {
     const handleSubmit = async (event) => {
         event.preventDefault()
 
+        const redirectTo = import.meta.env.DEV ? "http://localhost:5173/reset-password-form" : "https://route-manager-frontend.vercel.app/reset-password-form"
         const { error } = await supabase.auth.resetPasswordForEmail(
             email,
             {
-                redirectTo: "http://localhost:5173/reset-password-form",
+                redirectTo
             }
         )
 
@@ -30,7 +31,7 @@ export const ResetPasswordRequestForm = () => {
             setTimeout(() => {
                 setMessage("")
             }, 10000);
-            
+
         }
     }
 
