@@ -23,7 +23,11 @@ const Dashboard = () => {
     const [totalConductores, setTotalConductores] = useState(0);
     const [totalPaquetes, setTotalPaquetes] = useState(0);
     const [totalVehiculos, setTotalVehiculos] = useState(0);
+
     const [eficiencia, setEficiencia] = useState(0);
+    const [entregadosCount, setEntregadosCount] = useState(0);
+    const [fallidosCount, setFallidosCount] = useState(0);
+
     const [loading, setLoading] = useState(true);
 
 
@@ -43,12 +47,22 @@ const Dashboard = () => {
             setTotalPaquetes(paquetesRes.data.length);
             setTotalVehiculos(vehiculosRes.data.length);
 
+
             // Calcular eficiencia
             const entregados = paquetesRes.data.filter(p => p.estado_paquete === 'Entregado').length;
-            const eficienciaCalc = paquetesRes.data.length > 0
-                ? ((entregados / paquetesRes.data.length) * 100).toFixed(1)
+            const fallidos = paquetesRes.data.filter(p => p.estado_paquete === 'Fallido').length;
+
+            setEntregadosCount(entregados);
+            setFallidosCount(fallidos);
+
+            const totalProcesados = entregados + fallidos;
+
+            const eficienciaCalc = totalProcesados > 0
+                ? ((entregados / totalProcesados) * 100).toFixed(1)
                 : 0;
+
             setEficiencia(eficienciaCalc);
+
 
             // Procesar por estados
             setConductoresData(processByEstado(conductoresRes.data, 'estado', [
@@ -265,9 +279,11 @@ const Dashboard = () => {
                         <div className="text-7xl font-bold text-brand-500 dark:text-brand-400">
                             {eficiencia}%
                         </div>
-                        <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                            {paquetesData.find(p => p.estado === 'Entregado')?.count || 0} de {totalPaquetes} paquetes entregados
-                        </p>
+                        <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+                            <p className="pr-6 pl-6 text-center">
+                                {entregadosCount} de {entregadosCount + fallidosCount} paquetes procesados han sido entregados con éxito.
+                            </p>
+                        </div>
                     </div>
                 </ComponentCard>
 

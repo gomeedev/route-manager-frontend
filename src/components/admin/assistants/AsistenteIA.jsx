@@ -96,7 +96,7 @@ const AsistenteIA = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 sm:p-6">
+        <div className="min-h-screen p-4 sm:p-6">
             <div className="max-w-5xl mx-auto">
                 {/* Header Card */}
                 <div className="mb-6 rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03] overflow-hidden">
@@ -218,7 +218,6 @@ const AsistenteIA = () => {
                                 </>
                             ) : (
                                 <>
-                                    <Send className="w-4 h-4" />
                                     <span className="hidden sm:inline">Enviar</span>
                                 </>
                             )}

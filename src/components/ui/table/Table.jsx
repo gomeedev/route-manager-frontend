@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import SearchBar from './SearchBar';
 
 const Table = ({
   title,
@@ -9,8 +10,11 @@ const Table = ({
   onAdd,
   loading = false,
   emptyMessage = "No hay datos para mostrar",
+  // Nuevas props para búsqueda
+  searchValue,
+  onSearchChange,
+  searchPlaceholder = "Buscar"
 }) => {
-
 
   const getNestedValue = (obj, key) => {
     return key.split(".").reduce((acc, part) => acc?.[part], obj);
@@ -25,6 +29,15 @@ const Table = ({
         </div>
 
         <div className="flex items-center gap-3">
+          {/* SearchBar opcional */}
+          {onSearchChange && (
+            <SearchBar 
+              value={searchValue} 
+              onChange={onSearchChange} 
+              placeholder={searchPlaceholder}
+            />
+          )}
+          
           {headerActions && <div>{headerActions}</div>}
 
           {onAdd && (
@@ -38,7 +51,6 @@ const Table = ({
           )}
         </div>
       </div>
-
 
       {/* TABLE */}
       <div className="overflow-x-auto">
@@ -89,11 +101,9 @@ const Table = ({
                     >
                       {col.render ? col.render(item) : (
                         <div className={`text-sm text-gray-600 dark:text-gray-400 ${col.truncate ? 'max-w-xs truncate' : ''}`}>
-
                           {getNestedValue(item, col.key) ?? (
                             <i className='text-gray-400'>N/A</i>
                           )}
-
                         </div>
                       )}
                     </td>

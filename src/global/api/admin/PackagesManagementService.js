@@ -37,7 +37,7 @@ export const GetDetallesPaquetesService = async (id_paquete) => {
 }
 
 
-// Crear paquetes para el módulo de gestion de vehiculos
+// Crear paquetes para el módulo de gestion de paquetes
 export const PostPackagesManagementService = async (paquete) => {
 
     try {

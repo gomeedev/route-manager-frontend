@@ -35,29 +35,32 @@ export const getDetallesConductorService = async (id_conductor) => {
 
 // Editar informacion de conductores desde el admin
 export const EditConductorService = async (id_conductor, driverData) => {
-
     try {
         const payload = {
-            conductor_detalle: {
+            conductor_update: {
                 nombre: driverData.nombre,
                 apellido: driverData.apellido,
                 telefono_movil: driverData.telefono_movil,
                 tipo_documento: driverData.tipo_documento,
                 documento: driverData.documento,
                 correo: driverData.correo,
-                estado: driverData.estadoUsuario
-            }
+                estado: driverData.estado
+            },
+            direccion_base: driverData.direccion_base,
         };
 
-        const response = await axios.patch(`${API_URL}/api/v1/drivers/${id_conductor}/`, payload)
-        return response.data
+        const response = await axios.patch(
+            `${API_URL}/api/v1/drivers/${id_conductor}/`,
+            payload
+        );
+
+        return response.data;
 
     } catch (error) {
-      
-        console.log("Error completo:", error.response?.data || error)
-        throw error
+        console.log(error.response?.data || error);
+        throw error;
     }
-}
+};
 
 
 // Asignar vehiculo a un conductor

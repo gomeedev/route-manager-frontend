@@ -31,8 +31,8 @@ export const RoutesManagement = () => {
     const [loading, setLoading] = useState(false)
     const [filtroEstado, setFiltroEstado] = useState("");
 
-    
-    const ESTADOS_ROUTES = ["Pendiente", "Asignada", "En ruta", "Entregada", "Fallida"];
+
+    const ESTADOS_ROUTES = ["Pendiente", "Asignada", "En ruta"];
 
     const routesFiltradas = filtroEstado === ""
         ? routes
@@ -56,9 +56,18 @@ export const RoutesManagement = () => {
 
             }
 
-            const sorted = response.sort(
-                (a, b) => orderMap[a.estado] - orderMap[b.estado]
-            )
+            const sorted = response.sort((a, b) => {
+                const estadoComparison = orderMap[a.estado] - orderMap[b.estado];
+
+                // Si los estados son distintos, priorizar el estado
+                if (estadoComparison !== 0) {
+                    return estadoComparison;
+                }
+
+                // Si tienen el mismo estado, ordenar por cantidad de paquetes (desc)
+                return (b.total_paquetes || 0) - (a.total_paquetes || 0);
+            });
+
 
             setRoutes(sorted);
 
@@ -293,12 +302,12 @@ export const RoutesManagement = () => {
                         onAdd={() => { setIsModalOpen(true) }}
                         headerActions={
                             <EstadoFilter
-                            value={filtroEstado}
-                            onChange={setFiltroEstado}
-                            estados={ESTADOS_ROUTES}
-                            entityLabel="rutas"
-                            showLabel={true}
-                             />
+                                value={filtroEstado}
+                                onChange={setFiltroEstado}
+                                estados={ESTADOS_ROUTES}
+                                entityLabel="rutas"
+                                showLabel={true}
+                            />
                         }
                     />
 

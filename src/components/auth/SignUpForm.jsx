@@ -18,6 +18,7 @@ export const SignUpForm = () => {
     // Estados Para el formulario 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("")
     const [nombre, setNombre] = useState("")
     const [apellido, setApellido] = useState("")
     const [telefono_movil, setTelefono_movil] = useState("")
@@ -39,12 +40,17 @@ export const SignUpForm = () => {
 
 
     const handleSubmit = async (event) => {
-
         // Hace que no recargue la pagina despues de oprimir el botón
         event.preventDefault()
         // Mensaje vacio inicialmente
         setMessage("");
         setMessageType("");
+
+        if (password != confirmPassword) {
+            setMessage("Las contraseñas no coinciden")
+            setMessageType("error")
+            return
+        }
 
         const { data, error } = await supabase.auth.signUp({
             email: email,
@@ -226,7 +232,19 @@ export const SignUpForm = () => {
                                             onChange={(e) => setPassword(e.target.value)}
                                             value={password}
                                             type="password"
-                                            placeholder="Ingresa tu contraseña  "
+                                            placeholder="Ingresa tu contraseña"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="sm:col-span-2">
+                                        <label className="block text-[15px] mb-2 text-gray-700 dark:text-gray-400">
+                                            Confirmar Contraseña <span className="text-error-500">*</span>
+                                        </label>
+                                        <Input
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            value={confirmPassword}
+                                            type="password"
+                                            placeholder="Confirma tu contraseña"
                                             required
                                         />
                                     </div>

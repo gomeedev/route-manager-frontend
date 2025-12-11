@@ -9,6 +9,7 @@ import { EditarPaquete } from "./EditarPaquete";
 import { MostrarDetallesPaquete } from "./MostrarDetallesPaquete";
 import { EliminarPaquete } from "./EliminarPaquete";
 import { AsignarPaquete } from "./AsignarPaquete";
+import { ReasignarPaquete } from "./ReasignarPaquete";
 
 import Table from "../../ui/table/Table";
 import EstadoFilter from "../../../hooks/EstadoFilter";
@@ -221,6 +222,17 @@ export const PaquetesManagement = () => {
             disabled: (item) => item.estado_paquete !== "Pendiente",
             className: "hover:bg-success-50 text-success-600 hover:dark:bg-success-500/15 dark:text-success-500",
         },
+        {
+            key: "reasignar",
+            label: "Reasignar paquete",
+            icon: <ArrowRight className="w-4 h-4" />,
+            onClick: (item) => {
+                setSelectedIdPaquetes(item.id_paquete);
+                setIsModalOpen("reasignar_paquete");
+            },
+            disabled: (item) => item.estado_paquete !== "Fallido",
+            className: "hover:bg-warning-50 text-warning-600 hover:dark:bg-warning-500/15 dark:text-warning-500",
+        },
     ]
 
 
@@ -293,6 +305,14 @@ export const PaquetesManagement = () => {
 
             {isModalOpen === "asignar_paquete" && (
                 <AsignarPaquete
+                    paqueteId={selectedIdPaquetes}
+                    onClose={() => setIsModalOpen(false)}
+                    refreshTable={getPaquetes}
+                />
+            )}
+
+            {isModalOpen === "reasignar_paquete" && (
+                <ReasignarPaquete
                     paqueteId={selectedIdPaquetes}
                     onClose={() => setIsModalOpen(false)}
                     refreshTable={getPaquetes}

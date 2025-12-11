@@ -28,12 +28,13 @@ export const DriversManagement = () => {
     const [loading, setLoading] = useState(false)
     const [filtroEstado, setFiltroEstado] = useState("");
 
-    
-    const ESTADOS_DRIVERS = ["Disponible", "Asignado", "En ruta", "No Disponible"];
+
+    const ESTADOS_DRIVERS = ["Disponible", "Asignado", "En ruta", "No disponible"];
 
     const driversFiltrados = filtroEstado === ""
         ? drivers
         : drivers.filter(d => d.estado === filtroEstado);
+
 
     const GetConductores = async () => {
 
@@ -53,15 +54,18 @@ export const DriversManagement = () => {
             }
 
             const sorted = response.sort((a, b) => {
+
+                const estadoComparison = orderMap[a.estado] - orderMap[b.estado];
+                if (estadoComparison !== 0) {
+                    return estadoComparison;
+                }
+
                 const vehicleOrderA = a.vehiculo_detalle ? 0 : 1;
                 const vehicleOrderB = b.vehiculo_detalle ? 0 : 1;
 
-                if (vehicleOrderA !== vehicleOrderB) {
-                    return vehicleOrderA - vehicleOrderB;
-                }
-
-                return orderMap[a.estado] - orderMap[b.estado];
+                return vehicleOrderA - vehicleOrderB;
             });
+
 
             setDrivers(sorted);
 
@@ -224,12 +228,12 @@ export const DriversManagement = () => {
                         data={driversFiltrados}
                         actions={actions}
                         headerActions={
-                            <EstadoFilter 
-                            value={filtroEstado}
-                            onChange={setFiltroEstado}
-                            estados={ESTADOS_DRIVERS}
-                            entityLabel="conductores"
-                            showLabel={true}
+                            <EstadoFilter
+                                value={filtroEstado}
+                                onChange={setFiltroEstado}
+                                estados={ESTADOS_DRIVERS}
+                                entityLabel="conductores"
+                                showLabel={true}
                             />
                         }
                     />

@@ -20,6 +20,7 @@ export const EditarConductor = ({ driverId, onClose, refreshTable }) => {
     const [tipo_documento, setTipoDocumento] = useState("");
     const [documento, setDocumento] = useState("");
     const [correo, setCorreo] = useState("");
+    const [direccion, setDireccion] = useState("");
     const [estadoUsuario, setEstadoUsuario] = useState("");
 
     const [loading, setLoading] = useState(true);
@@ -41,13 +42,15 @@ export const EditarConductor = ({ driverId, onClose, refreshTable }) => {
         try {
             const data = await getDetallesConductorService(driverId);
 
-            setNombre(data.conductor_detalle.nombre);
-            setApellido(data.conductor_detalle.apellido);
-            setTelefono_movil(data.conductor_detalle.telefono_movil);
-            setTipoDocumento(data.conductor_detalle.tipo_documento);
-            setDocumento(data.conductor_detalle.documento);
-            setCorreo(data.conductor_detalle.correo)
-            setEstadoUsuario(data.conductor_detalle.estado);
+            setNombre(data.conductor_detalle.nombre ?? "");
+            setApellido(data.conductor_detalle.apellido ?? "");
+            setTelefono_movil(data.conductor_detalle.telefono_movil ?? "");
+            setTipoDocumento(data.conductor_detalle.tipo_documento ?? "");
+            setDocumento(data.conductor_detalle.documento ?? "");
+            setCorreo(data.conductor_detalle.correo ?? "");
+            setDireccion(data.direccion_base ?? "");
+            setEstadoUsuario(data.conductor_detalle.estado ?? "");
+
 
         } catch (error) {
 
@@ -82,7 +85,8 @@ export const EditarConductor = ({ driverId, onClose, refreshTable }) => {
             tipo_documento,
             documento,
             correo,
-            estadoUsuario,
+            direccion_base: direccion,
+            estado: estadoUsuario
         };
 
         try {
@@ -201,6 +205,18 @@ export const EditarConductor = ({ driverId, onClose, refreshTable }) => {
                                         type="text"
                                         value={documento}
                                         onChange={(e) => setDocumento(e.target.value)}
+                                        required
+
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[15px] mb-2 text-gray-700 dark:text-gray-400">
+                                        Direcciòn <span className="text-error-500">*</span>
+                                    </label>
+                                    <Input
+                                        type="text"
+                                        value={direccion}
+                                        onChange={(e) => setDireccion(e.target.value)}
                                         required
 
                                     />

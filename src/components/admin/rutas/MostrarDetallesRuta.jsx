@@ -107,19 +107,37 @@ export const MostrarDetallesRuta = ({ routeId, onClose }) => {
                             <div>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">Fecha creación</span>
                                 <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                                    {detallesRuta.fecha_creacion}
+                                    {detallesRuta.fecha_creacion ? new Date(detallesRuta.fecha_creacion).toLocaleDateString('es-CO', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    }) : "Pendiente"}
                                 </p>
                             </div>
                             <div>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">Fecha inicio</span>
                                 <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                                    {detallesRuta.fecha_inicio || "Pendiente"}
+                                    {detallesRuta.fecha_inicio ? new Date(detallesRuta.fecha_inicio).toLocaleDateString('es-CO', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    }) : "Pendiente"}
                                 </p>
                             </div>
                             <div>
                                 <span className="text-sm text-gray-600 dark:text-gray-400">Fecha fin</span>
                                 <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                                    {detallesRuta.fecha_fin || "Pendiente"}
+                                    {detallesRuta.fecha_fin ? new Date(detallesRuta.fecha_fin).toLocaleDateString('es-CO', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric',
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    }) : "Pendiente"}
                                 </p>
                             </div>
                             <div>

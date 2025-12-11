@@ -3,6 +3,7 @@ import { useState } from "react";
 import Select from "../../form/input/Select";
 import Input from "../../form/input/InputField";
 import Badge from "../../ui/badge/Badge";
+import { toast } from "sonner";
 
 const FormularioEntrega = ({ paquete, onSubmit, onClose }) => {
     const [estadoEntrega, setEstadoEntrega] = useState("Entregado");
@@ -21,7 +22,7 @@ const FormularioEntrega = ({ paquete, onSubmit, onClose }) => {
 
         // Validación: foto obligatoria
         if (!archivo) {
-            alert("Debes adjuntar una foto de evidencia");
+            toast.error("Debes adjuntar una foto de evidencia")
             return;
         }
 
@@ -31,7 +32,7 @@ const FormularioEntrega = ({ paquete, onSubmit, onClose }) => {
             // El modal se cierra automáticamente después de onSubmit exitoso
         } catch (err) {
             console.error("Error al confirmar entrega:", err);
-            alert("Error al guardar la entrega");
+            toast.error("Error al guardar la entrega");
         } finally {
             setLoading(false);
         }

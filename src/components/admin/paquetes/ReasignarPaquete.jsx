@@ -5,7 +5,10 @@ import { ArrowRight } from "lucide-react";
 
 import { fotoDefaultUrl } from "../../../global/supabase/storageService";
 
-import { GetRoutesManagementService, AsignarConductorService } from "../../../global/api/admin/RoutesManagementService";
+import {
+    GetRoutesManagementService,
+    ReasignarPaqueteService
+} from "../../../global/api/admin/RoutesManagementService";
 
 import Table from "../../ui/table/Table";
 import { Modal } from "../../ui/modal/Modal";
@@ -15,8 +18,7 @@ import Badge from "../../ui/badge/Badge";
 
 
 
-
-export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
+export const ReasignarPaquete = ({ paqueteId, onClose, refreshTable }) => {
 
     const [rutas, setRutas] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -24,23 +26,18 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
 
     const obtenerRutas = async () => {
 
-        setLoading(true)
+        setLoading(true);
 
         try {
 
             const rutasData = await GetRoutesManagementService();
 
-            // Filtrar rutas sin conductor
+            // Filtrar solo rutas Pendientes
             const disponibles = rutasData.filter(
-                (ruta) =>
-                    (ruta.estado === "Pendiente")
+                (ruta) => ruta.estado === "Pendiente"
             );
 
-            const rutasOrdenadas = disponibles.sort(
-                (a, b) => (b.total_paquetes || 0) - (a.total_paquetes || 0)
-            );
-
-            setRutas(rutasOrdenadas);
+            setRutas(disponibles);
 
         } catch (error) {
             toast.error("No se pudieron cargar las rutas disponibles");
@@ -56,17 +53,15 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
     }, []);
 
 
-    const asignar = async (id_ruta) => {
+    // ReasignarPaquete.jsx - función reasignar más simple
+    const reasignar = async (id_ruta_destino) => {
         try {
-
-            await AsignarConductorService(id_ruta, driverId)
-            toast.success("Conductor asignado correctamente");
-
+            await ReasignarPaqueteService(paqueteId, id_ruta_destino);
+            toast.success("Paquete reasignado correctamente");
             refreshTable();
             onClose();
-
         } catch (error) {
-            toast.error(error.response?.data?.error || "Error al asignar conductor");
+            toast.error(error.response?.data?.error || "Error al reasignar paquete");
         }
     };
 
@@ -84,7 +79,8 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
 
                 return (
                     <div className="flex items-center gap-3">
-                        <img src={conductor?.foto_perfil || fotoDefaultUrl}
+                        <img
+                            src={conductor?.foto_perfil || fotoDefaultUrl}
                             alt="Conductor"
                             className="w-10 h-10 rounded-full object-cover"
                         />
@@ -152,7 +148,7 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
                     "Completada": "success",
                     "Fallida": "error",
                 };
-                return <Badge color={colorMap[item.estado] || "primary"}>{item.estado}</Badge>
+                return <Badge color={colorMap[item.estado] || "primary"}>{item.estado}</Badge>;
             }
         },
     ];
@@ -160,22 +156,21 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
 
     const actions = [
         {
-            key: "ruta_asignada",
-            label: "Asignar conductor",
+            key: "reasignar_paquete",
+            label: "Reasignar paquete",
             icon: <ArrowRight className="w-4 h-4" />,
-            onClick: (item) => asignar(item.id_ruta),
+            onClick: (item) => reasignar(item.id_ruta),
             className: "hover:bg-success-50 text-success-600 hover:dark:bg-success-500/15 dark:text-success-500"
         },
     ];
 
+
     return (
         <>
             <Modal isOpen={true} onClose={onClose} showCloseButton className="p-8">
-
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 pb-6 mt-4">
-                    Asignar el conductor a una ruta
-                </h3>
-
+                <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 pb-6 mt-4">
+                    Reasignar paquete a una ruta
+                </h4>
 
                 {loading ? (
                     <div className="w-full flex justify-center py-10">
@@ -183,7 +178,7 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
                     </div>
                 ) : (
                     <Table
-                        title={`Total de rutas: ${rutas.length}`}
+                        title={`Total de rutas disponibles: ${rutas.length}`}
                         columns={columns}
                         data={rutas}
                         actions={actions}
@@ -192,4 +187,5 @@ export const AsignarConductor = ({ driverId, onClose, refreshTable }) => {
             </Modal>
         </>
     );
+
 };

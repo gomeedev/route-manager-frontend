@@ -10,7 +10,7 @@ import { iniciarRutaService } from "../../../global/api/drivers/iniciarRuta";
 
 import Loading from "../../common/Loading";
 import Badge from "../../ui/badge/Badge";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -20,6 +20,7 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
     const [loading, setLoading] = useState(true);
     const [loadingCalcular, setLoadingCalcular] = useState(false);
 
+    const navigate = useNavigate();
 
     const getRuta = async () => {
         try {
@@ -73,17 +74,19 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
         if (!rutaActual?.id_ruta) return;
 
         try {
-            // Llamar al endpoint iniciar_ruta
             await iniciarRutaService(rutaActual.id_ruta);
-
-            // Refrescar datos
             await getRuta();
+            onClose();
 
-            onClose()
-            Navigate("/driver")
+            // Redirigir inmediatamente
+            setTimeout(() => {
+                navigate("/driver", { replace: true });
 
-            // Aquí podrías redirigir al mapa de simulación
-            // navigate('/driver/mapa-simulacion');
+                // Recargar después de 500ms para forzar actualización
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            }, 100);
 
         } catch (error) {
             console.error("Error al iniciar ruta:", error);
@@ -182,19 +185,37 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
                     <div>
                         <span className="text-sm text-gray-600 dark:text-gray-400">Fecha creación</span>
                         <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                            {rutaActual.fecha_creacion}
+                            {rutaActual.fecha_creacion ? new Date(rutaActual.fecha_creacion).toLocaleDateString('es-CO', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) : "Pendiente"}
                         </p>
                     </div>
                     <div>
                         <span className="text-sm text-gray-600 dark:text-gray-400">Fecha inicio</span>
                         <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                            {rutaActual.fecha_inicio || "Pendiente"}
+                            {rutaActual.fecha_inicio ? new Date(rutaActual.fecha_inicio).toLocaleDateString('es-CO', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) : "Pendiente"}
                         </p>
                     </div>
                     <div>
                         <span className="text-sm text-gray-600 dark:text-gray-400">Fecha fin</span>
                         <p className="text-sm font-medium text-gray-900 dark:text-white mt-1">
-                            {rutaActual.fecha_fin || "Pendiente"}
+                            {rutaActual.fecha_fin ? new Date(rutaActual.fecha_fin).toLocaleDateString('es-CO', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) : "Pendiente"}
                         </p>
                     </div>
                 </div>
@@ -207,7 +228,30 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
                     Estado del cálculo de la ruta
                 </h4>
 
-                {!(rutaActual.estado === "Asignada" && rutaActual.distancia_total_km && rutaActual.tiempo_estimado_minutos && rutaActual.ruta_optimizada) ? (
+                {rutaActual.estado === "En ruta" ? (
+                    // Ruta ya iniciada
+                    <div className="text-center py-6 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                        <div className="flex items-center justify-center mb-3">
+                            <div className="w-12 h-12 rounded-full bg-green-100 dark:bg-green-800/30 flex items-center justify-center">
+                                <Route className="w-6 h-6 text-green-600 dark:text-green-400" />
+                            </div>
+                        </div>
+                        <p className="text-sm font-semibold text-green-900 dark:text-green-100 mb-2">
+                            Ruta iniciada
+                        </p>
+                        <p className="text-xs text-green-700 dark:text-green-300">
+                            La ruta está actualmente en progreso
+                        </p>
+
+                        {rutaActual.distancia_total_km && rutaActual.tiempo_estimado_minutos && (
+                            <div className="mt-4 flex gap-4 justify-center text-xs text-green-700 dark:text-green-300">
+                                <span>Distancia: {rutaActual.distancia_total_km} km</span>
+                                <span>•</span>
+                                <span>Tiempo: {rutaActual.tiempo_estimado_minutos} min</span>
+                            </div>
+                        )}
+                    </div>
+                ) : !(rutaActual.estado === "Asignada" && rutaActual.distancia_total_km && rutaActual.tiempo_estimado_minutos && rutaActual.ruta_optimizada) ? (
                     // Ruta no calculada
                     <div className="text-center py-6 bg-gray-50 dark:bg-gray-700/30 rounded-lg">
                         <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
@@ -217,10 +261,10 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
                             Distancia total: Pendiente · Tiempo estimado: Pendiente
                         </p>
 
-                        <div className="flex gap-4 justify-center pr-6 mr-6">
+                        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 px-4 sm:px-6">
                             <button
                                 onClick={onClose}
-                                className="flex items-center justify-center w-full px-4 py-3 font-medium text-white transition rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300"
+                                className="flex items-center justify-center px-4 py-3 font-medium transition-colors rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600 dark:active:bg-gray-500 w-full sm:w-auto sm:flex-1"
                             >
                                 Cancelar
                             </button>
@@ -228,14 +272,14 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
                             <button
                                 onClick={handleCalcularRuta}
                                 disabled={loadingCalcular}
-                                className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center justify-center px-4 py-3 text-sm font-medium text-white transition-all rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 active:bg-brand-700 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 w-full sm:w-auto sm:flex-1"
                             >
                                 {loadingCalcular ? "Calculando..." : "Calcular ruta"}
                             </button>
                         </div>
                     </div>
                 ) : (
-                    // Ruta ya calculada: mostrar resultados
+                    // Ruta calculada pero no iniciada: mostrar resultados y botón iniciar
                     <div className="space-y-4">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div className="bg-gray-50 dark:bg-gray-700/30 rounded-lg p-3">
@@ -261,7 +305,7 @@ export const ModalRutaActual = ({ onClose = () => { } }) => {
                         <div className="flex gap-4">
                             <button
                                 onClick={handleIniciarRuta}
-                                className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition-all rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600 active:bg-brand-700 active:scale-95"
                             >
                                 Iniciar ruta
                             </button>

@@ -7,7 +7,7 @@ import Loading from "../../components/common/Loading";
 
 
 export const DriverPage = () => {
-    // Ejemplo en DriverDashboard.jsx o donde estés
+
     const [driverId, setDriverId] = useState(null);
 
     useEffect(() => {
