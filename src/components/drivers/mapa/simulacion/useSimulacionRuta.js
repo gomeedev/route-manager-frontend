@@ -26,7 +26,7 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
   // Efecto para resetear cuando cambia resetKey
   useEffect(() => {
     if (resetKey > 0) {
-      console.log(`🔄 Reset key cambiada: ${resetKey}, reiniciando simulación`);
+      console.log(`Reset key cambiada: ${resetKey}, reiniciando simulación`);
 
       // Resetear todos los refs
       rutaIdRef.current = null;
@@ -83,13 +83,13 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
 
     const inicializarSimulacion = async () => {
       try {
-        console.log(`🚀 Inicializando simulación para ruta ${ruta.id_ruta}`);
+        console.log(`Inicializando simulación para ruta ${ruta.id_ruta}`);
         setEstado("loading");
         rutaIdRef.current = ruta.id_ruta;
 
         // 1. Obtener progreso
         const progreso = await obtenerProgresoRutaService(ruta.id_ruta);
-        console.log("📊 Progreso:", {
+        console.log("Progreso:", {
           total: progreso.total_paquetes,
           entregados: progreso.paquetes_entregados,
           fallidos: progreso.paquetes_fallidos,
@@ -104,7 +104,7 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
           indiceRef.current = Math.floor(
             polylineRef.current.length * porcentaje
           );
-          console.log(`📍 Iniciando en índice ${indiceRef.current}`);
+          console.log(`Iniciando en índice ${indiceRef.current}`);
         } else {
           indiceRef.current = 0;
         }
@@ -113,13 +113,13 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
         const respuesta = await obtenerProximoPaqueteService(ruta.id_ruta);
         const siguiente = respuesta.proximo || null;
 
-        // ✅ Convertir coordenadas a número
+        // Convertir coordenadas a número
         if (siguiente) {
           siguiente.lat = parseFloat(siguiente.lat);
           siguiente.lng = parseFloat(siguiente.lng);
 
           if (isNaN(siguiente.lat) || isNaN(siguiente.lng)) {
-            console.error("❌ Coordenadas inválidas:", siguiente);
+            console.error("Coordenadas inválidas:", siguiente);
             setEstado("idle");
             return;
           }
@@ -131,10 +131,10 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
         inicializadoRef.current = true;
 
         if (!siguiente) {
-          console.log("🏁 Sin paquetes pendientes");
+          console.log("Sin paquetes pendientes");
           setEstado("finished");
         } else if (ruta.estado === "En ruta") {
-          console.log(`✅ Listo. Próximo: #${siguiente.id_paquete}`, {
+          console.log(`Listo. Próximo: #${siguiente.id_paquete}`, {
             lat: siguiente.lat,
             lng: siguiente.lng,
             tipo_lat: typeof siguiente.lat,
@@ -142,11 +142,11 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
           });
           setEstado("running");
         } else {
-          console.log(`⏸️ Estado: ${ruta.estado}`);
+          console.log(`⏸Estado: ${ruta.estado}`);
           setEstado("idle");
         }
       } catch (error) {
-        console.error("❌ Error inicializando:", error);
+        console.error("Error inicializando:", error);
         setEstado("idle");
       }
     };
@@ -161,23 +161,23 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
     }
 
     if (polylineRef.current.length === 0 || !siguientePaqueteRef.current) {
-      console.warn("⚠️ Sin polyline o paquete");
+      console.warn("Sin polyline o paquete");
       return;
     }
 
     if (intervalRef.current !== null) {
-      console.warn("⚠️ Ya hay un intervalo activo");
+      console.warn("Ya hay un intervalo activo");
       return;
     }
 
-    console.log("▶️ Iniciando loop de simulación");
+    console.log("Iniciando loop de simulación");
 
     intervalRef.current = setInterval(() => {
       const poly = polylineRef.current;
       const siguiente = siguientePaqueteRef.current;
 
       if (!poly || poly.length === 0 || !siguiente) {
-        console.log("⏹️ Deteniendo: sin datos");
+        console.log("Deteniendo: sin datos");
         clearInterval(intervalRef.current);
         intervalRef.current = null;
         return;
@@ -190,7 +190,7 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
       const punto = poly[nuevoIndice];
       setPosicionActual({ lat: punto[0], lng: punto[1] });
 
-      // ✅ CALCULAR DISTANCIA PRIMERO
+      // CALCULAR DISTANCIA PRIMERO
       const distancia = calcularDistanciaKm(
         punto[0],
         punto[1],
@@ -201,13 +201,13 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
       // Log cada 20 iteraciones
       if (nuevoIndice % 20 === 0) {
         console.log(
-          `📍 Posición actual: [${punto[0].toFixed(6)}, ${punto[1].toFixed(6)}]`
+          `Posición actual: [${punto[0].toFixed(6)}, ${punto[1].toFixed(6)}]`
         );
         console.log(
-          `📦 Paquete objetivo: [${siguiente.lat}, ${siguiente.lng}]`
+          `Paquete objetivo: [${siguiente.lat}, ${siguiente.lng}]`
         );
         console.log(
-          `📏 Distancia: ${distancia.toFixed(
+          `Distancia: ${distancia.toFixed(
             4
           )} km | Tolerancia: ${toleranceKm} km`
         );
@@ -221,15 +221,15 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
         }).catch(() => {});
       }
 
-      // ✅ VERIFICAR LLEGADA
+      // VERIFICAR LLEGADA
       if (distancia <= toleranceKm) {
         console.log(
-          `🎯 ¡LLEGASTE! Paquete #${siguiente.id_paquete} (${distancia.toFixed(
+          `¡LLEGASTE! Paquete #${siguiente.id_paquete} (${distancia.toFixed(
             4
           )} km)`
         );
         console.log(
-          "🔍 Verificando si el intervalo está activo:",
+          "Verificando si el intervalo está activo:",
           intervalRef.current !== null
         );
 
@@ -239,18 +239,18 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
 
         // Cambiar estado
         setEstado("paused");
-        console.log("📝 Estado cambiado a 'paused'");
+        console.log("Estado cambiado a 'paused'");
 
         // Establecer paquete actual
         setPaqueteActual(siguiente);
-        console.log("📦 Paquete actual establecido:", siguiente.id_paquete);
+        console.log("Paquete actual establecido:", siguiente.id_paquete);
       }
     }, intervalMs);
 
     // Cleanup
     return () => {
       if (intervalRef.current) {
-        console.log("🧹 Cleanup del loop");
+        console.log("Cleanup del loop");
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
@@ -266,11 +266,11 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
       }
 
       console.log(
-        `📝 Marcando #${paqueteActual.id_paquete} como ${estadoEntrega}`
+        `Marcando #${paqueteActual.id_paquete} como ${estadoEntrega}`
       );
 
       try {
-        // ✅ Convertir coordenadas a número
+        // Convertir coordenadas a número
         const paqueteCoords = {
           lat: parseFloat(paqueteActual.lat),
           lng: parseFloat(paqueteActual.lng),
@@ -286,7 +286,7 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
           lng_entrega: paqueteCoords.lng,
         });
 
-        console.log(`✅ Entrega registrada`);
+        console.log(`Entrega registrada`);
 
         // Limpiar
         setPaqueteActual(null);
@@ -296,22 +296,22 @@ export const useSimulacionRuta = (ruta, polyline, opts = {}, resetKey = 0) => {
         const nuevoSiguiente = respuesta.proximo || null;
 
         if (nuevoSiguiente) {
-          // ✅ Convertir coordenadas
+          // Convertir coordenadas
           nuevoSiguiente.lat = parseFloat(nuevoSiguiente.lat);
           nuevoSiguiente.lng = parseFloat(nuevoSiguiente.lng);
         }
 
         if (!nuevoSiguiente) {
-          console.log("🏁 ¡Completado!");
+          console.log("¡Completado!");
           setSiguientePaquete(null);
           setEstado("finished");
         } else {
-          console.log(`📦 Siguiente: #${nuevoSiguiente.id_paquete}`);
+          console.log(`Siguiente: #${nuevoSiguiente.id_paquete}`);
           setSiguientePaquete(nuevoSiguiente);
           setEstado("running");
         }
       } catch (err) {
-        console.error("❌ Error:", err);
+        console.error("Error:", err);
         alert(err.response?.data?.error || "Error al registrar entrega");
       }
     },

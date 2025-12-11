@@ -21,7 +21,7 @@ export const useAutoLogout = (minutes = 10) => {
     localStorage.removeItem("user");
     localStorage.removeItem("rol");
 
-    toast.info("Sesión cerrada por inactividad", {duration: 2000})
+    toast.info("Sesión cerrada por inactividad", {duration: 20000})
     navigate("/signin");
   };
 

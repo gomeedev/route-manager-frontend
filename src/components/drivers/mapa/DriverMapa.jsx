@@ -45,14 +45,14 @@ export const DriverMapa = ({ driverId }) => {
   const mapRef = useRef(null);
   const { ruta, detenerPolling, refrescarRuta } = useRutaActivaPolling(driverId);
 
-  // 🆕 FUNCIÓN: Obtener posición base del conductor (REAL)
+  // FUNCIÓN: Obtener posición base del conductor (REAL)
   const obtenerPosicionBase = () => {
     // Prioridad 1: Conductor ya cargado independientemente
     if (conductorData?.base_lat && conductorData?.base_lng) {
       const lat = parseFloat(conductorData.base_lat);
       const lng = parseFloat(conductorData.base_lng);
       if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-        console.log("📍 Usando posición base de conductorData:", { lat, lng });
+        console.log("Usando posición base de conductorData:", { lat, lng });
         return [lat, lng];
       }
     }
@@ -62,7 +62,7 @@ export const DriverMapa = ({ driverId }) => {
       const lat = parseFloat(ruta.conductor_detalle.base_lat);
       const lng = parseFloat(ruta.conductor_detalle.base_lng);
       if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-        console.log("📍 Usando posición base de ruta.conductor_detalle:", { lat, lng });
+        console.log("Usando posición base de ruta.conductor_detalle:", { lat, lng });
         return [lat, lng];
       }
     }
@@ -72,13 +72,13 @@ export const DriverMapa = ({ driverId }) => {
       const lat = parseFloat(conductorData.ubicacion_actual_lat);
       const lng = parseFloat(conductorData.ubicacion_actual_lng);
       if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
-        console.log("📍 Usando ubicación actual de conductorData:", { lat, lng });
+        console.log("Usando ubicación actual de conductorData:", { lat, lng });
         return [lat, lng];
       }
     }
 
     // Fallback: Posición del SENA (solo si TODO falla)
-    console.warn("⚠️ Usando posición fallback SENA");
+    console.warn("Usando posición fallback SENA");
     return [4.6390764, -74.0660737];
   };
 
@@ -90,7 +90,7 @@ export const DriverMapa = ({ driverId }) => {
         const user = JSON.parse(localStorage.getItem("user"));
         if (user?.id_usuario) {
           const conductor = await getConductorByUserId(user.id_usuario);
-          console.log("🚗 Datos del conductor obtenidos:", {
+          console.log("Datos del conductor obtenidos:", {
             nombre: conductor?.conductor_detalle?.nombre,
             base_lat: conductor?.base_lat,
             base_lng: conductor?.base_lng,
@@ -113,7 +113,7 @@ export const DriverMapa = ({ driverId }) => {
     if (!ruta) return;
 
     if (ruta.estado === "En ruta") {
-      console.log("🎯 Ruta en estado 'En ruta', forzando actualización");
+      console.log("Ruta en estado 'En ruta', forzando actualización");
 
       // Forzar un refresh del polling
       if (refrescarRuta) {
@@ -181,7 +181,7 @@ export const DriverMapa = ({ driverId }) => {
   // Abrir modal cuando detecta paquete
   useEffect(() => {
     if (paqueteActual) {
-      console.log("🛑 PAQUETE DETECTADO: Abriendo modal");
+      console.log("PAQUETE DETECTADO: Abriendo modal");
       setPaqueteEnProceso(paqueteActual);
       setModalAbierto(true);
     } else if (!paqueteActual && modalAbierto) {
@@ -194,7 +194,7 @@ export const DriverMapa = ({ driverId }) => {
   // Finalización automática
   useEffect(() => {
     if (estado === "finished") {
-      console.log("🏁 Simulación terminada");
+      console.log("Simulación terminada");
 
       // Esperar 1 segundo para que el backend procese la última entrega
       setTimeout(async () => {
@@ -203,10 +203,10 @@ export const DriverMapa = ({ driverId }) => {
           await refrescarRuta();
         }
 
-        console.log("🛑 Deteniendo polling");
+        console.log("Deteniendo polling");
         detenerPolling();
 
-        console.log("📊 Estado final:", {
+        console.log("Estado final:", {
           entregados: ruta?.paquetes_entregados,
           fallidos: ruta?.paquetes_fallidos,
           total: ruta?.total_paquetes
@@ -232,7 +232,7 @@ export const DriverMapa = ({ driverId }) => {
   const handleCompletarEntrega = async (estadoEntrega, archivo, observacion) => {
     if (!paqueteEnProceso) return;
 
-    console.log("🔄 Procesando entrega...");
+    console.log("Procesando entrega...");
 
     try {
       await completarEntrega(
@@ -279,7 +279,7 @@ export const DriverMapa = ({ driverId }) => {
     }
   };
 
-  // 🆕 FUNCIÓN: Determinar posición del conductor
+  // FUNCIÓN: Determinar posición del conductor
   const obtenerPosicionConductor = () => {
     // Prioridad 1: Posición actual de la simulación
     if (posicionActual?.lat && posicionActual?.lng) {
@@ -346,7 +346,7 @@ export const DriverMapa = ({ driverId }) => {
   // Obtener posición del conductor
   const posicionConductor = obtenerPosicionConductor();
 
-  // 🆕 CENTRO DEL MAPA: Usar posición base del conductor
+  // CENTRO DEL MAPA: Usar posición base del conductor
   const obtenerCentroMapa = () => {
     if (polylineCompleta.length > 0) {
       return polylineCompleta[0];

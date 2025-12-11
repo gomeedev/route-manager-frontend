@@ -32,7 +32,7 @@ export const RoutesManagement = () => {
     const [filtroEstado, setFiltroEstado] = useState("");
 
 
-    const ESTADOS_ROUTES = ["Pendiente", "Asignada", "En ruta", "Entregada", "Fallida"];
+    const ESTADOS_ROUTES = ["Pendiente", "Asignada", "En ruta"];
 
     const routesFiltradas = filtroEstado === ""
         ? routes

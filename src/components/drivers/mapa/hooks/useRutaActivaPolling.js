@@ -19,7 +19,7 @@ export const useRutaActivaPolling = (driverId) => {
   const refrescarRuta = useCallback(async () => {
     if (!driverId || !pollingActivoRef.current) return;
 
-    console.log("🔄 Refrescando ruta manualmente");
+    console.log("Refrescando ruta manualmente");
     await obtenerRuta();
   }, [driverId]);
 
