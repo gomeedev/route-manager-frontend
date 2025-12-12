@@ -18,11 +18,19 @@
 
 
 ### Prerequisites
-- **Supabase Account**: For image storage and user authentication services
-- **Node.js** >= 18.0.0
-- **npm** >= 9.0.0 **or** **yarn** >= 1.22.0 **or** **pnpm** >= 8.0.0
-- **Backend API**: Running instance of [Route Manager Backend](https://github.com/gomeedev/route-manager-backend)
-- **Modern Browser**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
+- [Supabase](https://supabase.com) – For image storage and user authentication services
+- [Node.js](https://nodejs.org/) >= 18.0.0
+- Package manager:
+  - [npm](https://www.npmjs.com/) >= 9.0.0 **or**
+  - [yarn](https://yarnpkg.com/) >= 1.22.0 **or**
+  - [pnpm](https://pnpm.io/) >= 8.0.0
+- [Route Manager Backend](https://github.com/gomeedev/route-manager-backend) – Running backend instance required
+- Modern Browser:
+  - [Chrome](https://www.google.com/chrome/) 90+
+  - [Firefox](https://www.mozilla.org/firefox/) 88+
+  - [Safari](https://www.apple.com/safari/) 14+
+  - [Edge](https://www.microsoft.com/edge) 90+
+
 
 
 ## Installation
@@ -61,6 +69,11 @@ npm run build
 ```sh
 npm run preview
 ```
+
+
+> [!NOTE]
+> It is recommended to use **Yarn** as the package manager to avoid potential development frictions.
+
 
 ## Environment Variables
 
