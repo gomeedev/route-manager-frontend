@@ -12,6 +12,7 @@ import ProtectedRoute from "./hooks/ProtectedRoute";
 // Globales
 import { UserAutoLogout } from "./components/auth/UserAutoLogout";
 import NotFoundPage from "./pages/otherPages/NotFoundPage";
+import { LandingPage } from "./pages/otherPages/LandingPage";
 
 // Admin
 import AdminLayout from "./layout/adminLayout/AdminLayout";
@@ -48,7 +49,7 @@ function App() {
       <Routes>
 
         {/* Pagina de auth */}
-        <Route path="/" element={<SignInPage />} />
+        <Route path="/" element={<LandingPage/>} />
         <Route path="signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/reset-password" element={<ResetPasswordRequestPage />} />
