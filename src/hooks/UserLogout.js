@@ -1,8 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { toast } from "sonner";
-
 import { supabase } from "../global/supabase/supabaseClient";
 
 
@@ -12,7 +10,6 @@ export const useAutoLogout = (minutes = 10) => {
 
   const navigate = useNavigate();
   const timeoutRef = useRef(null);
-
 
   const logout = async () => {
 
@@ -27,8 +24,10 @@ export const useAutoLogout = (minutes = 10) => {
 
 
   const resetTimer = () => {
+    // Verificar nuevamente en cada reset por si el usuario cerró sesión
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-    // Valido como string porque localStorage guarda strings y no booleanos
     if (localStorage.getItem("keepConnected") === "true") {
         return;  
     } 
@@ -42,6 +41,12 @@ export const useAutoLogout = (minutes = 10) => {
 
 
   useEffect(() => {
+    // Solo activar si hay token (usuario autenticado)
+    const token = localStorage.getItem("token");
+    
+    if (!token) {
+      return; // No hacer nada si no hay sesión activa
+    }
 
     const events = ["click", "mousemove", "keydown", "scroll", "touchstart"];
 
@@ -49,17 +54,15 @@ export const useAutoLogout = (minutes = 10) => {
 
     resetTimer();
 
-    return () => {
 
+    return () => {
       events.forEach((event) =>
         window.removeEventListener(event, resetTimer)
       );
 
-      clearTimeout(timeoutRef.current);
-
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, []);
+  }, []); // Se ejecuta solo una vez al montar
   
-
   return null;
 };
