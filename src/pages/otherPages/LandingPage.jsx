@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Truck, Package, MapPin, BarChart3, Clock, CheckCircle, TrendingUp, Users, Shield, ArrowRight, Play, X } from 'lucide-react';
+import { Truck, Package, MapPin, BarChart3, Clock, CheckCircle, TrendingUp, Users, Shield, ArrowRight, Play, X, Sparkles, Brain, Zap } from 'lucide-react';
 import { logoUrl, iconUrl } from '../../global/supabase/storageService';
 
 import ThemeTogglerTwo from '../../components/common/ThemeTogglerTwo';
@@ -154,7 +154,7 @@ export const LandingPage = () => {
             </section>
 
 
-            {/* Companies Carousel - VERSIÓN FINAL MEJORADA */}
+            {/* Companies Carousel */}
             <section className="relative py-16 overflow-hidden">
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-12">
                     <p className="text-center text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
@@ -170,7 +170,6 @@ export const LandingPage = () => {
                                 className="flex-shrink-0 flex items-center justify-center opacity-70 hover:opacity-100 hover:scale-105 transition-all duration-300"
                             >
                                 <div className="relative w-32 h-16 flex items-center justify-center">
-                                    {/* Fondo blanco sutil para logos oscuros en dark mode */}
                                     <div className="absolute inset-0 rounded-lg"></div>
                                     <img
                                         src={company.logo}
@@ -307,6 +306,79 @@ export const LandingPage = () => {
             </section>
 
 
+            <section className="relative py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-blue-50 dark:from-gray-950 dark:to-gray-900">
+                {/* Background effects */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div className="absolute top-20 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
+                </div>
+
+                <div className="container mx-auto max-w-6xl relative z-10 mb-16">
+                    {/* Header */}
+                    <div className="text-center mb-16">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 mb-6 backdrop-blur-sm">
+                            <Sparkles className="w-4 h-4" />
+                            <span className="text-sm font-semibold">Potenciado por Inteligencia Artificial</span>
+                        </div>
+
+                        <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+                            Toma decisiones más rápidas con Alex
+                        </h2>
+
+                        <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+                            Pregunta en lenguaje natural y obtén análisis instantáneos de clientes, conductores,
+                            rutas y métricas financieras. Sin consultas SQL, sin reportes manuales, sin esperas.
+                        </p>
+                    </div>
+                    {/* Video Container - Estilo iPad */}
+                    <div className="relative max-w-5xl mx-auto">
+                        {/* Device mockup */}
+                        <div className="relative rounded-[2rem] overflow-hidden shadow-2xl bg-gray-900 dark:bg-gray-950 border-8 border-gray-900 dark:border-gray-950">
+                            {/* Top bar con 3 puntos (estilo iPad/browser) */}
+                            <div className="absolute top-0 left-0 right-0 h-12 bg-gray-800/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-700 dark:border-gray-800 z-10 flex items-center px-6">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                                </div>
+                            </div>
+
+                            {/* Video propio */}
+                            <div className="relative pt-12 aspect-video bg-gray-950">
+                                <video
+                                    className="w-full h-full object-cover"
+                                    autoPlay
+                                    loop
+                                    muted
+                                    playsInline
+                                    disablePictureInPicture
+                                    controlsList="nodownload nofullscreen noremoteplayback"
+                                >
+                                    <source src="/Alex_demo.mp4" type="video/mp4" />
+                                    <source src="/alex-demo.webm" type="video/webm" />
+                                    {/* Fallback para navegadores que no soporten video */}
+                                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900/20 to-indigo-900/20 backdrop-blur-sm">
+                                        <div className="text-center">
+                                            <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center mx-auto mb-4 border border-white/20">
+                                                <Play className="w-10 h-10 text-white" />
+                                            </div>
+                                            <p className="text-white text-lg font-medium mb-2">Demo de Alex AI</p>
+                                            <p className="text-white/70 text-sm">Tu navegador no soporta video HTML5</p>
+                                        </div>
+                                    </div>
+                                </video>
+                            </div>
+                        </div>
+
+                        {/* Floating elements decorativos */}
+                        <div className="absolute -top-8 -left-8 w-24 h-24 bg-blue-500/20 rounded-2xl blur-2xl animate-pulse"></div>
+                        <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-indigo-500/20 rounded-2xl blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+                    </div>
+
+                </div>
+            </section>
+
+
             {/* CTA Final */}
             <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-blue-600 to-indigo-600">
                 <div className="container mx-auto max-w-4xl text-center">
@@ -368,67 +440,67 @@ export const LandingPage = () => {
             )}
 
             <style>{`
-                @keyframes scroll-smooth {
-                    0% {
-                        transform: translateX(0);
-                    }
-                    100% {
-                        transform: translateX(-50%);
-                    }
-                }
-                
-                .animate-scroll-smooth {
-                    animation: scroll-smooth 20s linear infinite;
-                    will-change: transform;
-                }
-                
-                .animate-scroll-smooth:hover {
-                    animation-play-state: paused;
-                }
+    @keyframes scroll-smooth {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+    
+    .animate-scroll-smooth {
+        animation: scroll-smooth 20s linear infinite;
+        will-change: transform;
+    }
+    
+    .animate-scroll-smooth:hover {
+        animation-play-state: paused;
+    }
 
-                @keyframes fadeIn {
-                    from {
-                        opacity: 0;
-                    }
-                    to {
-                        opacity: 1;
-                    }
-                }
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
 
-                @keyframes scaleIn {
-                    from {
-                        transform: scale(0.9);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: scale(1);
-                        opacity: 1;
-                    }
-                }
+    @keyframes scaleIn {
+        from {
+            transform: scale(0.9);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
 
-                .animate-fadeIn {
-                    animation: fadeIn 0.2s ease-out;
-                }
+    .animate-fadeIn {
+        animation: fadeIn 0.2s ease-out;
+    }
 
-                .animate-scaleIn {
-                    animation: scaleIn 0.3s ease-out;
-                }
+    .animate-scaleIn {
+        animation: scaleIn 0.3s ease-out;
+    }
 
-                .bg-grid-pattern {
-                    background-image: 
-                        linear-gradient(to right, currentColor 1px, transparent 1px),
-                        linear-gradient(to bottom, currentColor 1px, transparent 1px);
-                    background-size: 40px 40px;
-                }
+    .bg-grid-pattern {
+        background-image: 
+            linear-gradient(to right, currentColor 1px, transparent 1px),
+            linear-gradient(to bottom, currentColor 1px, transparent 1px);
+        background-size: 40px 40px;
+    }
 
-                .bg-grid-white {
-                    background-image: 
-                        linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
-                        linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px);
-                    background-size: 50px 50px;
-                }
-            `}</style>
+    .bg-grid-white {
+        background-image: 
+            linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+    }
+`}
+            </style >
         </div>
-
-    );
+    )
 }
