@@ -45,17 +45,17 @@ export const LandingPage = () => {
 
     // Carrusel infinito de empresas
     const companies = [
-        { name: 'Servientrega', logo: '/servientrega_logo.png' },
-        { name: 'Interrapidísimo', logo: '/interrapidisimo_logo.png' },
-        { name: 'Coordinadora', logo: 'coordinadora_logo.png' },
-        { name: 'Envía', logo: '/envia_logo.png' },
-        { name: 'TCC', logo: 'tcc_logo.png' },
-        { name: 'Deprisa', logo: '/deprisa_logo.svg' },
-        { name: 'Fedex', logo: '/Fedex-logo.png' },
-        { name: 'DHL', logo: '/DHL-logo.png' },
-        { name: 'UPS', logo: '/UPS_logo.png' },
-        { name: '99 Minutos', logo: '/99_logo.gif' },
-        { name: 'Mensajeros Urbanos', logo: '/mensajeros_logo.png' },
+        { name: 'Servientrega', logo: '/companies/servientrega_logo.png' },
+        { name: 'Interrapidísimo', logo: '/companies/interrapidisimo_logo.png' },
+        { name: 'Coordinadora', logo: '/companies/coordinadora_logo.png' },
+        { name: 'Envía', logo: '/companies/envia_logo.png' },
+        { name: 'TCC', logo: '/companies/tcc_logo.png' },
+        { name: 'Deprisa', logo: '/companies/deprisa_logo.svg' },
+        { name: 'Fedex', logo: '/companies/Fedex-logo.png' },
+        { name: 'DHL', logo: '/companies/DHL-logo.png' },
+        { name: 'UPS', logo: '/companies/UPS_logo.png' },
+        { name: '99 Minutos', logo: '/companies/99_logo.gif' },
+        { name: 'Mensajeros Urbanos', logo: '/companies/mensajeros_logo.png' },
     ];
 
     const handleNavigate = (path) => {
@@ -139,12 +139,12 @@ export const LandingPage = () => {
                     <div className="mt-16 rounded-2xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-800">
                         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800 p-8 sm:p-12">
                             <img
-                                src="/demo.png"
+                                src="/demos/demo.png"
                                 alt="Dashboard principal mostrando mapa con rutas optimizadas, lista de paquetes y métricas en tiempo real"
                                 className="w-full rounded-lg shadow-xl dark:hidden"
                             />
                             <img
-                                src="/demo_dark.png"
+                                src="/demos//demo_dark.png"
                                 alt="Dashboard principal mostrando mapa con rutas optimizadas, lista de paquetes y métricas en tiempo real"
                                 className="w-full rounded-lg shadow-xl hidden dark:block"
                             />
