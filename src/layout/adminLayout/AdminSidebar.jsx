@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 import { Bell } from "lucide-react";
 import { Ellipsis as HorizontaLDots } from "lucide-react";
 import { Sparkles, Bot } from "lucide-react";
@@ -25,7 +25,7 @@ const navItems = [
   },
   {
     icon: <Sparkles className="menu-item-icon-size fill-current" />,
-    name: "Anàlista",
+    name: "Análista",
     path: "/admin/analista",
   },
   {
@@ -114,11 +114,13 @@ const AdminSidebar = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex justify-center items-center bg-white dark:bg-gray-900 mt-14 lg:mt-5">
-        <img
-          src={isExpanded || isHovered || isMobileOpen ? IconStudyImpetus : IconResponsive}
-          alt="Logo"
-          className={`mt-5 mb-4 transition-all ${isExpanded || isHovered || isMobileOpen ? "h-16" : "h-10"}`}
-        />
+        <Link to="/">
+          <img
+            src={isExpanded || isHovered || isMobileOpen ? IconStudyImpetus : IconResponsive}
+            alt="Logo"
+            className={`mt-5 mb-4 transition-all ${isExpanded || isHovered || isMobileOpen ? "h-16" : "h-10"}`}
+          />
+        </Link>
       </div>
 
 

@@ -452,8 +452,8 @@ export const DriverMapa = ({ driverId }) => {
               positions={polylineRecorrida}
               pathOptions={{
                 color: "#1e3a8a",
-                weight: 9,
-                opacity: 0.3,
+                weight: 2,
+                opacity: 0.8,
                 lineCap: "round",
                 lineJoin: "round"
               }}
