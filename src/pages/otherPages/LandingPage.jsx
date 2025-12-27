@@ -354,8 +354,8 @@ export const LandingPage = () => {
                                     disablePictureInPicture
                                     controlsList="nodownload nofullscreen noremoteplayback"
                                 >
-                                    <source src="/Alex_demo.mp4" type="video/mp4" />
-                                    <source src="/alex-demo.webm" type="video/webm" />
+                                    <source src="/demos/Alex_demo.mp4" type="video/mp4" />
+                                    <source src="/demos/alex-demo.webm" type="video/webm" />
                                     {/* Fallback para navegadores que no soporten video */}
                                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-900/20 to-indigo-900/20 backdrop-blur-sm">
                                         <div className="text-center">
